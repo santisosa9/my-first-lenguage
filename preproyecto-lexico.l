@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "calc-sintaxis.tab.h"
+#include "preproyecto-sintaxis.tab.h"
 %}
 
 /* Opciones */
@@ -20,50 +20,37 @@ ID              {LETRA}({LETRA}|{DIGITO})*
 
 NRO             (-?[1-9][0-9]{0,4})|0
 
-TRUE            "true"
-FALSE           "false"
-
-CTE             {NRO}|{TRUE}|{FALSE}
-
-INT             "int"
-BOOL            "bool"
-VOID            "void"
 
 /* Reglas */
 
 %%
 
-{NRO}                         { printf("number: %d\n",atoi(yytext)); return NRO;}
-
-{ID}                          { printf("id: %s\n",yytext); return ID;}
-
-"+"                           { printf("%s\n",yytext); return OP_SUMA;} 
-
-"*"                           { printf("%s\n",yytext); return OP_MULTI;}  
-
-"="                           { printf("%s\n",yytext); return OP_IGUAL;}    
-
-"!"                           { printf("%s\n",yytext); return OP_NEGACION;}
 
 "||"                          { printf("%s\n",yytext); return OP_CONJUNCION;}    
 
 "&&"                          { printf("%s\n",yytext); return OP_DISYUNCION;}  
 
-"{"                           { printf("%s\n",yytext); return LLAVE_A;}
+"true"                        { printf("%s\n",yytext); return TRUE_CTE;}  
 
-"}"                           { printf("%s\n",yytext); return LLAVE_C;}
+"false"                       { printf("%s\n",yytext); return FALSE_CTE;}  
 
-"("                           { printf("%s\n",yytext); return PARENTESIS_A;}
+"int"                         { printf("%s\n",yytext); return INT;}  
 
-")"                           { printf("%s\n",yytext); return PARENTESIS_C;}
+"bool"                        { printf("%s\n",yytext); return BOOL;}  
 
-";"                           { printf("%s\n",yytext); return FIN_SENTENCIA;}
+"void"                        { printf("%s\n",yytext); return VOID;}  
 
-"main()"                      ;
+"return"                      { printf("%s\n",yytext); return RETURN;}  
+
+"main"                        { printf("%s\n",yytext); return MAIN;}  
+
+{ID}                          { printf("ID: %s\n",yytext); return ID;}
+
+{NRO}                         { printf("NRO: %d\n",atoi(yytext)); return NRO;}
 
 [+*=!{};()]                   { printf("%s\n",yytext); return *yytext;}
 
-.|\n                          ; /* ignore all the rest */
+\n                            ;
 
 %%
 
