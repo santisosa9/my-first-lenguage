@@ -1,0 +1,9 @@
+# VSCode
+.vscode/*
+.history/
+
+# Object files
+*.o
+
+# Executables
+lexer
