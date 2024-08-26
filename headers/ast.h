@@ -1,9 +1,14 @@
 #pragma once
 
-
-
-
-typedef int Tag;
+typedef enum _tag{
+    ID,
+    MAIN,
+    RET,
+    STMT,
+    ASSIGN,
+    DEC,
+    EXPR,
+} Tag;
 
 typedef enum _type
 {
@@ -16,19 +21,21 @@ typedef enum _type
 } Type;
 
 
-typedef struct info
+typedef struct _info
 {
     int value;
     Tag tag;
     Type type;
+    char* name;
+    int line;
 } Info;
 
 /* Abstract Syntax Tree */
-typedef struct node
+typedef struct _node
 {
     Info* info;
-    struct node* left;
-    struct node* right;
+    struct _node* left;
+    struct _node* right;
 } AST;
 
 
