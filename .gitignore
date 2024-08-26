@@ -1,9 +1,11 @@
 # VSCode
-.vscode/*
+.vscode/
 .history/
 
 # Object files
+*build/
 *.o
 
 # Executables
 lexer
+main
