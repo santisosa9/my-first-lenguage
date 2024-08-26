@@ -1,35 +1,43 @@
 %{
 
-#include <stdlib.h>
-#include <stdio.h>
+  #include <stdlib.h>
+  #include <stdio.h>
+
+  #include "./headers/ast.h"
 
 %}
- 
-%token NRO
-%token ID
-%token OP_CONJUNCION
-%token OP_DISYUNCION
-%token TRUE_CTE
-%token FALSE_CTE
-%token INT
-%token BOOL
-%token VOID
-%token RETURN
-%token MAIN
+
+%union {
+  struct Info* INFOP; 
+  struct AST* ASTP; 
+  char* CHARP;
+};
+
+%token T_NRO
+%token T_ID
+%token T_OP_CONJUNCION
+%token T_OP_DISYUNCION
+%token T_TRUE
+%token T_FALSE
+%token T_INT
+%token T_BOOL
+%token T_VOID
+%token T_RETURN
+%token T_MAIN
     
 %left '!'
-%left OP_CONJUNCION OP_DISYUNCION
+%left T_OP_CONJUNCION T_OP_DISYUNCION
 %left '+'  
 %left '*'
  
 %%
  
-prog: type MAIN '(' ')' '{' body '}'
+prog: type T_MAIN '(' ')' '{' body '}' { }
     ;
 
-type: INT
-    | BOOL
-    | VOID
+type: T_INT
+    | T_BOOL
+    | T_VOID
     ;
 
 body: sentence ';'
@@ -42,26 +50,26 @@ sentence: ret
         | asig
         ;
 
-dec: type ID
+dec: type T_ID
    ;
 
-expr: ID
-    | NRO               
+expr: T_ID
+    | T_NRO               
     | expr '+' expr    
     | expr '*' expr  
     | '(' expr ')'  
-    | TRUE_CTE
-    | FALSE_CTE
-    | expr OP_CONJUNCION expr
-    | expr OP_DISYUNCION expr
+    | T_TRUE
+    | T_FALSE
+    | expr T_OP_CONJUNCION expr
+    | expr T_OP_DISYUNCION expr
     | '!' expr
     ;
 
-asig: ID '=' expr
+asig: T_ID '=' expr
     ;
 
-ret: RETURN
-   | RETURN expr
+ret: T_RETURN
+   | T_RETURN expr
    ;
 
 %%

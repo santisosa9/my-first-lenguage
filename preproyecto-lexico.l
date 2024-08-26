@@ -26,27 +26,27 @@ NRO             (-?[1-9][0-9]{0,4})|0
 %%
 
 
-"||"                          { printf("%s\n",yytext); return OP_CONJUNCION;}    
+"||"                          { printf("%s\n",yytext); return T_OP_CONJUNCION;}    
 
-"&&"                          { printf("%s\n",yytext); return OP_DISYUNCION;}  
+"&&"                          { printf("%s\n",yytext); return T_OP_DISYUNCION;}  
 
-"true"                        { printf("%s\n",yytext); return TRUE_CTE;}  
+"true"                        { printf("%s\n",yytext); return T_TRUE;}  
 
-"false"                       { printf("%s\n",yytext); return FALSE_CTE;}  
+"false"                       { printf("%s\n",yytext); return T_FALSE;}  
 
-"int"                         { printf("%s\n",yytext); return INT;}  
+"int"                         { printf("%s\n",yytext); return T_INT;}  
 
-"bool"                        { printf("%s\n",yytext); return BOOL;}  
+"bool"                        { printf("%s\n",yytext); return T_BOOL;}  
 
-"void"                        { printf("%s\n",yytext); return VOID;}  
+"void"                        { printf("%s\n",yytext); return T_VOID;}  
 
-"return"                      { printf("%s\n",yytext); return RETURN;}  
+"return"                      { printf("%s\n",yytext); return T_RETURN;}  
 
-"main"                        { printf("%s\n",yytext); return MAIN;}  
+"main"                        { printf("%s\n",yytext); return T_MAIN;}  
 
-{ID}                          { printf("ID: %s\n",yytext); return ID;}
+{ID}                          { printf("ID: %s\n",yytext); return T_ID;}
 
-{NRO}                         { printf("NRO: %d\n",atoi(yytext)); return NRO;}
+{NRO}                         { printf("NRO: %d\n",atoi(yytext)); return T_NRO;}
 
 [+*=!{};()]                   { printf("%s\n",yytext); return *yytext;}
 

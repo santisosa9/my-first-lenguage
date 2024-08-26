@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ast.h"
-#include "utils.h"
+#include "../headers/ast.h"
+#include "../headers/utils.h"
 
 
 int main(int argc, char const *argv[])
