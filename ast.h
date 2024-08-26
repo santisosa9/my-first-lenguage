@@ -1,16 +1,40 @@
 #pragma once
 
+
+
+
+typedef int Tag;
+
+typedef enum _type
+{
+    INT,
+    FLOAT,
+    CHAR,
+    STRING,
+    BOOL,
+    VOID
+} Type;
+
+
+typedef struct info
+{
+    int value;
+    Tag tag;
+    Type type;
+} Info;
+
 /* Abstract Syntax Tree */
 typedef struct node
 {
-    void* info;
+    Info* info;
     struct node* left;
     struct node* right;
 } AST;
 
 
-AST* new_tree(void* info, AST* left, AST* right);
-AST* new_node(void* info);
+AST* new_tree(Info* info, AST* left, AST* right);
+AST* new_node(Info* info);
+Info* new_info(int value, Tag tag, Type type);
 void free_tree(AST* tree);
-void print_tree(AST* tree, void (*print_info)(void*));
-void print_info_as_int(void* info);
+void print_tree(AST* tree);
+void print_info(Info* info);
