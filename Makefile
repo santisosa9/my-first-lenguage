@@ -22,7 +22,7 @@ executable: $(OBJS)
 	@echo
 	@echo "\e[1;33mExecutable created:\e[0m $(EXE)"
 
-dbg:
+dbg: clean
 	@echo
 	@echo "\e[1;33mCreating executable with debug objects...\e[0m"
 	$(MAKE) CC_FLAGS="$(CC_FLAGS) -g3" executable
