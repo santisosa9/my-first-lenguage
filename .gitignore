@@ -9,3 +9,8 @@
 # Executables
 lexer
 main
+
+# Flex and Bison generated files
+lex.yy.c
+*.tab.c
+*.tab.h
