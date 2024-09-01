@@ -1,5 +1,0 @@
-#!/bin/bash
-
-flex preproyecto-lexico.l
-bison -d preproyecto-sintaxis.y
-gcc lex.yy.c preproyecto-sintaxis.tab.c -o lexer
