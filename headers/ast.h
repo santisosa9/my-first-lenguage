@@ -5,9 +5,16 @@ typedef enum _tag{
     MAIN,
     RET,
     STMT,
-    ASSIGN,
+    ASIG,
+    TYPE,
+    COMMA,
     DEC,
-    EXPR,
+    NOT,
+    OR,
+    AND,
+    ADD,
+    MUL,
+    VALUE,
 } Tag;
 
 typedef enum _type
@@ -17,17 +24,20 @@ typedef enum _type
     CHAR,
     STRING,
     BOOL,
-    VOID
+    VOID,
+    NO_TYPED,
+    ANY
 } Type;
 
 
 typedef struct _info
 {
-    int value;
     Tag tag;
     Type type;
+    int value;
     char* name;
     int line;
+    int col;
 } Info;
 
 /* Abstract Syntax Tree */
@@ -38,10 +48,29 @@ typedef struct _node
     struct _node* right;
 } AST;
 
+/* Create a new node using info, and set its childs */
+AST* build_root(AST* left, Info* root_info, AST* right);
 
-AST* new_tree(Info* info, AST* left, AST* right);
+/* Create a new node using info */
 AST* new_node(Info* info);
-Info* new_info(int value, Tag tag, Type type);
+
+/* Join left and right trees to root */
+AST* join_trees(AST* left, AST* root, AST* right);
+
+/* Create a new info */
+Info* new_info(Tag tag, Type type, int value, char* name, int line, int col);
+
+/* Free the tree */
 void free_tree(AST* tree);
+
+/* Print the tree */
 void print_tree(AST* tree);
+
+/* Print the info */
 void print_info(Info* info);
+
+char* tag_to_str(Tag tag);
+
+char* type_to_str(Type type);
+
+char* value_to_str(int value, Type type);

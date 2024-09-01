@@ -19,3 +19,16 @@ char* repeat_str(char* str, int times){
     }
     return result;
 }
+
+char* itos(int n){
+    char* result = (char*)malloc(sizeof(char) * 12);
+    sprintf(result, "%d", n);
+    return result;
+}
+
+char *strdup(const char *src) {
+    char *dst = malloc(strlen (src) + 1);  // Space for length plus null
+    if (dst == NULL) return NULL;          // No memory
+    strcpy(dst, src);                      // Copy the characters
+    return dst;                            // Return the new string
+}
