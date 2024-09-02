@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum _tag{
+typedef enum Tag{
     ID,
     MAIN,
     RET,
@@ -17,7 +17,7 @@ typedef enum _tag{
     VALUE,
 } Tag;
 
-typedef enum _type
+typedef enum Type
 {
     INT,
     FLOAT,
@@ -30,7 +30,7 @@ typedef enum _type
 } Type;
 
 
-typedef struct _info
+typedef struct Info
 {
     Tag tag;
     Type type;
@@ -41,11 +41,11 @@ typedef struct _info
 } Info;
 
 /* Abstract Syntax Tree */
-typedef struct _node
+typedef struct AST
 {
     Info* info;
-    struct _node* left;
-    struct _node* right;
+    struct AST* left;
+    struct AST* right;
 } AST;
 
 /* Create a new node using info, and set its childs */
