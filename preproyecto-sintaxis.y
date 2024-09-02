@@ -83,8 +83,8 @@ expr: expr T_ADD expr                   { $$ = build_root($1, $2, $3); }
 asig: T_ID T_ASIG expr                  { $$ = join_trees(new_node($1), new_node($2), $3); }
     ;
 
-  ret: T_RET                            { $$ = new_node($1); }
-     | T_RET expr                       { $$ = build_root(NULL, $1, $2); }
-     ;
+ret: T_RET                              { $$ = new_node($1); }
+   | T_RET expr                         { $$ = build_root(NULL, $1, $2); }
+   ;
 
 %%
