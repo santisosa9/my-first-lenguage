@@ -6,7 +6,7 @@
 #include "../headers/utils.h"
 
 void _print_tree(AST* tree, int level);
-void _pretty_print_tree(AST* tree, int level, char* prefix, bool rigth_was_last);
+void _pretty_print_tree(AST* tree, int level, char* prefix, char* connection, bool rigth_was_last);
 
 
 AST* build_root(AST* left, Info* root_info, AST* right){
@@ -56,11 +56,13 @@ void print_tree(AST* tree){
     if (tree == NULL) return;
     puts("_print_tree");
     _print_tree(tree, 0);
-    // char* prefix = malloc(sizeof(char));
-    // prefix[0] = '\0';
-    // puts("\n_pretty_print_tree");
-    // _pretty_print_tree(tree, 0, prefix, tree->left == NULL);
-    // free(prefix);
+    char* prefix = malloc(sizeof(char));
+    prefix[0] = '\0';
+    char* connection = malloc(sizeof(char));
+    connection[0] = '\0';
+    puts("\n_pretty_print_tree");
+    _pretty_print_tree(tree, 0, prefix, connection, true);
+    free(prefix);
 }
 
 void _print_tree(AST* tree, int level){
@@ -68,39 +70,51 @@ void _print_tree(AST* tree, int level){
     printf("%s%i", repeat_str("   ", level), level);
     fflush(stdout);
     print_info(tree->info);
-    _print_tree(tree->right, level+1);
     _print_tree(tree->left, level+1);
+    _print_tree(tree->right, level+1);
 }
 
-void _pretty_print_tree(AST* tree, int level, char* prefix, bool right_was_last){
-    if(tree == NULL) return;
+void _pretty_print_tree(AST* tree, int level, char* prefix, char* conection, bool father_is_last){
+    if (tree == NULL) return;
 
-    /* Print root */
-    printf("%s", prefix);
+    char* child_prefix = malloc(sizeof(char) * (strlen(prefix) + 12));
+    char* left_child_connection = malloc(sizeof(char) * 12);
+    char* right_child_connection = malloc(sizeof(char) * 12);
+
+    /* print info */
+    printf("%s%s%i",prefix, conection, level);
     print_info(tree->info);
 
+    /* set prefix for children */
+    if (level >= 1) {
+        // need prefix
+        if (father_is_last)
+            sprintf(child_prefix, "%s%s", prefix, "    ");
+        else
+            sprintf(child_prefix, "%s%s", prefix, "│   ");
+    }
 
-    if (level > 0) {
-        if (right_was_last) {
-            prefix = strcat(prefix, "│   ");
+    /* set connection for children */
+    if (tree->left != NULL) {
+        if (tree->right != NULL){
+            // left child has a sibling
+            sprintf(left_child_connection, "├── ");
         } else {
-            prefix = strcat(prefix, "    ");
+            // left child is alone (is the last)
+            sprintf(left_child_connection, "└── ");
         }
     }
 
-    char* left_prefix = (char*)malloc(sizeof(char)*strlen(prefix));
-    strcpy(left_prefix, prefix);
+    if (tree->right != NULL) {
+        // right child is (always) the last
+        sprintf(right_child_connection, "└── ");
+    }
 
-    /* Print rigth child */
-    if (tree->left == NULL) strcat(prefix, "└─ "); // the right child is the last child
-    else strcat(prefix, "├─ ");
-
-    _pretty_print_tree(tree->right, level+1, prefix, tree->left == NULL);
-
-    /* Print left child */
-
-    _pretty_print_tree(tree->left, level+1, strcat(left_prefix, "└─ "), false);
+    /* print children */
+    _pretty_print_tree(tree->left, level+1, child_prefix, left_child_connection, tree->right == NULL);
+    _pretty_print_tree(tree->right, level+1, child_prefix, right_child_connection, true);
 }
+// "├── " "└── " "│   " "    "
 
 
 void print_info(Info* info){
