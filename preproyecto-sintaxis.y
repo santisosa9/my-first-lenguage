@@ -5,6 +5,8 @@
 
     #include "headers/ast.h"
     #include "headers/utils.h"
+    AST* global_tree = NULL;
+
 %}
 
 %union {
@@ -47,7 +49,7 @@
 
 %%
 
-prog: type T_MAIN '(' ')' '{' body '}'  { Info* i = $2; i->type = $1; AST* tree = build_root(NULL, $2, $6); print_tree(tree); }
+prog: type T_MAIN '(' ')' '{' body '}'  { Info* i = $2; i->type = $1; AST* tree = build_root(NULL, $2, $6); print_tree(tree); global_tree = tree; }
     ;
 
 type: T_INT                             { $$ = INT; }
@@ -88,3 +90,8 @@ ret: T_RET                              { $$ = new_node($1); }
    ;
 
 %%
+
+
+AST* get_parsed_tree() {
+    return global_tree;
+}

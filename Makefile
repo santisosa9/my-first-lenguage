@@ -5,7 +5,7 @@ W_FLAGS = -Wall -Wextra -Werror -Wpedantic
 HEADERS_F = headers
 SRC_F = src
 BUILD_F = build
-OBJS = $(BUILD_F)/main.o $(BUILD_F)/ast.o $(BUILD_F)/utils.o
+OBJS = $(BUILD_F)/main.o $(BUILD_F)/ast.o $(BUILD_F)/utils.o $(BUILD_F)/symbol_table.o
 EXE = ./main
 
 # TIP: Take a look to usefull phony rules at the end of this file!
@@ -40,6 +40,12 @@ $(BUILD_F)/ast.o: $(SRC_F)/ast.c $(HEADERS_F)/ast.h
 	@echo "\e[1;33mCompiling ast.o...\e[0m"
 	@mkdir -p $(BUILD_F)
 	$(CC) $(CC_FLAGS) -c $(SRC_F)/ast.c -o $(BUILD_F)/ast.o
+
+$(BUILD_F)/symbol_table.o: $(SRC_F)/symbol_table.c $(HEADERS_F)/symbol_table.h
+	@echo
+	@echo "\e[1;33mCompiling symbol_table.o...\e[0m"
+	@mkdir -p $(BUILD_F)
+	$(CC) $(CC_FLAGS) -c $(SRC_F)/symbol_table.c -o $(BUILD_F)/symbol_table.o
 
 $(BUILD_F)/utils.o: $(SRC_F)/utils.c $(HEADERS_F)/utils.h
 	@echo

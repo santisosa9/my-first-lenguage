@@ -38,31 +38,44 @@ Info* new_info(Tag tag, Type type, int value, char* name, int line, int col){
     return info;
 }
 
+Info* copy_info(Info* dest, Info* src){
+    if(dest == NULL || src == NULL) return NULL;
+
+    dest->tag = src->tag;
+    dest->type = src->type;
+    dest->value = src->value;
+    dest->name = src->name;
+    dest->line = src->line;
+    dest->col = src->col;
+
+    return dest;
+}
+
+
 void free_tree(AST* tree){
-    if(tree == NULL) {
-        // puts("free_tree: tree is NULL");
-        return;
-    }
-    // printf("free_tree: tree->info->name: %s\n", tree->info->name);
-    // printf("free_tree: tree->left : %s\n", tree->left == NULL ? "NULL" : tree->left->info->name);
-    // printf("free_tree: tree->right: %s\n", tree->left == NULL ? "NULL" : tree->right->info->name);
+    if(tree == NULL) return;
+
     free_tree(tree->left);
     free_tree(tree->right);
-    free(tree->info);
     free(tree);
 }
 
 void print_tree(AST* tree){
     if (tree == NULL) return;
-    puts("_print_tree");
-    _print_tree(tree, 0);
+
+    // puts("_print_tree");
+    // _print_tree(tree, 0);
+
     char* prefix = malloc(sizeof(char));
-    prefix[0] = '\0';
     char* connection = malloc(sizeof(char));
+    prefix[0] = '\0';
     connection[0] = '\0';
-    puts("\n_pretty_print_tree");
+
+    // puts("\n_pretty_print_tree");
     _pretty_print_tree(tree, 0, prefix, connection, true);
+
     free(prefix);
+    free(connection);
 }
 
 void _print_tree(AST* tree, int level){
@@ -113,11 +126,19 @@ void _pretty_print_tree(AST* tree, int level, char* prefix, char* conection, boo
     /* print children */
     _pretty_print_tree(tree->left, level+1, child_prefix, left_child_connection, tree->right == NULL);
     _pretty_print_tree(tree->right, level+1, child_prefix, right_child_connection, true);
+
+    free(child_prefix);
+    free(left_child_connection);
+    free(right_child_connection);
 }
 // "├── " "└── " "│   " "    "
 
 
 void print_info(Info* info){
+    if(info == NULL) {
+        puts("print_info: info is NULL");
+        return;
+    }
     printf("{");
     printf("Tag: %s, ", tag_to_str(info->tag));
     printf("Type: %s, ", type_to_str(info->type));
