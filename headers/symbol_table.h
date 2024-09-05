@@ -33,7 +33,9 @@ SymbolTableNode* erase(SymbolTable* table, char* name);
 SymbolTableNode* search(SymbolTable* table, char* name);
 
 /* Update the fields of an info inside the table searched by it name. */
-bool update(SymbolTable* table, Info* info);
+// bool update(SymbolTable* table, Info* info);
+
+bool update(SymbolTable* table, char* name, int value);
 
 /* Print the table. */
 void print_table(SymbolTable* table);
@@ -42,3 +44,7 @@ void print_table(SymbolTable* table);
    NOTE: Free the Info data.
 */
 void free_table(SymbolTable* table);
+
+void fill_table(AST* tree, SymbolTable* table);
+
+int evaluate_expression(AST* expr, SymbolTable* table);

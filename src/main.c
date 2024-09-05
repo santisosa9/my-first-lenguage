@@ -27,7 +27,7 @@ int main(int argc, char const *argv[])
 
     AST* tree = a;
 
-    print_tree(tree);
+    // print_tree(tree);
 
     SymbolTable* table = new_symbol_table();
     insert(table, a_info);
@@ -53,7 +53,8 @@ int main(int argc, char const *argv[])
     print_info(b_info);
     print_info(new_b_info);
     puts("update b");
-    update(table, new_b_info);
+    update(table, new_b_info->name, new_b_info->value);
+    // update(table, new_b_info);
     print_info(b_info);
     print_info(search(table, "b")->info);
     free_table(table);

@@ -83,3 +83,5 @@ char* type_to_str(Type type);
 
 /* Converts a value to its corresponding string representation. */
 char* value_to_str(int value, Type type);
+
+void update_value(Info* dest, int value);

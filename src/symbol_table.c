@@ -58,14 +58,14 @@ SymbolTableNode* search(SymbolTable* table, char* name){
     return NULL;
 }
 
-bool update(SymbolTable* table, Info* info){
+bool update(SymbolTable* table, char* name, int value){
     if(table == NULL) return false;
 
-    SymbolTableNode* target = search(table, info->name);
+    SymbolTableNode* target = search(table, name);
 
     if(target == NULL) return false;
 
-    copy_info(target->info, info);
+    update_value(target->info, value);
 
     return true;
 }
@@ -99,6 +99,7 @@ void print_table(SymbolTable* table){
 
     SymbolTableNode* current = table->head;
 
+    printf("Table: \n");
     while (current != NULL) {
         print_info(current->info);
         current = current->next;
@@ -119,5 +120,95 @@ void free_table(SymbolTable* table){
     }
 
     free(table);
+}
+
+void fill_table(AST* tree, SymbolTable* table) {
+    if (tree == NULL) {
+        return;
+    }
+
+    SymbolTableNode* existing;
+    Tag currentTag = tree->info->tag;
+
+    switch (currentTag) {
+      case ID: 
+          existing = search(table, tree->info->name);
+          if (existing == NULL) {
+              if (tree->info->type != ANY) { 
+                  insert(table, tree->info);
+                  printf("Declaracion exitosa de '%s' en línea %d.\n", tree->info->name, tree->info->line);
+              } else {
+                  printf("Error: Variable '%s' no declarada en línea %d.\n", tree->info->name, tree->info->line);
+                  return;
+              }
+          } else {
+              if (tree->info->type != ANY) {
+                  printf("Error: Redeclaración de la variable '%s' en línea %d.\n", tree->info->name, tree->info->line);
+                  return;
+              }
+          }
+          break;
+
+      case ASIG:
+          existing = search(table, tree->left->info->name);
+          if (existing == NULL) {
+              printf("Error: Asignación a variable '%s' no declarada en línea %d.\n", tree->info->name, tree->info->line);
+              return;
+          } else {
+              int result = evaluate_expression(tree->right, table);
+              
+              update(table, existing->info->name, result);
+
+              printf("Asignación exitosa a '%s' con valor %d en línea %d.\n", existing->info->name, result, tree->info->line);
+          }
+          break;
+
+      default:
+          break;
+    }
+
+    fill_table(tree->left, table);
+    fill_table(tree->right, table);
+}
+
+int evaluate_expression(AST* expr, SymbolTable* table) {
+    if (expr == NULL) {
+        return -1; 
+    }
+
+    Tag tag = expr->info->tag;
+
+    switch (tag) {
+        case VALUE: 
+            return expr->info->value;
+
+        case ID: { 
+            SymbolTableNode* var = search(table, expr->info->name);
+            if (var == NULL) {
+                printf("Error: Variable '%s' no declarada en línea %d.\n", expr->info->name, expr->info->line);
+                return 0;
+            }
+            return var->info->value; 
+        }
+
+        case ADD: 
+            return evaluate_expression(expr->left, table) + evaluate_expression(expr->right, table);
+
+        case MUL: 
+            return evaluate_expression(expr->left, table) * evaluate_expression(expr->right, table);
+
+        case OR: 
+            return evaluate_expression(expr->left, table) || evaluate_expression(expr->right, table);
+
+        case AND: 
+            return evaluate_expression(expr->left, table) && evaluate_expression(expr->right, table);
+
+        case NOT: 
+            return !evaluate_expression(expr->left, table);
+
+        default:
+            printf("Error: Expresión no reconocida en línea %d.\n", expr->info->line);
+            return 0;
+    }
 }
 

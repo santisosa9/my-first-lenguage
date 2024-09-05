@@ -189,3 +189,7 @@ char* value_to_str(int value, Type type){
         default:    return itos(value);
     }
 }
+
+void update_value(Info* dest, int value) {
+    if(dest != NULL) dest->value = value;
+}
