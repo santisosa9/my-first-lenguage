@@ -61,14 +61,14 @@ SymbolTableNode* search(SymbolTable* table, char* name){
     return NULL;
 }
 
-bool update(SymbolTable* table, char* name, int value){
+bool update(SymbolTable* table, Info* info){
     if(table == NULL) return false;
 
-    SymbolTableNode* target = search(table, name);
+    SymbolTableNode* target = search(table, info->name);
 
     if(target == NULL) return false;
 
-    update_value(target->info, value);
+    copy_info(target->info, info);
 
     return true;
 }
@@ -158,11 +158,11 @@ void fill_table(AST* tree, SymbolTable* table) {
               printf("Error: Asignación a variable '%s' no declarada en línea %d.\n", tree->info->name, tree->info->line);
               return;
           } else {
-              int result = evaluate_expression(tree->right, table);
-              
-              update(table, existing->info->name, result);
-
-              printf("Asignación exitosa a '%s' con valor %d en línea %d.\n", existing->info->name, result, tree->info->line);
+                Info* updatedInfo = existing->info;
+                int result = evaluate_expression(tree->right, table);
+                update_value(updatedInfo, result);
+                update(table, updatedInfo);
+                printf("Asignación exitosa a '%s' con valor %d en línea %d.\n", existing->info->name, result, tree->info->line);
           }
           break;
 
@@ -244,7 +244,7 @@ bool checkTypes (Info* left, Info* right, SymbolTable* table) {
   if (left->type == right->type) {
     return true;
   } else {
-    printf("Error: Operacion inválida para los tipos %s, %s en la linea %d.\n", type_to_str(left->type), type_to_str(right->type));
+    printf("Error: Operacion inválida para los tipos %s, %s.\n", type_to_str(left->type), type_to_str(right->type));
     return false;
   }
 }

@@ -3,6 +3,5 @@ int main(){
   bool y; 
   x = 1 ;
   y = true;
-  y = y + x; 
   return x;
 }

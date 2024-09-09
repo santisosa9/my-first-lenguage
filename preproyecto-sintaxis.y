@@ -57,7 +57,9 @@ prog: type T_MAIN '(' ')' '{' body '}'  { Info* i = $2;
                                           global_tree = tree; 
                                           global_table = new_symbol_table(); 
                                           fill_table(global_tree, global_table); 
-                                          print_table(global_table); }
+                                          print_table(global_table); 
+                                          print_tree(tree);
+                                        }
     ;
 
 type: T_INT                             { $$ = INT; }
