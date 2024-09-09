@@ -1,1 +1,11 @@
-int main(){int x; int y; x = 1 ; y = 1 ; x = x+3*2*y; return x; y = 4; x = 2; return y*2;}
+int main(){
+  int x; 
+  bool y; 
+  x = 1 ; 
+  y = true ; 
+  x = x+3*2*y; 
+  return x; 
+  x = 2; 
+  y = 0;
+  y || x;
+}

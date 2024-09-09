@@ -6,6 +6,9 @@
 #include "../headers/symbol_table.h"
 #include "../headers/utils.h"
 
+bool checkTypes (Info* left, Info* right, SymbolTable* table);
+Info* getTableInfo(Info* info, SymbolTable* table);
+
 SymbolTable* new_symbol_table(){
     SymbolTable* table = (SymbolTable*)malloc(sizeof(SymbolTable));
     table->size = 0;
@@ -177,6 +180,7 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
     }
 
     Tag tag = expr->info->tag;
+    bool sameType;
 
     switch (tag) {
         case VALUE: 
@@ -188,11 +192,16 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
                 printf("Error: Variable '%s' no declarada en línea %d.\n", expr->info->name, expr->info->line);
                 return 0;
             }
-            return var->info->value; 
+            return var->info->value;
         }
 
         case ADD: 
-            return evaluate_expression(expr->left, table) + evaluate_expression(expr->right, table);
+            sameType = checkTypes(expr->left->info, expr->right->info, table);
+            if (sameType) {
+                return evaluate_expression(expr->left, table) + evaluate_expression(expr->right, table);
+            } else {
+                exit(2);
+            }
 
         case MUL: 
             return evaluate_expression(expr->left, table) * evaluate_expression(expr->right, table);
@@ -212,3 +221,30 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
     }
 }
 
+Info* getTableInfo(Info* info, SymbolTable* table) {
+    SymbolTableNode* node = NULL;
+
+    if (info->tag == ID) {
+        node = search(table, info->name);
+        if (node == NULL) {
+            printf("Error: Variable %s no declarada.\n", info->name);
+            return false;
+        }
+        info = node->info;
+    }
+
+    return info;
+}
+
+bool checkTypes (Info* left, Info* right, SymbolTable* table) {
+
+  left = getTableInfo(left, table);
+  right = getTableInfo(right, table);
+
+  if (left->type == right->type) {
+    return true;
+  } else {
+    printf("Error: Operacion inválida para los tipos %s, %s en la linea %d.\n", type_to_str(left->type), type_to_str(right->type));
+    return false;
+  }
+}
