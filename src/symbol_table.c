@@ -7,7 +7,6 @@
 #include "../headers/utils.h"
 
 bool checkTypes (Info* left, Info* right, SymbolTable* table);
-Info* getTableInfo(Info* info, SymbolTable* table);
 
 SymbolTable* new_symbol_table(){
     SymbolTable* table = (SymbolTable*)malloc(sizeof(SymbolTable));
@@ -61,7 +60,7 @@ SymbolTableNode* search(SymbolTable* table, char* name){
     return NULL;
 }
 
-bool update(SymbolTable* table, Info* info){
+bool update(SymbolTable* table, AST* tree, Info* info){
     if(table == NULL) return false;
 
     SymbolTableNode* target = search(table, info->name);
@@ -69,6 +68,7 @@ bool update(SymbolTable* table, Info* info){
     if(target == NULL) return false;
 
     copy_info(target->info, info);
+    tree->info = target->info;
 
     return true;
 }
@@ -134,21 +134,14 @@ void fill_table(AST* tree, SymbolTable* table) {
     Tag currentTag = tree->info->tag;
 
     switch (currentTag) {
-      case ID: 
+      case DEC: 
           existing = search(table, tree->info->name);
           if (existing == NULL) {
-              if (tree->info->type != ANY) { 
-                  insert(table, tree->info);
-                  printf("Declaracion exitosa de '%s' en línea %d.\n", tree->info->name, tree->info->line);
-              } else {
-                  printf("Error: Variable '%s' no declarada en línea %d.\n", tree->info->name, tree->info->line);
-                  return;
-              }
+              insert(table, tree->info);
+              printf("Declaracion exitosa de '%s' en línea %d.\n", tree->info->name, tree->info->line);
           } else {
-              if (tree->info->type != ANY) {
-                  printf("Error: Redeclaración de la variable '%s' en línea %d.\n", tree->info->name, tree->info->line);
-                  return;
-              }
+              printf("Error: Redeclaración de la variable '%s' en línea %d.\n", tree->info->name, tree->info->line);
+              return;
           }
           break;
 
@@ -161,7 +154,7 @@ void fill_table(AST* tree, SymbolTable* table) {
                 Info* updatedInfo = existing->info;
                 int result = evaluate_expression(tree->right, table);
                 update_value(updatedInfo, result);
-                update(table, updatedInfo);
+                update(table, tree->left, updatedInfo);
                 printf("Asignación exitosa a '%s' con valor %d en línea %d.\n", existing->info->name, result, tree->info->line);
           }
           break;
@@ -169,7 +162,7 @@ void fill_table(AST* tree, SymbolTable* table) {
       default:
           break;
     }
-
+    
     fill_table(tree->left, table);
     fill_table(tree->right, table);
 }
@@ -221,26 +214,7 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
     }
 }
 
-Info* getTableInfo(Info* info, SymbolTable* table) {
-    SymbolTableNode* node = NULL;
-
-    if (info->tag == ID) {
-        node = search(table, info->name);
-        if (node == NULL) {
-            printf("Error: Variable %s no declarada.\n", info->name);
-            return false;
-        }
-        info = node->info;
-    }
-
-    return info;
-}
-
 bool checkTypes (Info* left, Info* right, SymbolTable* table) {
-
-  left = getTableInfo(left, table);
-  right = getTableInfo(right, table);
-
   if (left->type == right->type) {
     return true;
   } else {

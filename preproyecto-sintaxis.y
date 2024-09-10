@@ -77,7 +77,7 @@ sentence: ret                           { $$ = $1; }
         | asig                          { $$ = $1; }
         ;
 
-dec: type T_ID                          { AST* node = new_node($2); node->info->type = $1; $$ = node; }
+dec: type T_ID                          { AST* node = new_node($2); node->info->type = $1; node->info->tag = DEC; $$ = node; }
    ;
 
 expr: expr T_ADD expr                   { $$ = build_root($1, $2, $3); }

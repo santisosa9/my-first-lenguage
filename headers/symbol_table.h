@@ -35,7 +35,7 @@ SymbolTableNode* search(SymbolTable* table, char* name);
 /* Update the fields of an info inside the table searched by it name. */
 // bool update(SymbolTable* table, Info* info);
 
-bool update(SymbolTable* table, Info* info);
+bool update(SymbolTable* table, AST* tree, Info* info);
 
 /* Print the table. */
 void print_table(SymbolTable* table);
