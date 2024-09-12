@@ -9,12 +9,13 @@ void _print_tree(AST* tree, int level);
 void _pretty_print_tree(AST* tree, int level, char* prefix, char* connection, bool rigth_was_last);
 
 
-AST* build_root(AST* left, Info* root_info, AST* right){
-    return join_trees(left, new_node(root_info), right);
+AST* build_root(AST* left, Info* root_info, Tag tag, AST* right){
+    return join_trees(left, new_node(root_info, tag), right);
 }
 
-AST* new_node(Info* info){
+AST* new_node(Info* info, Tag tag){
     AST* root = (AST*)malloc(sizeof(AST));
+    root->tag = tag;
     root->info = info;
     root->left = NULL;
     root->right = NULL;
@@ -27,9 +28,8 @@ AST* join_trees(AST* left, AST* root, AST* right){
     return root;
 }
 
-Info* new_info(Tag tag, Type type, int value, char* name, int line, int col){
+Info* new_info(Type type, int value, char* name, int line, int col){
     Info* info = (Info*)malloc(sizeof(Info));
-    info->tag = tag;
     info->type = type;
     info->value = value;
     info->name = name;
@@ -41,7 +41,6 @@ Info* new_info(Tag tag, Type type, int value, char* name, int line, int col){
 Info* copy_info(Info* dest, Info* src){
     if(dest == NULL || src == NULL) return NULL;
 
-    dest->tag = src->tag;
     dest->type = src->type;
     dest->value = src->value;
     dest->name = src->name;
@@ -95,8 +94,8 @@ void _pretty_print_tree(AST* tree, int level, char* prefix, char* conection, boo
     char* right_child_connection = malloc(sizeof(char) * 12);
 
     /* print info */
-    printf("%s%s%i",prefix, conection, level);
-    print_info(tree->info);
+    printf("%s%s%i ",prefix, conection, level);
+    print_node(tree);
 
     /* set prefix for children */
     if (level >= 1) {
@@ -140,7 +139,6 @@ void print_info(Info* info){
         return;
     }
     printf("{");
-    printf("Tag: %s, ", tag_to_str(info->tag));
     printf("Type: %s, ", type_to_str(info->type));
     printf("Value: %s, ", value_to_str(info->value, info->type));
     printf("Name: %s, ", info->name);
@@ -148,6 +146,10 @@ void print_info(Info* info){
     printf("}\n");
 }
 
+void print_node(AST* node) {
+    printf("Tag: %s, ", tag_to_str(node->tag));
+    print_info(node->info);
+}
 
 char* tag_to_str(Tag tag){
     switch (tag){

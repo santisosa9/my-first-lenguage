@@ -32,7 +32,6 @@ typedef enum Type
 
 typedef struct Info
 {
-    Tag tag;
     Type type;
     int value;
     char* name;
@@ -43,22 +42,23 @@ typedef struct Info
 /* Abstract Syntax Tree */
 typedef struct AST
 {
+    Tag tag;
     Info* info;
     struct AST* left;
     struct AST* right;
 } AST;
 
 /* Create a new node using info, and set its childs. */
-AST* build_root(AST* left, Info* root_info, AST* right);
+AST* build_root(AST* left, Info* root_info, Tag tag, AST* right);
 
 /* Create a new node using info. */
-AST* new_node(Info* info);
+AST* new_node(Info* info, Tag tag);
 
 /* Join left and right trees to root. */
 AST* join_trees(AST* left, AST* root, AST* right);
 
 /* Create a new info. */
-Info* new_info(Tag tag, Type type, int value, char* name, int line, int col);
+Info* new_info(Type type, int value, char* name, int line, int col);
 
 /* Free the tree.
    NOTE: do NOT free the Info data.
@@ -70,6 +70,8 @@ void print_tree(AST* tree);
 
 /* Print the info. */
 void print_info(Info* info);
+
+void print_node(AST* node);
 
 /* Copy the info. */
 Info* copy_info(Info* dest, Info* src);

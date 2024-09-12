@@ -131,7 +131,7 @@ void fill_table(AST* tree, SymbolTable* table) {
     }
 
     SymbolTableNode* existing;
-    Tag currentTag = tree->info->tag;
+    Tag currentTag = tree->tag;
 
     switch (currentTag) {
       case DEC: 
@@ -172,7 +172,7 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
         return -1; 
     }
 
-    Tag tag = expr->info->tag;
+    Tag tag = expr->tag;
     bool sameType;
 
     switch (tag) {

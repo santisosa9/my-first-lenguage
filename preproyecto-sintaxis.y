@@ -52,7 +52,7 @@
 
 prog: type T_MAIN '(' ')' '{' body '}'  { Info* i = $2; 
                                           i->type = $1; 
-                                          AST* tree = build_root(NULL, $2, $6); 
+                                          AST* tree = build_root(NULL, $2, MAIN, $6); 
                                           print_tree(tree); 
                                           global_tree = tree; 
                                           global_table = new_symbol_table(); 
@@ -68,7 +68,7 @@ type: T_INT                             { $$ = INT; }
     ;
 
 body: sentence T_COMMA                  { $$ = $1; }
-    | sentence T_COMMA body             { $$ = build_root($1, $2, $3); }
+    | sentence T_COMMA body             { $$ = build_root($1, $2, COMMA, $3); }
     ;
 
 sentence: ret                           { $$ = $1; }
@@ -77,26 +77,26 @@ sentence: ret                           { $$ = $1; }
         | asig                          { $$ = $1; }
         ;
 
-dec: type T_ID                          { AST* node = new_node($2); node->info->type = $1; node->info->tag = DEC; $$ = node; }
+dec: type T_ID                          { AST* node = new_node($2, DEC); node->info->type = $1; $$ = node; }
    ;
 
-expr: expr T_ADD expr                   { $$ = build_root($1, $2, $3); }
-    | expr T_MUL expr                   { $$ = build_root($1, $2, $3); }
-    | expr T_AND expr                   { $$ = build_root($1, $2, $3); }
-    | expr T_OR  expr                   { $$ = build_root($1, $2, $3); }
-    | T_NOT expr                        { $$ = build_root(NULL, $1, $2); }
+expr: expr T_ADD expr                   { $$ = build_root($1, $2, ADD, $3); }
+    | expr T_MUL expr                   { $$ = build_root($1, $2, MUL, $3); }
+    | expr T_AND expr                   { $$ = build_root($1, $2, AND, $3); }
+    | expr T_OR  expr                   { $$ = build_root($1, $2, OR, $3); }
+    | T_NOT expr                        { $$ = build_root(NULL, $1, NOT, $2); }
     | '(' expr ')'                      { $$ = $2; }
-    | T_ID                              { $$ = new_node($1); }
-    | T_NRO                             { $$ = new_node($1); }
-    | T_TRUE                            { $$ = new_node($1); }
-    | T_FALSE                           { $$ = new_node($1); }
+    | T_ID                              { $$ = new_node($1, ID); }
+    | T_NRO                             { $$ = new_node($1, VALUE); }
+    | T_TRUE                            { $$ = new_node($1, VALUE); }
+    | T_FALSE                           { $$ = new_node($1, VALUE); }
     ;
 
-asig: T_ID T_ASIG expr                  { $$ = join_trees(new_node($1), new_node($2), $3); }
+asig: T_ID T_ASIG expr                  { $$ = join_trees(new_node($1, ID), new_node($2, ASIG), $3); }
     ;
 
-ret: T_RET                              { $$ = new_node($1); }
-   | T_RET expr                         { $$ = build_root(NULL, $1, $2); }
+ret: T_RET                              { $$ = new_node($1, RET); }
+   | T_RET expr                         { $$ = build_root(NULL, $1, RET, $2); }
    ;
 
 %%
