@@ -62,6 +62,7 @@ SymbolTableNode* search(SymbolTable* table, char* name){
 
 bool update(SymbolTable* table, AST* tree, Info* info){
     if(table == NULL) return false;
+    if (tree == NULL) return false;
 
     SymbolTableNode* target = search(table, info->name);
 
@@ -134,7 +135,7 @@ void fill_table(AST* tree, SymbolTable* table) {
     Tag currentTag = tree->tag;
 
     switch (currentTag) {
-      case DEC: 
+      case DEC:
           existing = search(table, tree->info->name);
           if (existing == NULL) {
               insert(table, tree->info);
@@ -162,24 +163,24 @@ void fill_table(AST* tree, SymbolTable* table) {
       default:
           break;
     }
-    
+
     fill_table(tree->left, table);
     fill_table(tree->right, table);
 }
 
 int evaluate_expression(AST* expr, SymbolTable* table) {
     if (expr == NULL) {
-        return -1; 
+        return -1;
     }
 
     Tag tag = expr->tag;
     bool sameType;
 
     switch (tag) {
-        case VALUE: 
+        case VALUE:
             return expr->info->value;
 
-        case ID: { 
+        case ID: {
             SymbolTableNode* var = search(table, expr->info->name);
             if (var == NULL) {
                 printf("Error: Variable '%s' no declarada en línea %d.\n", expr->info->name, expr->info->line);
@@ -188,7 +189,7 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
             return var->info->value;
         }
 
-        case ADD: 
+        case ADD:
             sameType = checkTypes(expr->left->info, expr->right->info, table);
             if (sameType) {
                 return evaluate_expression(expr->left, table) + evaluate_expression(expr->right, table);
@@ -196,16 +197,16 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
                 exit(2);
             }
 
-        case MUL: 
+        case MUL:
             return evaluate_expression(expr->left, table) * evaluate_expression(expr->right, table);
 
-        case OR: 
+        case OR:
             return evaluate_expression(expr->left, table) || evaluate_expression(expr->right, table);
 
-        case AND: 
+        case AND:
             return evaluate_expression(expr->left, table) && evaluate_expression(expr->right, table);
 
-        case NOT: 
+        case NOT:
             return !evaluate_expression(expr->left, table);
 
         default:

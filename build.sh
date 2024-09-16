@@ -57,7 +57,7 @@ done
 
 [[ "${RUN[*]}" == *"gcc"* || "${RUN[*]}" == *"all"* ]] \
     && echo -e "\n\e[33m⠶ gcc \e[0m (gcc ${GCC_ARGS[*]} lex.yy.c preproyecto-sintaxis.tab.c build/ast.o build/utils.o -o lexer)" \
-    && gcc ${GCC_ARGS[*]} lex.yy.c preproyecto-sintaxis.tab.c build/ast.o build/utils.o -o lexer
+    && gcc ${GCC_ARGS[*]} lex.yy.c preproyecto-sintaxis.tab.c build/*.o -o lexer
 
 
 

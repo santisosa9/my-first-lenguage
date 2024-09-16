@@ -6,8 +6,13 @@
     #include "headers/symbol_table.h"
     #include "headers/ast.h"
     #include "headers/utils.h"
+
     AST* global_tree = NULL;
     SymbolTable* global_table = NULL;
+
+    void yyerror(const char* s);
+    int yylex();
+
 %}
 
 %union {
@@ -50,14 +55,14 @@
 
 %%
 
-prog: type T_MAIN '(' ')' '{' body '}'  { Info* i = $2; 
-                                          i->type = $1; 
-                                          AST* tree = build_root(NULL, $2, MAIN, $6); 
-                                          print_tree(tree); 
-                                          global_tree = tree; 
-                                          global_table = new_symbol_table(); 
-                                          fill_table(global_tree, global_table); 
-                                          print_table(global_table); 
+prog: type T_MAIN '(' ')' '{' body '}'  { Info* i = $2;
+                                          i->type = $1;
+                                          AST* tree = build_root(NULL, $2, MAIN, $6);
+                                          print_tree(tree);
+                                          global_tree = tree;
+                                          global_table = new_symbol_table();
+                                          fill_table(global_tree, global_table);
+                                          print_table(global_table);
                                           print_tree(tree);
                                         }
     ;

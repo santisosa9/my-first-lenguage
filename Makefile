@@ -5,14 +5,15 @@ W_FLAGS = -Wall -Wextra -Werror -Wpedantic
 HEADERS_F = headers
 SRC_F = src
 BUILD_F = build
-OBJS = $(BUILD_F)/main.o $(BUILD_F)/ast.o $(BUILD_F)/utils.o $(BUILD_F)/symbol_table.o
+OBJS = $(BUILD_F)/ast.o $(BUILD_F)/utils.o $(BUILD_F)/symbol_table.o
 EXE = ./main
 
 # TIP: Take a look to usefull phony rules at the end of this file!
 
 ### executable compilation rules
 
-main: executable
+# main: executable
+main: $(OBJS)
 
 executable: $(OBJS)
 	@echo
@@ -25,7 +26,7 @@ executable: $(OBJS)
 dbg: clean
 	@echo
 	@echo "\e[1;33mCreating executable with debug objects...\e[0m"
-	$(MAKE) CC_FLAGS="$(CC_FLAGS) -g3" executable
+	$(MAKE) CC_FLAGS="$(CC_FLAGS) -g3" main
 
 ### objects files compilation rules
 

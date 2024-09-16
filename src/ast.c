@@ -92,6 +92,9 @@ void _pretty_print_tree(AST* tree, int level, char* prefix, char* conection, boo
     char* child_prefix = malloc(sizeof(char) * (strlen(prefix) + 12));
     char* left_child_connection = malloc(sizeof(char) * 12);
     char* right_child_connection = malloc(sizeof(char) * 12);
+    child_prefix[0] = '\0';
+    left_child_connection[0] = '\0';
+    right_child_connection[0] = '\0';
 
     /* print info */
     printf("%s%s%i ",prefix, conection, level);
