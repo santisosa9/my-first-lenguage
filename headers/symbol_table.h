@@ -48,3 +48,7 @@ void free_table(SymbolTable* table);
 void fill_table(AST* tree, SymbolTable* table);
 
 int evaluate_expression(AST* expr, SymbolTable* table);
+
+bool checkTypes (AST* left, AST* right, SymbolTable* table);
+
+void interpret(AST* tree, SymbolTable* table);

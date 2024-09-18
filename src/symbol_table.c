@@ -6,8 +6,6 @@
 #include "../headers/symbol_table.h"
 #include "../headers/utils.h"
 
-bool checkTypes (Info* left, Info* right, SymbolTable* table);
-
 SymbolTable* new_symbol_table(){
     SymbolTable* table = (SymbolTable*)malloc(sizeof(SymbolTable));
     table->size = 0;
@@ -190,21 +188,18 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
         }
 
         case ADD:
-            sameType = checkTypes(expr->left->info, expr->right->info, table);
-            if (sameType) {
-                return evaluate_expression(expr->left, table) + evaluate_expression(expr->right, table);
-            } else {
-                exit(2);
-            }
-
         case MUL:
-            return evaluate_expression(expr->left, table) * evaluate_expression(expr->right, table);
-
         case OR:
-            return evaluate_expression(expr->left, table) || evaluate_expression(expr->right, table);
-
         case AND:
-            return evaluate_expression(expr->left, table) && evaluate_expression(expr->right, table);
+            sameType = checkTypes(expr->left, expr->right, table);
+            if (sameType) {
+                return (tag == ADD) ? (evaluate_expression(expr->left, table) + evaluate_expression(expr->right, table)) :
+                       (tag == MUL) ? (evaluate_expression(expr->left, table) * evaluate_expression(expr->right, table)) :
+                       (tag == OR)  ? (evaluate_expression(expr->left, table) || evaluate_expression(expr->right, table)) :
+                                      (evaluate_expression(expr->left, table) && evaluate_expression(expr->right, table));
+            } else {
+                exit(2); // Error de tipos
+            }
 
         case NOT:
             return !evaluate_expression(expr->left, table);
@@ -215,11 +210,51 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
     }
 }
 
-bool checkTypes (Info* left, Info* right, SymbolTable* table) {
-  if (left->type == right->type) {
-    return true;
-  } else {
-    printf("Error: Operacion inválida para los tipos %s, %s.\n", type_to_str(left->type), type_to_str(right->type));
-    return false;
-  }
+bool checkTypes (AST* left, AST* right, SymbolTable* table) {
+    SymbolTableNode* left_in_table = NULL;
+    SymbolTableNode* right_in_table = NULL;
+
+    // Si el nodo izquierdo es un ID, lo busco en la tabla
+    if (left->tag == ID) {
+        left_in_table = search(table, left->info->name);
+        if (left_in_table == NULL) {
+            printf("Error: Variable '%s' no declarada.\n", left->info->name);
+            return false;
+        }
+    }
+
+    // Si el nodo derecho es un ID, lo busco en la tabla
+    if (right->tag == ID) {
+        right_in_table = search(table, right->info->name);
+        if (right_in_table == NULL) {
+            printf("Error: Variable '%s' no declarada.\n", right->info->name);
+            return false;
+        }
+    }
+
+    // Comparar tipos, usando la tabla si son IDs o directamente el tipo si es un literal
+    Type left_type = (left_in_table != NULL) ? left_in_table->info->type : left->info->type;
+    Type right_type = (right_in_table != NULL) ? right_in_table->info->type : right->info->type;
+
+    if (left_type == right_type) {
+        return true;
+    } else {
+        printf("Error: Operación inválida para los tipos %s, %s.\n", type_to_str(left_type), type_to_str(right_type));
+        return false;
+    }
+}
+
+void interpret(AST* tree, SymbolTable* table) {
+    if (tree == NULL) {
+        return;
+    }
+
+    if (tree->tag == RET) {
+        int result = evaluate_expression(tree->right, table);
+        printf("Returned value: %d\n", result);
+        return; 
+    }
+
+    interpret(tree->left, table);
+    interpret(tree->right, table);
 }

@@ -58,12 +58,13 @@
 prog: type T_MAIN '(' ')' '{' body '}'  { Info* i = $2;
                                           i->type = $1;
                                           AST* tree = build_root(NULL, $2, MAIN, $6);
-                                          print_tree(tree);
+                                          -- print_tree(tree);
                                           global_tree = tree;
                                           global_table = new_symbol_table();
                                           fill_table(global_tree, global_table);
-                                          print_table(global_table);
-                                          print_tree(tree);
+                                          -- print_table(global_table);
+                                          -- print_tree(tree);
+                                          interpret(global_tree, global_table);
                                         }
     ;
 
