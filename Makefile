@@ -1,58 +1,73 @@
+# make flags
 MAKEFLAGS += --no-print-directory
+
+# compilation flags
 CC = gcc
 CC_FLAGS = -I $(HEADERS_F)/
 W_FLAGS = -Wall -Wextra -Werror -Wpedantic
+
+# folders
 HEADERS_F = headers
 SRC_F = src
 BUILD_F = build
-OBJS = $(BUILD_F)/ast.o $(BUILD_F)/utils.o $(BUILD_F)/symbol_table.o
-EXE = ./main
+
+# objects
+OBJS = $(patsubst $(SRC_F)/%.c, $(BUILD_F)/%.o, $(wildcard $(SRC_F)/*.c))
+
+# flex and bison
+# FLEX_FLAGS =
+BISON_FLAGS = -d
+
+# executable
+EXE = ./compiler
 
 # TIP: Take a look to usefull phony rules at the end of this file!
 
 ### executable compilation rules
 
-# main: executable
-main: $(OBJS)
+main: executable
 
-executable: $(OBJS)
+executable: $(BUILD_F) $(SRC_F)/scanner.c $(SRC_F)/parser.c $(OBJS)
 	@echo
 	@echo "\e[1;33mCreating executable...\e[0m"
-	@mkdir -p $(BUILD_F)
 	$(CC) $(CC_FLAGS) -o $(EXE) $(OBJS)
 	@echo
 	@echo "\e[1;33mExecutable created:\e[0m $(EXE)"
 
-dbg: clean
+dbg: clean warns
 	@echo
 	@echo "\e[1;33mCreating executable with debug objects...\e[0m"
 	$(MAKE) CC_FLAGS="$(CC_FLAGS) -g3" main
 
+$(BUILD_F):
+	@mkdir -p $@
+
+### scanner
+$(SRC_F)/scanner.c: scanner.l
+	@echo
+	@echo "\e[1;33mCreating scanner.c...\e[0m"
+	flex $(FLEX_FLAGS) -o $@ $<
+
+### parser
+$(SRC_F)/parser.c: parser.y
+	@echo
+	@echo "\e[1;33mCreating parser.c and parser.h...\e[0m"
+	bison $(BISON_FLAGS) -o $@ $<
+	@mv $(SRC_F)/parser.h $(HEADERS_F)/
+
 ### objects files compilation rules
 
-$(BUILD_F)/main.o: $(SRC_F)/main.c
+$(BUILD_F)/%.o: $(SRC_F)/%.c
 	@echo
-	@echo "\e[1;33mCompiling main.o...\e[0m"
+	@echo "\e[1;33mCreating $@...\e[0m"
 	@mkdir -p $(BUILD_F)
-	$(CC) $(CC_FLAGS) -c $(SRC_F)/main.c -o $(BUILD_F)/main.o
+	$(CC) $(CC_FLAGS) -c $< -o $@
 
-$(BUILD_F)/ast.o: $(SRC_F)/ast.c $(HEADERS_F)/ast.h
+$(BUILD_F)/%.o: $(SRC_F)/%.c $(HEADERS_F)/%.h
 	@echo
-	@echo "\e[1;33mCompiling ast.o...\e[0m"
+	@echo "\e[1;33mCreating $@...\e[0m"
 	@mkdir -p $(BUILD_F)
-	$(CC) $(CC_FLAGS) -c $(SRC_F)/ast.c -o $(BUILD_F)/ast.o
-
-$(BUILD_F)/symbol_table.o: $(SRC_F)/symbol_table.c $(HEADERS_F)/symbol_table.h
-	@echo
-	@echo "\e[1;33mCompiling symbol_table.o...\e[0m"
-	@mkdir -p $(BUILD_F)
-	$(CC) $(CC_FLAGS) -c $(SRC_F)/symbol_table.c -o $(BUILD_F)/symbol_table.o
-
-$(BUILD_F)/utils.o: $(SRC_F)/utils.c $(HEADERS_F)/utils.h
-	@echo
-	@echo "\e[1;33mCompiling utils.o...\e[0m"
-	@mkdir -p $(BUILD_F)
-	$(CC) $(CC_FLAGS) -c $(SRC_F)/utils.c -o $(BUILD_F)/utils.o
+	$(CC) $(CC_FLAGS) -c $< -o $@
 
 ### phony rules
 
@@ -84,4 +99,4 @@ w: warns
 c: clean
 
 .PHONY: recompile r
-recompile r: clean warns
+recompile r: clean warns executable
