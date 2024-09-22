@@ -7,10 +7,13 @@
 *.o
 
 # Executables
-lexer
+compiler
 main
 
 # Flex and Bison generated files
 lex.yy.c
 *.tab.c
 *.tab.h
+headers/parser.h
+src/parser.c
+src/scanner.c
