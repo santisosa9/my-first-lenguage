@@ -38,6 +38,11 @@
 %token <INFOP> T_VOID
 %token <INFOP> T_RET
 %token <INFOP> T_MAIN
+%token <INFOP> T_IF
+%token <INFOP> T_THEN
+%token <INFOP> T_ELSE
+%token <INFOP> T_WHILE
+%token <INFOP> T_EXTERN
 
 %left T_NOT
 %left T_AND T_OR

@@ -36,6 +36,26 @@ NRO         	(-?[1-9][0-9]{0,4})|0
                 yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
                 return T_COMMA; }
 
+"extern"      { /* printf("%s\n",yytext); */
+                yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
+                return T_EXTERN; }
+
+"if"          { /* printf("%s\n",yytext); */
+                yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
+                return T_IF; }
+
+"then"        { /* printf("%s\n",yytext); */
+                yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
+                return T_THEN; }
+
+"else"        { /* printf("%s\n",yytext); */
+                yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
+                return T_ELSE; }
+
+"while"       { /* printf("%s\n",yytext); */
+                yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
+                return T_WHILE; }
+
 "="			  { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
                 return T_ASIG; }
@@ -51,7 +71,6 @@ NRO         	(-?[1-9][0-9]{0,4})|0
 "!"		  	  { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
                 return T_NOT; }
-
 "||"		  { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
                 return T_OR; }
@@ -71,6 +90,10 @@ NRO         	(-?[1-9][0-9]{0,4})|0
 "int"		  { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
                 return T_INT; }
+
+"integer"	  { /* printf("%s\n",yytext); */
+                yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
+                return T_INT; }               
 
 "bool"		  { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);

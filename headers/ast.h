@@ -15,6 +15,12 @@ typedef enum Tag{
     ADD,
     MUL,
     VALUE,
+    IF,
+    THEN,
+    ELSE,
+    WHILE,
+    EXTERN,
+    FN,
 } Tag;
 
 typedef enum Type
