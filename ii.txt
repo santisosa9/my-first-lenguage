@@ -5,4 +5,5 @@ int main(){
   y = true;
   y = y || false;
   return x;
+  return y;
 }

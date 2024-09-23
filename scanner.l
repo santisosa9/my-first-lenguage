@@ -54,11 +54,11 @@ NRO         	(-?[1-9][0-9]{0,4})|0
 
 "||"		  { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
-                return T_AND; }
+                return T_OR; }
 
 "&&"		  { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
-                return T_OR; }
+                return T_AND; }
 
 "true"		  { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(BOOL, 1, strdup(yytext), yylineno, 0);

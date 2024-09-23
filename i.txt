@@ -2,12 +2,15 @@ int main(){
   int x; 
   bool y; 
   bool z;
-  x = 1 ; 
-  y = true; 
+  x = 1; 
+  y = true;
+  return y;
+  y = y && false;
+  return y; 
   x = x+3*2; 
   return x; 
   x = 2; 
   return x;
-  y = 0;
-  z = y || false;
+  z = true || y;
+  return z;
 }

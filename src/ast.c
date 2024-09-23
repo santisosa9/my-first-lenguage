@@ -190,7 +190,7 @@ char* type_to_str(Type type){
 
 char* value_to_str(int value, Type type){
     switch (type) {
-        case BOOL:  return value == 0 ? strdup("FALSE") : strdup("TRUE");
+        case BOOL:  return value == 0 ? strdup("false") : strdup("true");
         default:    return itos(value);
     }
 }

@@ -9,7 +9,6 @@
 
     AST* global_tree = NULL;
     AST* get_parsed_tree();
-    SymbolTable* global_table = NULL;
 
     void yyerror(const char* s);
     int yylex();
@@ -59,9 +58,6 @@
 prog: type T_MAIN '(' ')' '{' body '}'  { Info* i = $2;
                                           i->type = $1;
                                           global_tree = build_root(NULL, $2, MAIN, $6);
-                                          global_table = new_symbol_table();
-                                          fill_table(global_tree, global_table);
-                                          interpret(global_tree, global_table);
                                         }
     ;
 

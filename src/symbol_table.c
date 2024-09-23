@@ -6,6 +6,8 @@
 #include "../headers/symbol_table.h"
 #include "../headers/utils.h"
 
+Type get_type(char* name, SymbolTable* table);
+
 SymbolTable* new_symbol_table(){
     SymbolTable* table = (SymbolTable*)malloc(sizeof(SymbolTable));
     table->size = 0;
@@ -137,24 +139,10 @@ void fill_table(AST* tree, SymbolTable* table) {
           existing = search(table, tree->info->name);
           if (existing == NULL) {
               insert(table, tree->info);
-              printf("Declaracion exitosa de '%s' en línea %d.\n", tree->info->name, tree->info->line);
+              // printf("Declaracion exitosa de '%s' en línea %d.\n", tree->info->name, tree->info->line);
           } else {
               printf("Error: Redeclaración de la variable '%s' en línea %d.\n", tree->info->name, tree->info->line);
               return;
-          }
-          break;
-
-      case ASIG:
-          existing = search(table, tree->left->info->name);
-          if (existing == NULL) {
-              printf("Error: Asignación a variable '%s' no declarada en línea %d.\n", tree->info->name, tree->info->line);
-              return;
-          } else {
-                Info* updatedInfo = existing->info;
-                int result = evaluate_expression(tree->right, table);
-                update_value(updatedInfo, result);
-                update(table, tree->left, updatedInfo);
-                printf("Asignación exitosa a '%s' con valor %d en línea %d.\n", existing->info->name, result, tree->info->line);
           }
           break;
 
@@ -249,12 +237,33 @@ void interpret(AST* tree, SymbolTable* table) {
         return;
     }
 
+    if (tree->tag == ASIG) {
+          SymbolTableNode* existing = search(table, tree->left->info->name);
+          if (existing == NULL) {
+              // printf("Error: Asignación a variable '%s' no declarada en línea %d.\n", tree->info->name, tree->info->line);
+              return;
+          } else {
+                Info* updatedInfo = existing->info;
+                int result = evaluate_expression(tree->right, table);
+                update_value(updatedInfo, result);
+                update(table, tree->left, updatedInfo);
+                // printf("Asignación exitosa a '%s' con valor %d en línea %d.\n", existing->info->name, result, tree->info->line);
+          }
+    }
+
     if (tree->tag == RET) {
         int result = evaluate_expression(tree->right, table);
-        printf("Returned value: %d\n", result);
+        Type type = get_type(tree->right->info->name, table);
+        char* to_print = value_to_str(result, type);
+        printf("%s\n", to_print);
         return; 
     }
 
     interpret(tree->left, table);
     interpret(tree->right, table);
+}
+
+Type get_type(char* name, SymbolTable* table) {
+    SymbolTableNode* e = search(table, name);
+    return e->info->type;
 }
