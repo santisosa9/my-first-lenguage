@@ -129,7 +129,7 @@ void free_table(SymbolTable* table){
 
 void fill_table(AST* tree, SymbolTable* table) {
     if (tree == NULL) {
-        return true;
+        return;
     }
 
     SymbolTableNode* existing;
