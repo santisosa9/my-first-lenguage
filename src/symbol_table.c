@@ -6,6 +6,7 @@
 #include "../headers/symbol_table.h"
 #include "../headers/utils.h"
 
+Type get_type_from_table(AST* node, SymbolTable* table);
 Type get_type(char* name, SymbolTable* table);
 
 SymbolTable* new_symbol_table(){
@@ -128,7 +129,7 @@ void free_table(SymbolTable* table){
 
 void fill_table(AST* tree, SymbolTable* table) {
     if (tree == NULL) {
-        return;
+        return true;
     }
 
     SymbolTableNode* existing;
@@ -136,15 +137,14 @@ void fill_table(AST* tree, SymbolTable* table) {
 
     switch (currentTag) {
       case DEC:
-          existing = search(table, tree->info->name);
-          if (existing == NULL) {
-              insert(table, tree->info);
-              // printf("Declaracion exitosa de '%s' en línea %d.\n", tree->info->name, tree->info->line);
-          } else {
-              printf("Error: Redeclaración de la variable '%s' en línea %d.\n", tree->info->name, tree->info->line);
-              return;
-          }
-          break;
+            existing = search(table, tree->info->name);
+            if (existing == NULL) {
+                insert(table, tree->info);
+            } else {
+                printf("Error: Redeclaración de la variable '%s' en línea %d.\n", tree->info->name, tree->info->line);
+                return;
+            }
+            break;
 
       default:
           break;
@@ -152,6 +152,93 @@ void fill_table(AST* tree, SymbolTable* table) {
 
     fill_table(tree->left, table);
     fill_table(tree->right, table);
+}
+
+bool check_types(AST* tree, SymbolTable* table) {
+    if (tree == NULL) {
+        return true;
+    }
+
+    Tag tag = tree->tag;
+    Type left_type;
+    Type right_type;
+
+    switch (tag) {
+        case ADD:
+        case MUL: {
+            left_type = get_type_from_table(tree->left, table);
+            right_type = get_type_from_table(tree->right, table);
+            if (left_type == INT && right_type == INT) {
+                Info* updatedInfo = tree->info;
+                updatedInfo->type = INT;
+                update(table, tree, updatedInfo);
+            } else {
+                printf("Error: Operación inválida para los tipos %s, %s en línea %d.\n", type_to_str(left_type), type_to_str(right_type), tree->info->line);
+                return false;
+            }
+            break;
+        }
+
+        case AND:
+        case OR: {
+            left_type = get_type_from_table(tree->left, table);
+            right_type = get_type_from_table(tree->right, table);
+            if (left_type == BOOL && right_type == BOOL) {
+                Info* updatedInfo = tree->info;
+                updatedInfo->type = BOOL;
+                update(table, tree, updatedInfo);
+            } else {
+                printf("Error: Operación inválida para los tipos %s, %s en línea %d.\n", type_to_str(left_type), type_to_str(right_type), tree->info->line);
+                return false;
+            }
+            break;
+        }
+
+        case NOT: {
+            left_type = get_type_from_table(tree->left, table);
+            if (left_type == BOOL) {
+                Info* updatedInfo = tree->info;
+                updatedInfo->type = BOOL;
+                update(table, tree, updatedInfo);
+            } else {
+                printf("Error: Operación inválida para el tipo %s en línea %d.\n", type_to_str(left_type), tree->info->line);
+                return false;
+            }
+            break;
+        }
+
+        case ASIG: {
+            left_type = get_type_from_table(tree->left, table);
+            right_type = get_type_from_table(tree->right, table);
+            if (left_type != right_type) {
+                printf("Error: Asignación inválida para los tipos %s, %s en línea %d.\n", type_to_str(left_type), type_to_str(right_type), tree->info->line);
+                return false;
+            }
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    bool left_check = check_types(tree->left, table);
+    bool right_check = check_types(tree->right, table);
+
+    return left_check && right_check;
+}
+
+Type get_type_from_table(AST* node, SymbolTable* table) {
+    SymbolTableNode* node_in_table = NULL;
+
+    if (node->tag == ID) {
+        node_in_table = search(table, node->info->name);
+        if (node_in_table == NULL) {
+            printf("Error: Variable '%s' no declarada en linea %d.\n", node->info->name, node->info->line);
+        }
+    }
+
+    // Si no lo encuentra en la tabla, usamos el tipo que tiene en el arbol
+    return (node_in_table != NULL) ? node_in_table->info->type : node->info->type;
 }
 
 int evaluate_expression(AST* expr, SymbolTable* table) {
@@ -168,67 +255,34 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
 
         case ID: {
             SymbolTableNode* var = search(table, expr->info->name);
-            if (var == NULL) {
-                printf("Error: Variable '%s' no declarada en línea %d.\n", expr->info->name, expr->info->line);
-                return 0;
+            if (var != NULL) {
+              return var->info->value;
+            } else {
+              return -1;
             }
-            return var->info->value;
         }
 
-        case ADD:
-        case MUL:
-        case OR:
-        case AND:
-            sameType = checkTypes(expr->left, expr->right, table);
-            if (sameType) {
-                return (tag == ADD) ? (evaluate_expression(expr->left, table) + evaluate_expression(expr->right, table)) :
-                       (tag == MUL) ? (evaluate_expression(expr->left, table) * evaluate_expression(expr->right, table)) :
-                       (tag == OR)  ? (evaluate_expression(expr->left, table) || evaluate_expression(expr->right, table)) :
-                                      (evaluate_expression(expr->left, table) && evaluate_expression(expr->right, table));
-            } else {
-                exit(2); // Error de tipos
-            }
+        case ADD: {
+            return (evaluate_expression(expr->left, table) + evaluate_expression(expr->right, table));
+        }
+
+        case MUL: {
+            return (evaluate_expression(expr->left, table) * evaluate_expression(expr->right, table));
+        }
+
+        case OR: {
+            return (evaluate_expression(expr->left, table) || evaluate_expression(expr->right, table));
+        }
+        
+        case AND: {
+            return (evaluate_expression(expr->left, table) && evaluate_expression(expr->right, table));
+        }
 
         case NOT:
             return !evaluate_expression(expr->left, table);
 
         default:
-            printf("Error: Expresión no reconocida en línea %d.\n", expr->info->line);
-            return 0;
-    }
-}
-
-bool checkTypes (AST* left, AST* right, SymbolTable* table) {
-    SymbolTableNode* left_in_table = NULL;
-    SymbolTableNode* right_in_table = NULL;
-
-    // Si el nodo izquierdo es un ID, lo busco en la tabla
-    if (left->tag == ID) {
-        left_in_table = search(table, left->info->name);
-        if (left_in_table == NULL) {
-            printf("Error: Variable '%s' no declarada.\n", left->info->name);
-            return false;
-        }
-    }
-
-    // Si el nodo derecho es un ID, lo busco en la tabla
-    if (right->tag == ID) {
-        right_in_table = search(table, right->info->name);
-        if (right_in_table == NULL) {
-            printf("Error: Variable '%s' no declarada.\n", right->info->name);
-            return false;
-        }
-    }
-
-    // Comparar tipos, usando la tabla si son IDs o directamente el tipo si es un literal
-    Type left_type = (left_in_table != NULL) ? left_in_table->info->type : left->info->type;
-    Type right_type = (right_in_table != NULL) ? right_in_table->info->type : right->info->type;
-
-    if (left_type == right_type) {
-        return true;
-    } else {
-        printf("Error: Operación inválida para los tipos %s, %s.\n", type_to_str(left_type), type_to_str(right_type));
-        return false;
+            return -1;
     }
 }
 
@@ -238,17 +292,11 @@ void interpret(AST* tree, SymbolTable* table) {
     }
 
     if (tree->tag == ASIG) {
-          SymbolTableNode* existing = search(table, tree->left->info->name);
-          if (existing == NULL) {
-              // printf("Error: Asignación a variable '%s' no declarada en línea %d.\n", tree->info->name, tree->info->line);
-              return;
-          } else {
-                Info* updatedInfo = existing->info;
-                int result = evaluate_expression(tree->right, table);
-                update_value(updatedInfo, result);
-                update(table, tree->left, updatedInfo);
-                // printf("Asignación exitosa a '%s' con valor %d en línea %d.\n", existing->info->name, result, tree->info->line);
-          }
+        SymbolTableNode* existing = search(table, tree->left->info->name);
+        Info* updatedInfo = existing->info;
+        int result = evaluate_expression(tree->right, table);
+        update_value(updatedInfo, result);
+        update(table, tree->left, updatedInfo);
     }
 
     if (tree->tag == RET) {

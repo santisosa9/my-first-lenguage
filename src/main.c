@@ -24,6 +24,6 @@ int main(int argc, char const *argv[])
     AST *tree = get_parsed_tree();
     SymbolTable* table = new_symbol_table();
     fill_table(tree, table);
-    interpret(tree, table);
+    if (check_types(tree, table)) interpret(tree, table);
     free_table(table);
 }
