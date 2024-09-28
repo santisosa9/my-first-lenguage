@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "../headers/ast.h"
+#include "../headers/info.h"
 #include "../headers/utils.h"
 
 void _print_tree(AST* tree, int level);
@@ -27,29 +28,6 @@ AST* join_trees(AST* left, AST* root, AST* right){
     root->right = right;
     return root;
 }
-
-Info* new_info(Type type, int value, char* name, int line, int col){
-    Info* info = (Info*)malloc(sizeof(Info));
-    info->type = type;
-    info->value = value;
-    info->name = name;
-    info->line = line;
-    info->col = col;
-    return info;
-}
-
-Info* copy_info(Info* dest, Info* src){
-    if(dest == NULL || src == NULL) return NULL;
-
-    dest->type = src->type;
-    dest->value = src->value;
-    dest->name = src->name;
-    dest->line = src->line;
-    dest->col = src->col;
-
-    return dest;
-}
-
 
 void free_tree(AST* tree){
     if(tree == NULL) return;
@@ -81,7 +59,7 @@ void _print_tree(AST* tree, int level){
     if(tree == NULL) return;
     printf("%s%i", repeat_str("   ", level), level);
     fflush(stdout);
-    print_info(tree->info);
+    print_info(tree->tag, tree->info);
     _print_tree(tree->left, level+1);
     _print_tree(tree->right, level+1);
 }
@@ -132,69 +110,29 @@ void _pretty_print_tree(AST* tree, int level, char* prefix, char* conection, boo
     free(child_prefix);
     free(left_child_connection);
     free(right_child_connection);
-}
-// "├── " "└── " "│   " "    "
-
-
-void print_info(Info* info){
-    if(info == NULL) {
-        puts("print_info: info is NULL");
-        return;
-    }
-    printf("{");
-    printf("Type: %s, ", type_to_str(info->type));
-    printf("Value: %s, ", value_to_str(info->value, info->type));
-    printf("Name: %s, ", info->name);
-    printf("Line: %d", info->line);
-    printf("}\n");
+    // "├── " "└── " "│   " "    "
 }
 
 void print_node(AST* node) {
     printf("Tag: %s, ", tag_to_str(node->tag));
-    print_info(node->info);
+    print_info(node->tag, node->info);
 }
 
 char* tag_to_str(Tag tag){
     switch (tag){
-        case ID:    return strdup("ID");            break;
-        case MAIN:  return strdup("MAIN");          break;
-        case RET:   return strdup("RET");           break;
-        case STMT:  return strdup("STMT");          break;
-        case ASIG:  return strdup("ASIG");          break;
-        case TYPE:  return strdup("TYPE");          break;
-        case COMMA: return strdup("COMMA");         break;
-        case DEC:   return strdup("DEC");           break;
-        case NOT:   return strdup("NOT");           break;
-        case OR:    return strdup("OR");            break;
-        case AND:   return strdup("AND");           break;
-        case ADD:   return strdup("ADD");           break;
-        case MUL:   return strdup("MUL");           break;
-        case VALUE: return strdup("VALUE");         break;
-        default:    return strdup("UNKNOWN_TAG");   break;
+        case ID:        return strdup("ID");            break;
+        case MAIN:      return strdup("MAIN");          break;
+        case RET:       return strdup("RET");           break;
+        case ASIG:      return strdup("ASIG");          break;
+        case TYPE:      return strdup("TYPE");          break;
+        case SEMICOLON: return strdup("SEMICOLON");     break;
+        case DEC:       return strdup("DEC");           break;
+        case NOT:       return strdup("NOT");           break;
+        case OR:        return strdup("OR");            break;
+        case AND:       return strdup("AND");           break;
+        case ADD:       return strdup("ADD");           break;
+        case MUL:       return strdup("MUL");           break;
+        case VALUE:     return strdup("VALUE");         break;
+        default:        return strdup("UNKNOWN_TAG");   break;
     }
-}
-
-char* type_to_str(Type type){
-    switch (type){
-        case INT:       return strdup("INT");           break;
-        case FLOAT:     return strdup("FLOAT");         break;
-        case CHAR:      return strdup("CHAR");          break;
-        case STRING:    return strdup("STRING");        break;
-        case BOOL:      return strdup("BOOL");          break;
-        case VOID:      return strdup("VOID");          break;
-        case NO_TYPED:  return strdup("NO_TYPED");      break;
-        case ANY:       return strdup("ANY");           break;
-        default:        return strdup("UNKNOWN_TYPE");  break;
-    }
-}
-
-char* value_to_str(int value, Type type){
-    switch (type) {
-        case BOOL:  return value == 0 ? strdup("false") : strdup("true");
-        default:    return itos(value);
-    }
-}
-
-void update_value(Info* dest, int value) {
-    if(dest != NULL) dest->value = value;
 }

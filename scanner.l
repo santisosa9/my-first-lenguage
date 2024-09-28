@@ -34,7 +34,7 @@ NRO         	(-?[1-9][0-9]{0,4})|0
 
 ";" 		  { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
-                return T_COMMA; }
+                return T_SEMICOLON; }
 
 "extern"      { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
@@ -93,7 +93,7 @@ NRO         	(-?[1-9][0-9]{0,4})|0
 
 "integer"	  { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
-                return T_INT; }               
+                return T_INT; }
 
 "bool"		  { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);

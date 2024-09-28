@@ -16,14 +16,14 @@
 %}
 
 %union {
-  struct Info* INFOP;
+  union Info* INFOP;
   struct AST* ASTP;
   char* CHARP;
   Type TYPE;
 };
 
 %token <INFOP> T_ASIG
-%token <INFOP> T_COMMA
+%token <INFOP> T_SEMICOLON
 %token <INFOP> T_NRO
 %token <INFOP> T_ID
 %token <INFOP> T_ADD
@@ -61,7 +61,7 @@
 %%
 
 prog: type T_MAIN '(' ')' '{' body '}'  { Info* i = $2;
-                                          i->type = $1;
+                                          as_info_base(i)->props->type = $1;
                                           global_tree = build_root(NULL, $2, MAIN, $6);
                                         }
     ;
@@ -71,8 +71,8 @@ type: T_INT                             { $$ = INT; }
     | T_VOID                            { $$ = VOID; }
     ;
 
-body: sentence T_COMMA                  { $$ = $1; }
-    | sentence T_COMMA body             { $$ = build_root($1, $2, COMMA, $3); }
+body: sentence T_SEMICOLON                  { $$ = $1; }
+    | sentence T_SEMICOLON body             { $$ = build_root($1, $2, SEMICOLON, $3); }
     ;
 
 sentence: ret                           { $$ = $1; }
@@ -81,7 +81,10 @@ sentence: ret                           { $$ = $1; }
         | asig                          { $$ = $1; }
         ;
 
-dec: type T_ID                          { AST* node = new_node($2, DEC); node->info->type = $1; $$ = node; }
+dec: type T_ID                          { AST* node = new_node($2, DEC);
+                                          as_info_base(node->info)->props->type = $1;
+                                          $$ = node;
+                                        }
    ;
 
 expr: expr T_ADD expr                   { $$ = build_root($1, $2, ADD, $3); }

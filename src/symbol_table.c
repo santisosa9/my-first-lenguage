@@ -5,6 +5,7 @@
 
 #include "../headers/symbol_table.h"
 #include "../headers/utils.h"
+#include "../headers/ast.h"
 
 Type get_type_from_table(AST* node, SymbolTable* table);
 Type get_type(char* name, SymbolTable* table);
@@ -30,7 +31,7 @@ bool insert(SymbolTable* table, Info* info){
     SymbolTableNode* current = table->head;
 
     while (table->size > 0 && current->next != NULL) {
-        if(strcmp(current->info->name, info->name) == 0){
+        if(strcmp(as_info_base(current->info)->props->name, as_info_base(info)->props->name) == 0){
             return false;
         }
         current = current->next;
@@ -52,7 +53,7 @@ SymbolTableNode* search(SymbolTable* table, char* name){
     SymbolTableNode* current = table->head;
 
     while (current != NULL) {
-        if(strcmp(current->info->name, name) == 0){
+        if(strcmp(as_info_base(current->info)->props->name, name) == 0){
             return current;
         }
         current = current->next;
@@ -65,11 +66,11 @@ bool update(SymbolTable* table, AST* tree, Info* info){
     if(table == NULL) return false;
     if (tree == NULL) return false;
 
-    SymbolTableNode* target = search(table, info->name);
+    SymbolTableNode* target = search(table, as_info_base(info)->props->name);
 
     if(target == NULL) return false;
 
-    copy_info(target->info, info);
+    copy_info(tree->tag, target->info, info);
     tree->info = target->info;
 
     return true;
@@ -83,7 +84,7 @@ SymbolTableNode* erase(SymbolTable* table, char* name){
     SymbolTableNode* prev = NULL;
 
     while (current != NULL) {
-        if(strcmp(current->info->name, name) == 0){
+        if(strcmp(as_info_base(current->info)->props->name, name) == 0){
             if(prev == NULL){
                 table->head = current->next;
             } else {
@@ -106,7 +107,7 @@ void print_table(SymbolTable* table){
 
     printf("Table: \n");
     while (current != NULL) {
-        print_info(current->info);
+        print_info(ID, current->info);
         current = current->next;
     }
 }
@@ -137,11 +138,11 @@ void fill_table(AST* tree, SymbolTable* table) {
 
     switch (currentTag) {
       case DEC:
-            existing = search(table, tree->info->name);
+            existing = search(table, as_info_base(tree->info)->props->name);
             if (existing == NULL) {
                 insert(table, tree->info);
             } else {
-                printf("Error: Redeclaración de la variable '%s' en línea %d.\n", tree->info->name, tree->info->line);
+                printf("Error: Redeclaración de la variable '%s' en línea %d.\n", as_info_base(tree->info)->props->name, as_info_base(tree->info)->props->line);
                 return;
             }
             break;
@@ -170,10 +171,10 @@ bool check_types(AST* tree, SymbolTable* table) {
             right_type = get_type_from_table(tree->right, table);
             if (left_type == INT && right_type == INT) {
                 Info* updatedInfo = tree->info;
-                updatedInfo->type = INT;
+                as_info_base(updatedInfo)->props->type = INT;
                 update(table, tree, updatedInfo);
             } else {
-                printf("Error: Operación inválida para los tipos %s, %s en línea %d.\n", type_to_str(left_type), type_to_str(right_type), tree->info->line);
+                printf("Error: Operación inválida para los tipos %s, %s en línea %d.\n", type_to_str(left_type), type_to_str(right_type), as_info_base(tree->info)->props->line);
                 return false;
             }
             break;
@@ -185,10 +186,10 @@ bool check_types(AST* tree, SymbolTable* table) {
             right_type = get_type_from_table(tree->right, table);
             if (left_type == BOOL && right_type == BOOL) {
                 Info* updatedInfo = tree->info;
-                updatedInfo->type = BOOL;
+                as_info_base(updatedInfo)->props->type = BOOL;
                 update(table, tree, updatedInfo);
             } else {
-                printf("Error: Operación inválida para los tipos %s, %s en línea %d.\n", type_to_str(left_type), type_to_str(right_type), tree->info->line);
+                printf("Error: Operación inválida para los tipos %s, %s en línea %d.\n", type_to_str(left_type), type_to_str(right_type), as_info_base(tree->info)->props->line);
                 return false;
             }
             break;
@@ -198,10 +199,10 @@ bool check_types(AST* tree, SymbolTable* table) {
             left_type = get_type_from_table(tree->left, table);
             if (left_type == BOOL) {
                 Info* updatedInfo = tree->info;
-                updatedInfo->type = BOOL;
+                as_info_base(updatedInfo)->props->type = BOOL;
                 update(table, tree, updatedInfo);
             } else {
-                printf("Error: Operación inválida para el tipo %s en línea %d.\n", type_to_str(left_type), tree->info->line);
+                printf("Error: Operación inválida para el tipo %s en línea %d.\n", type_to_str(left_type), as_info_base(tree->info)->props->line);
                 return false;
             }
             break;
@@ -211,7 +212,7 @@ bool check_types(AST* tree, SymbolTable* table) {
             left_type = get_type_from_table(tree->left, table);
             right_type = get_type_from_table(tree->right, table);
             if (left_type != right_type) {
-                printf("Error: Asignación inválida para los tipos %s, %s en línea %d.\n", type_to_str(left_type), type_to_str(right_type), tree->info->line);
+                printf("Error: Asignación inválida para los tipos %s, %s en línea %d.\n", type_to_str(left_type), type_to_str(right_type), as_info_base(tree->info)->props->line);
                 return false;
             }
             break;
@@ -231,14 +232,14 @@ Type get_type_from_table(AST* node, SymbolTable* table) {
     SymbolTableNode* node_in_table = NULL;
 
     if (node->tag == ID) {
-        node_in_table = search(table, node->info->name);
+        node_in_table = search(table, as_info_base(node->info)->props->name);
         if (node_in_table == NULL) {
-            printf("Error: Variable '%s' no declarada en linea %d.\n", node->info->name, node->info->line);
+            printf("Error: Variable '%s' no declarada en linea %d.\n", as_info_base(node->info)->props->name, as_info_base(node->info)->props->line);
         }
     }
 
     // Si no lo encuentra en la tabla, usamos el tipo que tiene en el arbol
-    return (node_in_table != NULL) ? node_in_table->info->type : node->info->type;
+    return (node_in_table != NULL) ? as_info_base(node_in_table->info)->props->type : as_info_base(node->info)->props->type;
 }
 
 int evaluate_expression(AST* expr, SymbolTable* table) {
@@ -247,16 +248,15 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
     }
 
     Tag tag = expr->tag;
-    bool sameType;
 
     switch (tag) {
         case VALUE:
-            return expr->info->value;
+            return as_info_base(expr->info)->props->value;
 
         case ID: {
-            SymbolTableNode* var = search(table, expr->info->name);
+            SymbolTableNode* var = search(table, as_info_base(expr->info)->props->name);
             if (var != NULL) {
-              return var->info->value;
+              return as_info_base(var->info)->props->value;
             } else {
               return -1;
             }
@@ -273,7 +273,7 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
         case OR: {
             return (evaluate_expression(expr->left, table) || evaluate_expression(expr->right, table));
         }
-        
+
         case AND: {
             return (evaluate_expression(expr->left, table) && evaluate_expression(expr->right, table));
         }
@@ -292,7 +292,7 @@ void interpret(AST* tree, SymbolTable* table) {
     }
 
     if (tree->tag == ASIG) {
-        SymbolTableNode* existing = search(table, tree->left->info->name);
+        SymbolTableNode* existing = search(table, as_info_base(tree->left->info)->props->name);
         Info* updatedInfo = existing->info;
         int result = evaluate_expression(tree->right, table);
         update_value(updatedInfo, result);
@@ -301,10 +301,10 @@ void interpret(AST* tree, SymbolTable* table) {
 
     if (tree->tag == RET) {
         int result = evaluate_expression(tree->right, table);
-        Type type = get_type(tree->right->info->name, table);
+        Type type = get_type(as_info_base(tree->right->info)->props->name, table);
         char* to_print = value_to_str(result, type);
         printf("%s\n", to_print);
-        return; 
+        return;
     }
 
     interpret(tree->left, table);
@@ -313,5 +313,5 @@ void interpret(AST* tree, SymbolTable* table) {
 
 Type get_type(char* name, SymbolTable* table) {
     SymbolTableNode* e = search(table, name);
-    return e->info->type;
+    return as_info_base(e->info)->props->type;
 }

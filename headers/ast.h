@@ -1,49 +1,7 @@
 #pragma once
-
-typedef enum Tag{
-    ID,
-    MAIN,
-    RET,
-    STMT,
-    ASIG,
-    TYPE,
-    COMMA,
-    DEC,
-    NOT,
-    OR,
-    AND,
-    ADD,
-    MUL,
-    VALUE,
-    IF,
-    THEN,
-    ELSE,
-    WHILE,
-    EXTERN,
-    FN,
-} Tag;
-
-typedef enum Type
-{
-    INT,
-    FLOAT,
-    CHAR,
-    STRING,
-    BOOL,
-    VOID,
-    NO_TYPED,
-    ANY
-} Type;
-
-
-typedef struct Info
-{
-    Type type;
-    int value;
-    char* name;
-    int line;
-    int col;
-} Info;
+#include "info.h"
+#include "tag.h"
+#include "utils.h"
 
 /* Abstract Syntax Tree */
 typedef struct AST
@@ -63,33 +21,16 @@ AST* new_node(Info* info, Tag tag);
 /* Join left and right trees to root. */
 AST* join_trees(AST* left, AST* root, AST* right);
 
-/* Create a new info. */
-Info* new_info(Type type, int value, char* name, int line, int col);
-
 /* Free the tree.
-   NOTE: do NOT free the Info data.
+   IMPORTANT: this function do NOT free the Info data.
 */
 void free_tree(AST* tree);
 
 /* Print the tree. */
 void print_tree(AST* tree);
 
-/* Print the info. */
-void print_info(Info* info);
-
+/* Print a node. */
 void print_node(AST* node);
-
-/* Copy the info. */
-Info* copy_info(Info* dest, Info* src);
-
 
 /* Converts a tag to its corresponding string representation. */
 char* tag_to_str(Tag tag);
-
-/* Converts a type to its corresponding string representation. */
-char* type_to_str(Type type);
-
-/* Converts a value to its corresponding string representation. */
-char* value_to_str(int value, Type type);
-
-void update_value(Info* dest, int value);
