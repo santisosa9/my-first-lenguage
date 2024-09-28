@@ -4,7 +4,7 @@ MAKEFLAGS += --no-print-directory
 # compilation flags
 CC = gcc
 CC_FLAGS = -I $(HEADERS_F)/
-W_FLAGS = -Wall -Wextra -Werror -Wpedantic
+W_FLAGS = -Wall -Wextra -Wpedantic -Werror=sign-compare
 
 # folders
 HEADERS_F = headers
@@ -34,10 +34,10 @@ executable: $(BUILD_F) $(SRC_F)/scanner.c $(SRC_F)/parser.c $(OBJS)
 	@echo
 	@echo "\e[1;33mExecutable created:\e[0m $(EXE)"
 
-dbg: clean warns
+dbg: warns clean
 	@echo
-	@echo "\e[1;33mCreating executable with debug objects...\e[0m"
-	$(MAKE) CC_FLAGS="$(CC_FLAGS) -g3" main
+	@echo "\e[1;33mCreating executable with debug symbols...\e[0m"
+	@$(MAKE) CC_FLAGS="$(CC_FLAGS) -g3" main
 
 $(BUILD_F):
 	@mkdir -p $@
@@ -83,7 +83,13 @@ clean:
 warns:
 	@echo
 	@echo "\e[1;33mWarnings enabled:\e[0m $(W_FLAGS)"
-	$(MAKE) CC_FLAGS=$(CC_FLAGS) $(W_FLAGS)
+	$(eval CC_FLAGS += $(W_FLAGS))
+
+.PHONY: we
+we:
+	@echo
+	@echo "\e[1;33mWarnings as errors enabled.\e[0m"
+	$(eval W_FLAGS += -Werror)
 
 # aliases
 .PHONY: e
