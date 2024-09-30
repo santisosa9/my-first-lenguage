@@ -12,6 +12,7 @@ typedef enum Tag{
     SEMICOLON,
     NOT, OR, AND, ADD, MUL,
     IF, THEN, ELSE,
+    WHILE,
     CF,
     FN,
 } Tag;

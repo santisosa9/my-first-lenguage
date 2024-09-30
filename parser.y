@@ -61,6 +61,8 @@
 %type <ASTP> exprs
 %type <ASTP> asig
 %type <ASTP> ret
+%type <ASTP> while
+%type <ASTP> if
 
 %%
 
@@ -88,6 +90,7 @@ statement: ret                           { $$ = $1; }
          | if                            { $$ = $1; }
          | while                         { $$ = $1; }
          | block                         { $$ = $1; }
+         | dec_fn                        { $$ = $1; } 
          ;
 
 dec_fn: type_fn T_ID '(' param ')' block      {printf("dec fn block"); }
@@ -135,8 +138,8 @@ if: T_IF '(' expr ')' T_THEN block                       { printf("if then"); }
   | T_IF '(' expr ')' T_THEN block T_ELSE block          { printf("if then else"); }
   ;
 
-while: T_WHILE '(' expr ')' block       { printf("while"); }
-     ;
+while: T_WHILE '(' expr ')' block       { $$ = build_root($3, $1, WHILE, $5); }
+  ;
 %%
 
 
