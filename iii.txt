@@ -6,5 +6,6 @@ Program {
     x = 4;
   } else {
     x = 8;
-  };
+  }
+  return x;
 }
