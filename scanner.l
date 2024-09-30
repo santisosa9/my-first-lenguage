@@ -107,9 +107,9 @@ NRO         	(-?[1-9][0-9]{0,4})|0
                 yylval.INFOP = new_info(ANY, 0, strdup(yytext), yylineno, 0);
                 return T_RET; }
 
-"main"		  { /* printf("%s\n",yytext); */
+"Program"		{ /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(ANY, 0, strdup(yytext), yylineno, 0);
-                return T_MAIN; }
+                return T_PROGRAM; }
 
 {ID}		  { /* printf("ID: %s\n",yytext); */
                 yylval.INFOP = new_info(ANY, 0, strdup(yytext), yylineno, 0);

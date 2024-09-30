@@ -37,7 +37,7 @@
 %token <INFOP> T_BOOL
 %token <INFOP> T_VOID
 %token <INFOP> T_RET
-%token <INFOP> T_MAIN
+%token <INFOP> T_PROGRAM
 %token <INFOP> T_IF
 %token <INFOP> T_THEN
 %token <INFOP> T_ELSE
@@ -50,42 +50,66 @@
 %left T_MUL
 
 %type <ASTP> prog
-%type <TYPE> type
+%type <TYPE> type_fn
+%type <TYPE> type_var
 %type <ASTP> body
-%type <ASTP> sentence
+%type <ASTP> block
+%type <ASTP> statement
 %type <ASTP> dec
+%type <ASTP> dec_fn
 %type <ASTP> expr
+%type <ASTP> exprs
 %type <ASTP> asig
 %type <ASTP> ret
 
 %%
 
-prog: type T_MAIN '(' ')' '{' body '}'  { Info* i = $2;
-                                          as_info_base(i)->props->type = $1;
-                                          global_tree = build_root(NULL, $2, MAIN, $6);
-                                        }
+prog: T_PROGRAM block                    { global_tree = build_root(NULL, $1, MAIN, $2); }
     ;
 
-type: T_INT                             { $$ = INT; }
-    | T_BOOL                            { $$ = BOOL; }
-    | T_VOID                            { $$ = VOID; }
-    ;
-
-body: sentence T_SEMICOLON                  { $$ = $1; }
-    | sentence T_SEMICOLON body             { $$ = build_root($1, $2, SEMICOLON, $3); }
-    ;
-
-sentence: ret                           { $$ = $1; }
-        | dec                           { $$ = $1; }
-        | expr                          { $$ = $1; }
-        | asig                          { $$ = $1; }
+type_var: T_INT                          { $$ = INT; }
+        | T_BOOL                         { $$ = BOOL; }
         ;
 
-dec: type T_ID                          { AST* node = new_node($2, DEC);
+type_fn: type_var                        { $$ = $1; }
+       | T_VOID                          { $$ = VOID; }
+       ;
+
+block: '{' body '}'                      { printf("block"); }
+     ;
+
+body: statement T_SEMICOLON              { $$ = $1; }
+    | statement T_SEMICOLON body         { $$ = build_root($1, $2, SEMICOLON, $3); }
+    ;
+
+statement: ret                           { $$ = $1; }
+         | dec                           { $$ = $1; }
+         | asig                          { $$ = $1; }
+         | if                            { $$ = $1; }
+         | while                         { $$ = $1; }
+         | block                         { $$ = $1; }
+         ;
+
+dec_fn: type_fn T_ID '(' param ')' block      {printf("dec fn block"); }
+      | type_fn T_ID '(' param ')' T_EXTERN   {printf("dec fn extern"); }
+      ;
+
+call_fn: T_ID '(' exprs ')'                    {printf("call fn"); }
+       ;
+
+param: type_var T_ID                           {printf("param"); }
+     | type_var T_ID ',' param                 {printf("params"); }
+     ;
+
+dec: type_var T_ID                      { AST* node = new_node($2, DEC);
                                           as_info_base(node->info)->props->type = $1;
                                           $$ = node;
                                         }
    ;
+
+exprs: expr                             { printf("expr"); }
+     | expr ',' exprs                   { printf("exprs"); } 
+     ;
 
 expr: expr T_ADD expr                   { $$ = build_root($1, $2, ADD, $3); }
     | expr T_MUL expr                   { $$ = build_root($1, $2, MUL, $3); }
@@ -97,6 +121,7 @@ expr: expr T_ADD expr                   { $$ = build_root($1, $2, ADD, $3); }
     | T_NRO                             { $$ = new_node($1, VALUE); }
     | T_TRUE                            { $$ = new_node($1, VALUE); }
     | T_FALSE                           { $$ = new_node($1, VALUE); }
+    | call_fn                           { printf("call fn"); }
     ;
 
 asig: T_ID T_ASIG expr                  { $$ = join_trees(new_node($1, ID), new_node($2, ASIG), $3); }
@@ -106,6 +131,12 @@ ret: T_RET                              { $$ = new_node($1, RET); }
    | T_RET expr                         { $$ = build_root(NULL, $1, RET, $2); }
    ;
 
+if: T_IF '(' expr ')' T_THEN block                       { printf("if then"); }
+  | T_IF '(' expr ')' T_THEN block T_ELSE block          { printf("if then else"); }
+  ;
+
+while: T_WHILE '(' expr ')' block       { printf("while"); }
+     ;
 %%
 
 
