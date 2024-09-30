@@ -1,0 +1,10 @@
+Program {
+  int x;
+  bool y;
+  y = false;
+  if (true) then {
+    x = 4;
+  } else {
+    x = 8;
+  };
+}

@@ -121,7 +121,7 @@ void print_node(AST* node) {
 char* tag_to_str(Tag tag){
     switch (tag){
         case ID:        return strdup("ID");            break;
-        case MAIN:      return strdup("MAIN");          break;
+        case PROGRAM:   return strdup("PROGRAM");       break;
         case RET:       return strdup("RET");           break;
         case ASIG:      return strdup("ASIG");          break;
         case TYPE:      return strdup("TYPE");          break;
@@ -133,6 +133,8 @@ char* tag_to_str(Tag tag){
         case ADD:       return strdup("ADD");           break;
         case MUL:       return strdup("MUL");           break;
         case VALUE:     return strdup("VALUE");         break;
+        case IF:        return strdup("IF");            break;
+        case T_E:       return strdup("T_E");           break;
         default:        return strdup("UNKNOWN_TAG");   break;
     }
 }

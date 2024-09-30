@@ -66,18 +66,18 @@
 
 %%
 
-prog: T_PROGRAM block                    { global_tree = build_root(NULL, $1, MAIN, $2); }
+prog: T_PROGRAM block                    { global_tree = build_root(NULL, $1, PROGRAM, $2); }
     ;
-
-type_var: T_INT                          { $$ = INT; }
-        | T_BOOL                         { $$ = BOOL; }
-        ;
 
 type_fn: type_var                        { $$ = $1; }
        | T_VOID                          { $$ = VOID; }
        ;
 
-block: '{' body '}'                      { printf("block"); }
+type_var: T_INT                          { $$ = INT; }
+        | T_BOOL                         { $$ = BOOL; }
+        ;
+
+block: '{' body '}'                      { $$ = $2; }
      ;
 
 body: statement T_SEMICOLON              { $$ = $1; }
@@ -134,8 +134,10 @@ ret: T_RET                              { $$ = new_node($1, RET); }
    | T_RET expr                         { $$ = build_root(NULL, $1, RET, $2); }
    ;
 
-if: T_IF '(' expr ')' T_THEN block                       { printf("if then"); }
-  | T_IF '(' expr ')' T_THEN block T_ELSE block          { printf("if then else"); }
+if: T_IF '(' expr ')' T_THEN block                       { $$ = build_root($3, $1, IF, $6); }
+  | T_IF '(' expr ')' T_THEN block T_ELSE block          { AST* t_e = build_root($6, $5, T_E, $8);
+                                                           $$ = build_root($3, $1, IF, t_e); 
+                                                         }
   ;
 
 while: T_WHILE '(' expr ')' block       { $$ = build_root($3, $1, WHILE, $5); }
