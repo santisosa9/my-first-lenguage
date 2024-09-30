@@ -128,9 +128,9 @@ void free_table(SymbolTable* table){
     free(table);
 }
 
-void fill_table(AST* tree, SymbolTable* table) {
+bool fill_table(AST* tree, SymbolTable* table) {
     if (tree == NULL) {
-        return;
+        return true;
     }
 
     SymbolTableNode* existing;
@@ -143,7 +143,7 @@ void fill_table(AST* tree, SymbolTable* table) {
                 insert(table, tree->info);
             } else {
                 printf("Error: Redeclaración de la variable '%s' en línea %d.\n", as_info_base(tree->info)->props->name, as_info_base(tree->info)->props->line);
-                return;
+                return false;
             }
             break;
 
@@ -151,8 +151,7 @@ void fill_table(AST* tree, SymbolTable* table) {
           break;
     }
 
-    fill_table(tree->left, table);
-    fill_table(tree->right, table);
+    return fill_table(tree->left, table) && fill_table(tree->right, table);
 }
 
 bool check_types(AST* tree, SymbolTable* table) {

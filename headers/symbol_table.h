@@ -45,7 +45,7 @@ void print_table(SymbolTable* table);
 */
 void free_table(SymbolTable* table);
 
-void fill_table(AST* tree, SymbolTable* table);
+bool fill_table(AST* tree, SymbolTable* table);
 
 bool check_types(AST* tree, SymbolTable* table);
 
