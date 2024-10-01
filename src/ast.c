@@ -134,6 +134,7 @@ char* tag_to_str(Tag tag){
         case MUL:       return strdup("MUL");           break;
         case VALUE:     return strdup("VALUE");         break;
         case IF:        return strdup("IF");            break;
+        case WHILE:     return strdup("WHILE");         break;
         case T_E:       return strdup("T_E");           break;
         default:        return strdup("UNKNOWN_TAG");   break;
     }
