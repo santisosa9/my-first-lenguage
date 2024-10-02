@@ -9,52 +9,97 @@
 
 Type get_type_from_table(AST* node, SymbolTable* table);
 Type get_type(char* name, SymbolTable* table);
+Info* _search_in_scope(STStackNode* scope, char* name);
 
 SymbolTable* new_symbol_table(){
     SymbolTable* table = (SymbolTable*)malloc(sizeof(SymbolTable));
-    table->size = 0;
-    table->head = NULL;
+    table->scope_size = 1; // the global scope
+    table->total_size = 0;
+    table->base = new_symbol_table_stack_node(NULL, NULL, NULL);
+    table->top = table->base;
     return table;
 }
 
-SymbolTableNode* new_symbol_table_node(Info* info){
-    SymbolTableNode* node = (SymbolTableNode*)malloc(sizeof(SymbolTableNode));
-    node->info = info;
-    node->next = NULL;
+STStackNode* new_symbol_table_stack_node(STListNode* head, STStackNode* next, STStackNode* prev){
+    STStackNode* node = (STStackNode*)malloc(sizeof(STStackNode));
+    node->head = head;
+    node->next = next;
+    node->prev = prev;
     return node;
+}
+
+STListNode* new_symbol_table_list_node(Info* info, STListNode* next){
+    STListNode* node = (STListNode*)malloc(sizeof(STListNode));
+    node->info = info;
+    node->next = next;
+    return node;
+}
+
+void open_scope(SymbolTable* table){
+    STStackNode* new_node = new_symbol_table_stack_node(NULL, NULL, table->top);
+    table->top->next = new_node;
+    table->top = new_node;
+    table->scope_size++;
+}
+
+void close_scope(SymbolTable* table){
+    if(table->scope_size <= 1) return;
+
+    STStackNode* prev = table->top->prev;
+    STListNode* current = table->top->head;
+    STListNode* next = NULL;
+
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+
+    free_symbol_table_stack_node(table->top);
+    table->top = prev;
+    table->scope_size--;
 }
 
 bool insert(SymbolTable* table, Info* info){
     if(table == NULL) return false;
 
-    SymbolTableNode* new_node = new_symbol_table_node(info);
-    SymbolTableNode* current = table->head;
-
-    while (table->size > 0 && current->next != NULL) {
-        if(strcmp(as_info_base(current->info)->props->name, as_info_base(info)->props->name) == 0){
-            return false;
-        }
-        current = current->next;
-    }
-
-    if(table->size == 0){
-        table->head = new_node;
-    } else {
-        current->next = new_node;
-    }
-
-    table->size++;
+    STListNode* new_node = new_symbol_table_list_node(info, table->top->head);
+    table->top->head = new_node;
+    table->total_size++;
     return true;
 }
 
-SymbolTableNode* search(SymbolTable* table, char* name){
+Info* search(SymbolTable* table, char* name){
     if(table == NULL) return NULL;
 
-    SymbolTableNode* current = table->head;
+    STStackNode* current_scope = table->top;
+
+    while (current_scope != NULL) {
+        Info* result = _search_in_scope(current_scope, name);
+        if (result != NULL) {
+            return result;
+        }
+        current_scope = current_scope->prev;
+    }
+
+    return NULL;
+}
+
+
+Info* search_fn(SymbolTable* table, char* name) {
+    if (table == NULL) return NULL;
+
+    return _search_in_scope(table->base, name);
+}
+
+Info* _search_in_scope(STStackNode* scope, char* name) {
+    if (scope == NULL) return NULL;
+
+    STListNode* current = scope->head;
 
     while (current != NULL) {
-        if(strcmp(as_info_base(current->info)->props->name, name) == 0){
-            return current;
+        if (strcmp(as_info_base(current->info)->props->name, name) == 0) {
+            return current->info;
         }
         current = current->next;
     }
@@ -66,35 +111,46 @@ bool update(SymbolTable* table, AST* tree, Info* info){
     if(table == NULL) return false;
     if (tree == NULL) return false;
 
-    SymbolTableNode* target = search(table, as_info_base(info)->props->name);
+    Info* target = NULL;
+    if (tree->tag == DEC_FN || tree->tag == CALL_FN)
+        target = search_fn(table, as_info_fn(info)->props->name);
+    else
+        target = search(table, as_info_base(info)->props->name);
 
     if(target == NULL) return false;
 
-    copy_info(tree->tag, target->info, info);
-    tree->info = target->info;
+    copy_info(tree->tag, target, info);
+    tree->info = target;
 
     return true;
 }
 
 
-SymbolTableNode* erase(SymbolTable* table, char* name){
-    if(table == NULL) return false;
+Info* erase(SymbolTable* table, char* name){
+    if(table == NULL) return NULL;
 
-    SymbolTableNode* current = table->head;
-    SymbolTableNode* prev = NULL;
+    STStackNode* current_scope = table->top;
 
-    while (current != NULL) {
-        if(strcmp(as_info_base(current->info)->props->name, name) == 0){
-            if(prev == NULL){
-                table->head = current->next;
-            } else {
-                prev->next = current->next;
+    while (current_scope != NULL) {
+        STListNode* current = current_scope->head;
+        STListNode* prev = NULL;
+
+        while (current != NULL) {
+            if (strcmp(as_info_base(current->info)->props->name, name) == 0) {
+                Info* info = current->info;
+                if (prev == NULL) {
+                    current_scope->head = current->next;
+                } else {
+                    prev->next = current->next;
+                }
+                free(current);
+                return info;
             }
-            table->size--;
-            return current;
+            prev = current;
+            current = current->next;
         }
-        prev = current;
-        current = current->next;
+
+        current_scope = current_scope->prev;
     }
 
     return NULL;
@@ -103,29 +159,50 @@ SymbolTableNode* erase(SymbolTable* table, char* name){
 void print_table(SymbolTable* table){
     if(table == NULL) return;
 
-    SymbolTableNode* current = table->head;
+    STStackNode* current_scope = table->base;
 
-    printf("Table: \n");
-    while (current != NULL) {
-        print_info(ID, current->info);
-        current = current->next;
+    while (current_scope != NULL) {
+        STListNode* current = current_scope->head;
+
+        while (current != NULL) {
+            print_info(ID, current->info);
+            current = current->next;
+        }
+
+        current_scope = current_scope->next;
     }
 }
 
 void free_table(SymbolTable* table){
-    if(table == NULL) return;
+    if (table == NULL) return;
 
-    SymbolTableNode* current = table->head;
-    SymbolTableNode* next = NULL;
+    STStackNode* current_scope = table->top;
+    STStackNode* prev = NULL;
 
-    while (current != NULL) {
-        next = current->next;
-        free(current->info);
-        free(current);
-        current = next;
+    while (current_scope != NULL) {
+        free_symbol_table_stack_node(current_scope);
+        current_scope = prev;
     }
 
     free(table);
+}
+
+void free_symbol_table_stack_node(STStackNode* node){
+    if(node == NULL) return;
+
+    while (node->head != NULL)
+    {
+        STListNode* next = node->head->next;
+        free_symbol_table_list_node(node->head);
+        node->head = next;
+    }
+
+    free(node);
+}
+
+void free_symbol_table_list_node(STListNode* node){
+    if(node == NULL) return;
+    free(node);
 }
 
 bool fill_table(AST* tree, SymbolTable* table) {
@@ -133,7 +210,7 @@ bool fill_table(AST* tree, SymbolTable* table) {
         return true;
     }
 
-    SymbolTableNode* existing;
+    Info* existing;
     Tag currentTag = tree->tag;
 
     switch (currentTag) {
@@ -228,17 +305,17 @@ bool check_types(AST* tree, SymbolTable* table) {
 }
 
 Type get_type_from_table(AST* node, SymbolTable* table) {
-    SymbolTableNode* node_in_table = NULL;
+    Info* info = NULL;
 
     if (node->tag == ID) {
-        node_in_table = search(table, as_info_base(node->info)->props->name);
-        if (node_in_table == NULL) {
+        info = search(table, as_info_base(node->info)->props->name);
+        if (info == NULL) {
             printf("Error: Variable '%s' no declarada en linea %d.\n", as_info_base(node->info)->props->name, as_info_base(node->info)->props->line);
         }
     }
 
     // Si no lo encuentra en la tabla, usamos el tipo que tiene en el arbol
-    return (node_in_table != NULL) ? as_info_base(node_in_table->info)->props->type : as_info_base(node->info)->props->type;
+    return (info != NULL) ? as_info_base(info)->props->type : as_info_base(node->info)->props->type;
 }
 
 int evaluate_expression(AST* expr, SymbolTable* table) {
@@ -253,9 +330,9 @@ int evaluate_expression(AST* expr, SymbolTable* table) {
             return as_info_base(expr->info)->props->value;
 
         case ID: {
-            SymbolTableNode* var = search(table, as_info_base(expr->info)->props->name);
-            if (var != NULL) {
-              return as_info_base(var->info)->props->value;
+            Info* info = search(table, as_info_base(expr->info)->props->name);
+            if (info != NULL) {
+              return as_info_base(info)->props->value;
             } else {
               return -1;
             }
@@ -291,8 +368,7 @@ void interpret(AST* tree, SymbolTable* table) {
     }
 
     if (tree->tag == ASIG) {
-        SymbolTableNode* existing = search(table, as_info_base(tree->left->info)->props->name);
-        Info* updatedInfo = existing->info;
+        Info* updatedInfo = search(table, as_info_base(tree->left->info)->props->name);
         int result = evaluate_expression(tree->right, table);
         update_value(updatedInfo, result);
         update(table, tree->left, updatedInfo);
@@ -311,6 +387,6 @@ void interpret(AST* tree, SymbolTable* table) {
 }
 
 Type get_type(char* name, SymbolTable* table) {
-    SymbolTableNode* e = search(table, name);
-    return as_info_base(e->info)->props->type;
+    Info* info = search(table, name);
+    return as_info_base(info)->props->type;
 }

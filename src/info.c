@@ -55,7 +55,7 @@ Info* copy_info(Tag tag, Info* dest, Info* src){
     if(dest == NULL || src == NULL) return NULL;
 
     switch (tag) {
-        case FN:
+        case DEC_FN:
             as_info_fn(dest)->props = as_info_fn(src)->props;
             as_info_fn(dest)->cant_params = as_info_fn(src)->cant_params;
             as_info_fn(dest)->params = as_info_fn(src)->params;
@@ -82,7 +82,7 @@ void update_value(Info* dest, int value) {
 void print_info(Tag tag, Info* info){
     switch (tag)
     {
-    case FN:
+    case DEC_FN:
         _print_info_fn(as_info_fn(info));
         break;
 
