@@ -3,8 +3,9 @@
     #include <stdlib.h>
     #include <string.h>
 
-    #include "../headers/symbol_table.h"
     #include "../headers/ast.h"
+    #include "../headers/linked_list.h"
+    #include "../headers/symbol_table.h"
     #include "../headers/utils.h"
 
     AST* global_tree = NULL;
@@ -18,6 +19,7 @@
 %union {
   union Info* INFOP;
   struct AST* ASTP;
+  struct LinkedList* LISTP;
   char* CHARP;
   Type TYPE;
 };
@@ -57,12 +59,14 @@
 %type <ASTP> statement
 %type <ASTP> dec
 %type <ASTP> dec_fn
+%type <ASTP> call_fn
 %type <ASTP> expr
-%type <ASTP> exprs
+%type <ASTP> param_exprs
 %type <ASTP> asig
 %type <ASTP> ret
 %type <ASTP> while
 %type <ASTP> if
+%type <LISTP> param
 
 %%
 
@@ -90,29 +94,45 @@ statement: ret                           { $$ = $1; }
          | if                            { $$ = $1; }
          | while                         { $$ = $1; }
          | block                         { $$ = $1; }
-         | dec_fn                        { $$ = $1; } 
+         | dec_fn                        { $$ = $1; }
          ;
 
-dec_fn: type_fn T_ID '(' param ')' block      {printf("dec fn block"); }
-      | type_fn T_ID '(' param ')' T_EXTERN   {printf("dec fn extern"); }
+dec_fn: type_fn T_ID '(' param ')' block       { InfoFunction* i_fn = new_info_fn(as_info_base($2)->props, $4, false);
+                                                 i_fn->props->type = $1;
+                                                 $$ = build_root(NULL, i_fn, DEC_FN, $6);
+                                               }
+      | type_fn T_ID '(' param ')' T_EXTERN T_SEMICOLON   { InfoFunction* i_fn = new_info_fn(as_info_base($2)->props, $4, true);
+                                                 i_fn->props->type = $1;
+                                                 $$ = build_root(NULL, i_fn, DEC_FN, $6);
+                                               }
       ;
 
-call_fn: T_ID '(' exprs ')'                    {printf("call fn"); }
+param: type_var T_ID                           { InfoBase* i_base = as_info_base($2);
+                                                 i_base->props->type = $1;
+                                                 LinkedList* params = new_linked_list();
+                                                 insert_head(params, i_base);
+                                                 $$ = params;
+                                               }
+     | type_var T_ID ',' param                 { InfoBase* i_base = as_info_base($2);
+                                                 i_base->props->type = $1;
+                                                 LinkedList* params = $4;
+                                                 insert_head(params, i_base);
+                                                 $$ = params;
+                                               }
+     ;
+
+call_fn: T_ID '(' param_exprs ')'              { $$ = join_trees(NULL, new_node($1, CALL_FN), $3); }
        ;
 
-param: type_var T_ID                           {printf("param"); }
-     | type_var T_ID ',' param                 {printf("params"); }
-     ;
+param_exprs: expr                       { $$ = build_root($1, NULL, PARAM, NULL); }
+           | expr ',' param_exprs       { $$ = build_root($1, NULL, PARAM, $3); }
+           ;
 
 dec: type_var T_ID                      { AST* node = new_node($2, DEC);
                                           as_info_base(node->info)->props->type = $1;
                                           $$ = node;
                                         }
    ;
-
-exprs: expr                             { printf("expr"); }
-     | expr ',' exprs                   { printf("exprs"); } 
-     ;
 
 expr: expr T_ADD expr                   { $$ = build_root($1, $2, ADD, $3); }
     | expr T_MUL expr                   { $$ = build_root($1, $2, MUL, $3); }
@@ -124,7 +144,7 @@ expr: expr T_ADD expr                   { $$ = build_root($1, $2, ADD, $3); }
     | T_NRO                             { $$ = new_node($1, VALUE); }
     | T_TRUE                            { $$ = new_node($1, VALUE); }
     | T_FALSE                           { $$ = new_node($1, VALUE); }
-    | call_fn                           { printf("call fn"); }
+    | call_fn                           { $$ = $1; }
     ;
 
 asig: T_ID T_ASIG expr                  { $$ = join_trees(new_node($1, ID), new_node($2, ASIG), $3); }

@@ -1,6 +1,7 @@
 #pragma once
 #include "tag.h"
 #include "utils.h"
+#include "linked_list.h"
 
 typedef enum Type
 {
@@ -32,7 +33,8 @@ typedef struct InfoFunction
 {
     Props* props;
     nat cant_params;
-    Param* params; // Param[]
+    LinkedList* params; // Param[]
+    bool is_extern;
 } InfoFunction;
 
 typedef struct InfoControlFlow
@@ -57,7 +59,7 @@ Props* new_props(Type type, int value, char* name, int line, int col);
 
 /* Create a new info. */
 Info* new_info(Type type, int value, char* name, int line, int col);
-Info* new_info_fn(Props* props, nat cant_params, InfoBase* params);
+Info* new_info_fn(Props* props, LinkedList* params, bool is_extern);
 Info* new_info_base(Props* props);
 
 /* Print the info. */

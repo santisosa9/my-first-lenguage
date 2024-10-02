@@ -41,12 +41,13 @@ Info* new_info(Type type, int value, char* name, int line, int col){
 }
 
 
-Info* new_info_fn(Props* props, nat cant_params, InfoBase* params){
+Info* new_info_fn(Props* props, LinkedList* params, bool is_extern){
     Info* info = (Info*)malloc(sizeof(Info));
 
     as_info_fn(info)->props = props;
-    as_info_fn(info)->cant_params = cant_params;
+    as_info_fn(info)->cant_params = params->size;
     as_info_fn(info)->params = params;
+    as_info_fn(info)->is_extern = is_extern;
 
     return info;
 }
@@ -55,7 +56,7 @@ Info* copy_info(Tag tag, Info* dest, Info* src){
     if(dest == NULL || src == NULL) return NULL;
 
     switch (tag) {
-        case FN:
+        case DEC_FN:
             as_info_fn(dest)->props = as_info_fn(src)->props;
             as_info_fn(dest)->cant_params = as_info_fn(src)->cant_params;
             as_info_fn(dest)->params = as_info_fn(src)->params;

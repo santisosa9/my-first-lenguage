@@ -14,5 +14,7 @@ typedef enum Tag{
     IF, THEN, ELSE,
     WHILE,
     CF,
-    FN,
+    DEC_FN,
+    CALL_FN,
+    PARAM
 } Tag;
