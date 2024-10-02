@@ -89,7 +89,7 @@ void print_info(Tag tag, Info* info){
 
 void _print_info_base(InfoBase* info){
     if(info == NULL) {
-        puts("print_info: info is NULL");
+        puts("");
         return;
     }
     printf("{");

@@ -18,3 +18,7 @@ secuencia lineal de instrucciones, por ejemplo, funciones, para mejorar el
 diseño y no tener una sola estructura sobrecargada con información innecesaria
 se decidió discriminar entre varios tipos de Info: InfoBase, InfoFunction e
 InfoControlFlow.
+
+### Statement vacio
+
+No se puede.

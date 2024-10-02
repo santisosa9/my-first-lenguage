@@ -117,3 +117,25 @@ void print_node(AST* node) {
     printf("Tag: %s, ", tag_to_str(node->tag));
     print_info(node->tag, node->info);
 }
+
+char* tag_to_str(Tag tag){
+    switch (tag){
+        case ID:        return strdup("ID");            break;
+        case PROGRAM:   return strdup("PROGRAM");       break;
+        case RET:       return strdup("RET");           break;
+        case ASIG:      return strdup("ASIG");          break;
+        case TYPE:      return strdup("TYPE");          break;
+        case SEMICOLON: return strdup("SEMICOLON");     break;
+        case DEC:       return strdup("DEC");           break;
+        case NOT:       return strdup("NOT");           break;
+        case OR:        return strdup("OR");            break;
+        case AND:       return strdup("AND");           break;
+        case ADD:       return strdup("ADD");           break;
+        case MUL:       return strdup("MUL");           break;
+        case VALUE:     return strdup("VALUE");         break;
+        case IF:        return strdup("IF");            break;
+        case WHILE:     return strdup("WHILE");         break;
+        case T_E:       return strdup("T_E");           break;
+        default:        return strdup("UNKNOWN_TAG");   break;
+    }
+}

@@ -70,27 +70,27 @@
 
 %%
 
-prog: T_PROGRAM block                    { global_tree = build_root(NULL, $1, MAIN, $2); }
+prog: T_PROGRAM block                    { global_tree = build_root(NULL, $1, PROGRAM, $2); }
     ;
-
-type_var: T_INT                          { $$ = INT; }
-        | T_BOOL                         { $$ = BOOL; }
-        ;
 
 type_fn: type_var                        { $$ = $1; }
        | T_VOID                          { $$ = VOID; }
        ;
 
-block: '{' body '}'                      { printf("block"); }
+type_var: T_INT                          { $$ = INT; }
+        | T_BOOL                         { $$ = BOOL; }
+        ;
+
+block: '{' body '}'                      { $$ = $2; }
      ;
 
-body: statement T_SEMICOLON              { $$ = $1; }
-    | statement T_SEMICOLON body         { $$ = build_root($1, $2, SEMICOLON, $3); }
+body: statement                          { $$ = $1; }
+    | statement body                     { $$ = build_root($1, NULL, SEMICOLON, $2); }
     ;
 
-statement: ret                           { $$ = $1; }
-         | dec                           { $$ = $1; }
-         | asig                          { $$ = $1; }
+statement: ret T_SEMICOLON               { $$ = $1; }
+         | dec T_SEMICOLON               { $$ = $1; }
+         | asig T_SEMICOLON              { $$ = $1; }
          | if                            { $$ = $1; }
          | while                         { $$ = $1; }
          | block                         { $$ = $1; }
@@ -154,8 +154,10 @@ ret: T_RET                              { $$ = new_node($1, RET); }
    | T_RET expr                         { $$ = build_root(NULL, $1, RET, $2); }
    ;
 
-if: T_IF '(' expr ')' T_THEN block                       { printf("if then"); }
-  | T_IF '(' expr ')' T_THEN block T_ELSE block          { printf("if then else"); }
+if: T_IF '(' expr ')' T_THEN block                       { $$ = build_root($3, $1, IF, $6); }
+  | T_IF '(' expr ')' T_THEN block T_ELSE block          { AST* t_e = build_root($6, NULL, T_E, $8);
+                                                           $$ = build_root($3, $1, IF, t_e); 
+                                                         }
   ;
 
 while: T_WHILE '(' expr ')' block       { $$ = build_root($3, $1, WHILE, $5); }
