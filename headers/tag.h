@@ -13,8 +13,9 @@ typedef enum Tag{
     NOT, OR, AND, ADD, MUL,
     IF, THEN, ELSE,
     WHILE,
-    CF,
     DEC_FN,
     CALL_FN,
     PARAM
 } Tag;
+
+char* tag_to_str(Tag tag);

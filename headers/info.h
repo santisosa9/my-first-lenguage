@@ -20,6 +20,7 @@ typedef struct Props
     char* name;
     nat line;
     nat col;
+    bool is_fn;
 } Props;
 
 typedef struct InfoBase
@@ -37,14 +38,7 @@ typedef struct InfoFunction
     bool is_extern;
 } InfoFunction;
 
-typedef struct InfoControlFlow
-{
-    Props* props;
-} InfoControlFlow;
-
-
 typedef union Info {
-    InfoControlFlow cf;
     InfoFunction fn;
     InfoBase base;
 } Info;
@@ -52,7 +46,6 @@ typedef union Info {
 /* Convert the info to its corresponding type. */
 InfoBase* as_info_base(Info* info);
 InfoFunction* as_info_fn(Info* info);
-InfoControlFlow* as_info_cf(Info* info);
 
 /* Create a new prop. */
 Props* new_props(Type type, int value, char* name, int line, int col);

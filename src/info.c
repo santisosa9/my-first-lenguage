@@ -7,7 +7,6 @@
 
 void _print_info_base(InfoBase* info);
 void _print_info_fn(InfoFunction* info);
-void _print_info_cf(InfoControlFlow* info);
 
 InfoBase* as_info_base(Info* info){
     return &info->base;
@@ -17,10 +16,6 @@ InfoFunction* as_info_fn(Info* info){
     return &info->fn;
 }
 
-InfoControlFlow* as_info_cf(Info* info){
-    return &info->cf;
-}
-
 Props* new_prop(Type type, int value, char* name, int line, int col){
     Props* prop = (Props*)malloc(sizeof(Props));
     prop->type = type;
@@ -28,6 +23,7 @@ Props* new_prop(Type type, int value, char* name, int line, int col){
     prop->name = name;
     prop->line = line;
     prop->col = col;
+    prop->is_fn = false;
     return prop;
 }
 
@@ -45,9 +41,11 @@ Info* new_info_fn(Props* props, LinkedList* params, bool is_extern){
     Info* info = (Info*)malloc(sizeof(Info));
 
     as_info_fn(info)->props = props;
+    as_info_fn(info)->props->is_fn = true;
     as_info_fn(info)->cant_params = params->size;
     as_info_fn(info)->params = params;
     as_info_fn(info)->is_extern = is_extern;
+
 
     return info;
 }
@@ -60,10 +58,6 @@ Info* copy_info(Tag tag, Info* dest, Info* src){
             as_info_fn(dest)->props = as_info_fn(src)->props;
             as_info_fn(dest)->cant_params = as_info_fn(src)->cant_params;
             as_info_fn(dest)->params = as_info_fn(src)->params;
-            break;
-
-        case CF:
-            as_info_cf(dest)->props = as_info_cf(src)->props;
             break;
 
         default:
@@ -83,12 +77,8 @@ void update_value(Info* dest, int value) {
 void print_info(Tag tag, Info* info){
     switch (tag)
     {
-    case FN:
+    case DEC_FN:
         _print_info_fn(as_info_fn(info));
-        break;
-
-    case CF:
-        _print_info_cf(as_info_cf(info));
         break;
 
     default:
@@ -126,19 +116,6 @@ void _print_info_fn(InfoFunction* info){
         _print_info_base(&info->params[i]);
     }
     printf("]");
-    printf("}\n");
-}
-
-void _print_info_cf(InfoControlFlow* info){
-    if(info == NULL) {
-        puts("print_info: info is NULL");
-        return;
-    }
-    printf("{");
-    printf("Type: %s, ", type_to_str(info->props->type));
-    printf("Value: %s, ", value_to_str(info->props->value, info->props->type));
-    printf("Name: %s, ", info->props->name);
-    printf("Line: %d", info->props->line);
     printf("}\n");
 }
 
