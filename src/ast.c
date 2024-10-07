@@ -131,6 +131,9 @@ char* tag_to_str(Tag tag){
         case OR:        return strdup("OR");            break;
         case AND:       return strdup("AND");           break;
         case ADD:       return strdup("ADD");           break;
+        case EQUALS:    return strdup("EQUALS");        break;
+        case MINOR:     return strdup("MINOR");         break;
+        case BIGGER:    return strdup("BIGGER");        break;
         case MUL:       return strdup("MUL");           break;
         case VALUE:     return strdup("VALUE");         break;
         case IF:        return strdup("IF");            break;

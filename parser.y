@@ -30,6 +30,9 @@
 %token <INFOP> T_ID
 %token <INFOP> T_ADD
 %token <INFOP> T_MUL
+%token <INFOP> T_MINOR
+%token <INFOP> T_BIGGER
+%token <INFOP> T_EQUALS
 %token <INFOP> T_AND
 %token <INFOP> T_OR
 %token <INFOP> T_NOT
@@ -138,6 +141,9 @@ expr: expr T_ADD expr                   { $$ = build_root($1, $2, ADD, $3); }
     | expr T_MUL expr                   { $$ = build_root($1, $2, MUL, $3); }
     | expr T_AND expr                   { $$ = build_root($1, $2, AND, $3); }
     | expr T_OR  expr                   { $$ = build_root($1, $2, OR, $3); }
+    | expr T_EQUALS expr                { $$ = build_root($1, $2, EQUALS, $3); }
+    | expr T_MINOR expr                 { $$ = build_root($1, $2, MINOR, $3); }
+    | expr T_BIGGER expr                { $$ = build_root($1, $2, BIGGER, $3); }
     | T_NOT expr                        { $$ = build_root(NULL, $1, NOT, $2); }
     | '(' expr ')'                      { $$ = $2; }
     | T_ID                              { $$ = new_node($1, ID); }

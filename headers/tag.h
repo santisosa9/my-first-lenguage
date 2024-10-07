@@ -15,7 +15,9 @@ typedef enum Tag{
     WHILE,
     DEC_FN,
     CALL_FN,
-    PARAM
+    PARAM,
+    MINOR, BIGGER, EQUALS,
+    FN,
 } Tag;
 
 char* tag_to_str(Tag tag);
