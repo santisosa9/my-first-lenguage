@@ -86,7 +86,7 @@ Info* search(SymbolTable* table, char* name){
 }
 
 
-Info* search_fn(SymbolTable* table, char* name) {
+Info* search_global(SymbolTable* table, char* name) {
     if (table == NULL) return NULL;
 
     return _search_in_scope(table->base, name);
@@ -113,7 +113,7 @@ bool update(SymbolTable* table, AST* tree, Info* info){
 
     Info* target = NULL;
     if (tree->tag == DEC_FN || tree->tag == CALL_FN)
-        target = search_fn(table, as_info_fn(info)->props->name);
+        target = search_global(table, as_info_fn(info)->props->name);
     else
         target = search(table, as_info_base(info)->props->name);
 
@@ -225,7 +225,7 @@ bool fill_table(AST* tree, SymbolTable* table) {
             break;
 
         case DEC_FN:
-            existing = search_fn(table, as_info_fn(tree->info)->props->name);
+            existing = search_global(table, as_info_fn(tree->info)->props->name);
             if (existing == NULL) {
                 insert(table, tree->info);
             } else {
@@ -327,7 +327,7 @@ Type get_type_from_table(AST* node, SymbolTable* table) {
     }
 
     else if (node->tag == CALL_FN) {
-        info = search_fn(table, as_info_fn(node->info)->props->name);
+        info = search_global(table, as_info_fn(node->info)->props->name);
         if (info == NULL) {
             printf("Error: Función '%s' no declarada en linea %d.\n", as_info_fn(node->info)->props->name, as_info_fn(node->info)->props->line);
         }

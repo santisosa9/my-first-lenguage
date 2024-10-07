@@ -47,7 +47,7 @@ Info* search(SymbolTable* table, char* name);
 /* Search for the function with the given name in the table.
    Returns a pointer to the node if was found, or NULL if not.
 */
-Info* search_fn(SymbolTable* table, char* name);
+Info* search_global(SymbolTable* table, char* name);
 
 /* Open a new scope in the table. */
 void open_scope(SymbolTable* table);
