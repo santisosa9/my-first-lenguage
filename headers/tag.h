@@ -10,6 +10,7 @@ typedef enum Tag{
     RET, DEC, ASIG,
     EXTERN,
     SEMICOLON,
+    BLOCK,
     NOT, OR, AND, ADD, MUL,
     IF, T_E,
     WHILE,

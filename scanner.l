@@ -32,39 +32,39 @@ NRO         	(-?[1-9][0-9]{0,4})|0
 
  /* Info* new_info(Tag tag, Type type, int value, char* name, int line, int col); */
 
-";" 		  { /* printf("%s\n",yytext); */
+";" 		  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
                 return T_SEMICOLON; }
 
-"extern"      { /* printf("%s\n",yytext); */
+"extern"      { printf("%s\n",yytext);
                 yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
                 return T_EXTERN; }
 
-"if"          { /* printf("%s\n",yytext); */
+"if"          { printf("%s\n",yytext);
                 yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
                 return T_IF; }
 
-"then"        { /* printf("%s\n",yytext); */
+"then"        { printf("%s\n",yytext);
                 yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
                 return T_THEN; }
 
-"else"        { /* printf("%s\n",yytext); */
+"else"        { printf("%s\n",yytext);
                 yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
                 return T_ELSE; }
 
-"while"       { /* printf("%s\n",yytext); */
+"while"       { printf("%s\n",yytext);
                 yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
                 return T_WHILE; }
 
-"="			  { /* printf("%s\n",yytext); */
+"="			  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(NO_TYPED, 0, strdup(yytext), yylineno, 0);
                 return T_ASIG; }
 
-"+"		  	  { /* printf("%s\n",yytext); */
+"+"		  	  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
                 return T_ADD; }
 
-"*"		  	  { /* printf("%s\n",yytext); */
+"*"		  	  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
                 return T_MUL; }
 
@@ -78,7 +78,7 @@ NRO         	(-?[1-9][0-9]{0,4})|0
 
 "=="        { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
-                return T_EQUALS; }                
+                return T_EQUALS; }
 
 "!"		  	  { /* printf("%s\n",yytext); */
                 yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
@@ -88,47 +88,47 @@ NRO         	(-?[1-9][0-9]{0,4})|0
                 yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
                 return T_OR; }
 
-"&&"		  { /* printf("%s\n",yytext); */
+"&&"		  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
                 return T_AND; }
 
-"true"		  { /* printf("%s\n",yytext); */
+"true"		  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(BOOL, 1, strdup(yytext), yylineno, 0);
                 return T_TRUE; }
 
-"false"		  { /* printf("%s\n",yytext); */
+"false"		  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
                 return T_FALSE; }
 
-"int"		  { /* printf("%s\n",yytext); */
+"int"		  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
                 return T_INT; }
 
-"integer"	  { /* printf("%s\n",yytext); */
+"integer"	  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
                 return T_INT; }
 
-"bool"		  { /* printf("%s\n",yytext); */
+"bool"		  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
                 return T_BOOL; }
 
-"void"		  { /* printf("%s\n",yytext); */
+"void"		  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(VOID, 0, strdup(yytext), yylineno, 0);
                 return T_VOID; }
 
-"return"	  { /* printf("%s\n",yytext); */
+"return"	  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(ANY, 0, strdup(yytext), yylineno, 0);
                 return T_RET; }
 
-"Program"		{ /* printf("%s\n",yytext); */
+"Program"	  { printf("%s\n",yytext);
                 yylval.INFOP = new_info(ANY, 0, strdup(yytext), yylineno, 0);
                 return T_PROGRAM; }
 
-{ID}		  { /* printf("ID: %s\n",yytext); */
+{ID}		  { printf("ID: %s\n",yytext);
                 yylval.INFOP = new_info(ANY, 0, strdup(yytext), yylineno, 0);
                 return T_ID; }
 
-{NRO}		  { /* printf("NRO: %d\n",atoi(yytext)); */
+{NRO}		  { printf("NRO: %d\n",atoi(yytext));
                 yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_NRO; }
 
@@ -136,12 +136,12 @@ NRO         	(-?[1-9][0-9]{0,4})|0
 
 [/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]  { /* DO NOTHING */ }
 
-[{}()]        { /* printf("%s\n",yytext); */
+[{}(),]        { printf("HI!%s\n",yytext);
                 return *yytext; }
 
 [ \t\n]       ;  /* Ignorar espacios en blanco (pq los imprime????) */
 
-.			  { /* printf("ERROR: %s\n",yytext); */
+.			  { printf("ERROR: %s\n",yytext);
                 yyerror(); }
 
 %%

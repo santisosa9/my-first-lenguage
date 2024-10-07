@@ -106,14 +106,14 @@ void _print_info_fn(InfoFunction* info){
         return;
     }
     printf("{");
-    printf("Return_type: %s", type_to_str(info->props->type));
+    printf("Ret type: %s,", type_to_str(info->props->type));
     printf("Value: %s, ", value_to_str(info->props->value, info->props->type));
     printf("Name: %s, ", info->props->name);
-    printf("Line: %d", info->props->line);
-    printf("Cant_params: %d, ", info->cant_params);
+    printf("Line: %d,", info->props->line);
+    printf("Cant p: %d, ", info->cant_params);
     printf("Params: [");
     for (nat i = 0; i < info->cant_params; i++) {
-        _print_info_base(&info->params[i]);
+        _print_info_base(lookup(info->params, i));
     }
     printf("]");
     printf("}\n");

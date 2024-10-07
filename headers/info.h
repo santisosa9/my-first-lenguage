@@ -1,4 +1,6 @@
 #pragma once
+
+#include <stdbool.h>
 #include "tag.h"
 #include "utils.h"
 #include "linked_list.h"

@@ -49,13 +49,15 @@
 %token <INFOP> T_WHILE
 %token <INFOP> T_EXTERN
 
-%left T_NOT
+
 %left T_AND T_OR
+%nonassoc T_EQUALS T_MINOR T_BIGGER
 %left T_ADD
 %left T_MUL
+%left T_UNMINUS
+
 
 %type <ASTP> prog
-%type <TYPE> type_fn
 %type <TYPE> type_var
 %type <ASTP> body
 %type <ASTP> block
@@ -76,15 +78,13 @@
 prog: T_PROGRAM block                    { global_tree = build_root(NULL, $1, PROGRAM, $2); }
     ;
 
-type_fn: type_var                        { $$ = $1; }
-       | T_VOID                          { $$ = VOID; }
-       ;
 
 type_var: T_INT                          { $$ = INT; }
         | T_BOOL                         { $$ = BOOL; }
+        | T_VOID                         { $$ = VOID; }
         ;
 
-block: '{' body '}'                      { $$ = $2; }
+block: '{' body '}'                      { $$ = build_root(NULL, NULL, BLOCK, $2); }
      ;
 
 body: statement                          { $$ = $1; }
@@ -98,17 +98,27 @@ statement: ret T_SEMICOLON               { $$ = $1; }
          | while                         { $$ = $1; }
          | block                         { $$ = $1; }
          | dec_fn                        { $$ = $1; }
+         | call_fn T_SEMICOLON           { $$ = $1; }
          ;
 
-dec_fn: type_fn T_ID '(' param ')' block       { InfoFunction* i_fn = new_info_fn(as_info_base($2)->props, $4, false);
-                                                 i_fn->props->type = $1;
-                                                 $$ = build_root(NULL, i_fn, DEC_FN, $6);
-                                               }
-      | type_fn T_ID '(' param ')' T_EXTERN T_SEMICOLON   { InfoFunction* i_fn = new_info_fn(as_info_base($2)->props, $4, true);
-                                                 i_fn->props->type = $1;
-                                                 $$ = build_root(NULL, i_fn, DEC_FN, $6);
-                                               }
-      ;
+dec_fn: type_var T_ID '(' param ')' block           { Info* i_fn = new_info_fn(as_info_base($2)->props, $4, false);
+                                                      as_info_fn(i_fn)->props->type = $1;
+                                                      $$ = build_root(NULL, i_fn, DEC_FN, $6);
+                                                    }
+
+      | type_var T_ID '(' ')' block                 { Info* i_fn = new_info_fn(as_info_base($2)->props, new_linked_list(), false);
+                                                      as_info_fn(i_fn)->props->type = $1;
+                                                      $$ = build_root(NULL, i_fn, DEC_FN, $5);
+                                                    }
+      | type_var T_ID '(' param ')' T_EXTERN T_SEMICOLON  { Info* i_fn = new_info_fn(as_info_base($2)->props, $4, true);
+                                                      as_info_fn(i_fn)->props->type = $1;
+                                                      $$ = build_root(NULL, i_fn, DEC_FN, NULL);
+                                                    }
+      | type_var T_ID '(' ')' T_EXTERN T_SEMICOLON  { Info* i_fn = new_info_fn(as_info_base($2)->props, new_linked_list(), true);
+                                                      as_info_fn(i_fn)->props->type = $1;
+                                                      $$ = build_root(NULL, i_fn, DEC_FN, NULL);
+                                                    }
+
 
 param: type_var T_ID                           { InfoBase* i_base = as_info_base($2);
                                                  i_base->props->type = $1;
@@ -124,7 +134,8 @@ param: type_var T_ID                           { InfoBase* i_base = as_info_base
                                                }
      ;
 
-call_fn: T_ID '(' param_exprs ')'              { $$ = join_trees(NULL, new_node($1, CALL_FN), $3); }
+call_fn: T_ID '(' param_exprs ')'       { $$ = join_trees(NULL, new_node($1, CALL_FN), $3); }
+       | T_ID '(' ')'                   { $$ = join_trees(NULL, new_node($1, CALL_FN), NULL); }
        ;
 
 param_exprs: expr                       { $$ = build_root($1, NULL, PARAM, NULL); }
@@ -144,7 +155,7 @@ expr: expr T_ADD expr                   { $$ = build_root($1, $2, ADD, $3); }
     | expr T_EQUALS expr                { $$ = build_root($1, $2, EQUALS, $3); }
     | expr T_MINOR expr                 { $$ = build_root($1, $2, MINOR, $3); }
     | expr T_BIGGER expr                { $$ = build_root($1, $2, BIGGER, $3); }
-    | T_NOT expr                        { $$ = build_root(NULL, $1, NOT, $2); }
+    | T_NOT expr %prec T_UNMINUS        { $$ = build_root(NULL, $1, NOT, $2); }
     | '(' expr ')'                      { $$ = $2; }
     | T_ID                              { $$ = new_node($1, ID); }
     | T_NRO                             { $$ = new_node($1, VALUE); }
@@ -162,7 +173,7 @@ ret: T_RET                              { $$ = new_node($1, RET); }
 
 if: T_IF '(' expr ')' T_THEN block                       { $$ = build_root($3, $1, IF, $6); }
   | T_IF '(' expr ')' T_THEN block T_ELSE block          { AST* t_e = build_root($6, NULL, T_E, $8);
-                                                           $$ = build_root($3, $1, IF, t_e); 
+                                                           $$ = build_root($3, $1, IF, t_e);
                                                          }
   ;
 

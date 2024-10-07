@@ -10,9 +10,9 @@ void print_string(void* data)
 int main(int argc, char const *argv[])
 {
     LinkedList* list = new_linked_list();
-    insert(list, "Hello");
-    insert(list, "World");
-    insert(list, "!");
+    insert_ll(list, "Hello");
+    insert_ll(list, "World");
+    insert_ll(list, "!");
     print_list(list, print_string);
     remove_at(list, 1);
     print_list(list, print_string);

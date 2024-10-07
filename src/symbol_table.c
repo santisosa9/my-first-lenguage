@@ -214,7 +214,7 @@ bool fill_table(AST* tree, SymbolTable* table) {
     Tag currentTag = tree->tag;
 
     switch (currentTag) {
-      case DEC:
+        case DEC:
             existing = search(table, as_info_base(tree->info)->props->name);
             if (existing == NULL) {
                 insert(table, tree->info);
@@ -224,8 +224,18 @@ bool fill_table(AST* tree, SymbolTable* table) {
             }
             break;
 
-      default:
-          break;
+        case DEC_FN:
+            existing = search_fn(table, as_info_fn(tree->info)->props->name);
+            if (existing == NULL) {
+                insert(table, tree->info);
+            } else {
+                printf("Error: Redeclaración de la función '%s' en línea %d.\n", as_info_fn(tree->info)->props->name, as_info_fn(tree->info)->props->line);
+                return false;
+            }
+            break;
+
+        default:
+            break;
     }
 
     return fill_table(tree->left, table) && fill_table(tree->right, table);
@@ -306,16 +316,29 @@ bool check_types(AST* tree, SymbolTable* table) {
 
 Type get_type_from_table(AST* node, SymbolTable* table) {
     Info* info = NULL;
+    Type result;
 
     if (node->tag == ID) {
         info = search(table, as_info_base(node->info)->props->name);
         if (info == NULL) {
             printf("Error: Variable '%s' no declarada en linea %d.\n", as_info_base(node->info)->props->name, as_info_base(node->info)->props->line);
         }
+        result = (info != NULL) ? as_info_base(info)->props->type : as_info_base(node->info)->props->type;
+    }
+
+    else if (node->tag == CALL_FN) {
+        info = search_fn(table, as_info_fn(node->info)->props->name);
+        if (info == NULL) {
+            printf("Error: Función '%s' no declarada en linea %d.\n", as_info_fn(node->info)->props->name, as_info_fn(node->info)->props->line);
+        }
+        if (info != NULL && as_info_fn(info)->props->is_fn == false) {
+            printf("Error: '%s' no es una función en linea %d.\n", as_info_fn(node->info)->props->name, as_info_fn(node->info)->props->line);
+        }
+        result = (info != NULL) ? as_info_fn(info)->props->type : as_info_fn(node->info)->props->type;
     }
 
     // Si no lo encuentra en la tabla, usamos el tipo que tiene en el arbol
-    return (info != NULL) ? as_info_base(info)->props->type : as_info_base(node->info)->props->type;
+    return (info != NULL) ? result : as_info_base(node->info)->props->type;
 }
 
 int evaluate_expression(AST* expr, SymbolTable* table) {

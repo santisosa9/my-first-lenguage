@@ -18,9 +18,9 @@ LinkedList* new_linked_list()
     return list;
 }
 
-void insert_at(LinkedList* list, void* data, int index)
+void insert_at(LinkedList* list, void* data, nat index)
 {
-    if (index < 0 || index > list->size)
+    if (index > list->size)
     {
         printf("Index out of bounds\n");
         exit(1);
@@ -34,7 +34,7 @@ void insert_at(LinkedList* list, void* data, int index)
     else
     {
         LinkedListNode* current = list->head;
-        for (int i = 0; i < index - 1; i++)
+        for (nat i = 0; i < index - 1; i++)
         {
             current = current->next;
         }
@@ -44,7 +44,7 @@ void insert_at(LinkedList* list, void* data, int index)
     list->size++;
 }
 
-void insert(LinkedList* list, void* data)
+void insert_ll(LinkedList* list, void* data)
 {
     insert_at(list, data, list->size);
 }
@@ -54,15 +54,15 @@ void insert_head(LinkedList* list, void* data)
     insert_at(list, data, 0);
 }
 
-void* remove_at(LinkedList* list, int index)
+void* remove_at(LinkedList* list, nat index)
 {
-    if (index < 0 || index >= list->size)
+    if (index >= list->size)
     {
         return NULL;
     }
     LinkedListNode* current = list->head;
     LinkedListNode* previous = NULL;
-    for (int i = 0; i < index; i++)
+    for (nat i = 0; i < index; i++)
     {
         previous = current;
         current = current->next;
@@ -95,14 +95,14 @@ void* remove_tail(LinkedList* list)
     return remove_at(list, list->size - 1);
 }
 
-void* lookup(LinkedList* list, int index)
+void* lookup(LinkedList* list, nat index)
 {
-    if (index < 0 || index >= list->size)
+    if (index >= list->size)
     {
         return NULL;
     }
     LinkedListNode* current = list->head;
-    for (int i = 0; i < index; i++)
+    for (nat i = 0; i < index; i++)
     {
         current = current->next;
     }

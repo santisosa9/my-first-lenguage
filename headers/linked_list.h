@@ -20,10 +20,10 @@ LinkedListNode* new_linked_list_node(void* data);
 LinkedList* new_linked_list();
 
 /* Insert new data in the list. */
-void insert(LinkedList* list, void* data);
+void insert_ll(LinkedList* list, void* data);
 
 /* Insert new data in the list at the given index. */
-void insert_at(LinkedList* list, void* data, int index);
+void insert_at(LinkedList* list, void* data, nat index);
 
 /* Insert new data at the head of the list. */
 void insert_head(LinkedList* list, void* data);
@@ -35,12 +35,12 @@ void* remove_head(LinkedList* list);
 void* remove_tail(LinkedList* list);
 
 /* Remove the data with the given index from the list and retrun it. */
-void* remove_at(LinkedList* list, int index);
+void* remove_at(LinkedList* list, nat index);
 
 /* Search for the data with the given index in the list.
    Returns a pointer to the data if was found, or NULL if not.
 */
-void* lookup(LinkedList* list, int index);
+void* lookup(LinkedList* list, nat index);
 
 /* Print the list. */
 void print_list(LinkedList* list, void (*print)(void*));
