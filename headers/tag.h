@@ -17,4 +17,6 @@ typedef enum Tag{
     DEC_FN,
     CALL_FN,
     PARAM,
+    MINOR, BIGGER, EQUALS,
+    FN,
 } Tag;

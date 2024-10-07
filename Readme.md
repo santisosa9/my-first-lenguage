@@ -22,3 +22,11 @@ InfoControlFlow.
 ### Statement vacio
 
 No se puede.
+
+### if-then-else
+
+El nodo izquierdo será la condicion. A la derecha se presentan dos casos:
+
+- Si hay un token del else pasamos a un nuevo nodo then-else donde el hijo izquierdo es el cuerpo del then y el hijo derecho es el cuerpo del else.
+
+- Si no hay un token del else el hijo derecho simplemente será el cuerpo del then.
