@@ -27,6 +27,7 @@ int main(int argc, char const *argv[])
     if (!fill_table(tree, table)) exit(EXIT_FAILURE);
     if (!check_types(tree, table)) exit(EXIT_FAILURE);
     // interpret(tree, table);
-    free_table(table);
-    print_tree(tree);
+    // free_table(table);
+    print_table(table);
+    // print_tree(tree);
 }

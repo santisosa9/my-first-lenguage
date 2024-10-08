@@ -165,7 +165,8 @@ void print_table(SymbolTable* table){
         STListNode* current = current_scope->head;
 
         while (current != NULL) {
-            print_info(ID, current->info);
+            Tag currentTag = current->info->fn.props->is_fn ? DEC_FN : ID;
+            print_info(currentTag, current->info);
             current = current->next;
         }
 
@@ -281,6 +282,35 @@ bool check_types(AST* tree, SymbolTable* table) {
             break;
         }
 
+        case EQUALS: {
+            left_type = get_type_from_table(tree->left, table);
+            right_type = get_type_from_table(tree->right, table);
+            if ((left_type == INT && right_type == INT) || (left_type == BOOL && right_type == BOOL)) {
+                Info* updatedInfo = tree->info;
+                as_info_base(updatedInfo)->props->type = BOOL;
+                update(table, tree, updatedInfo);
+            } else {
+                printf("Error: Operación inválida para los tipos %s, %s en línea %d.\n", type_to_str(left_type), type_to_str(right_type), as_info_base(tree->info)->props->line);
+                return false;
+            }
+            break;
+        }
+
+        case MINOR:
+        case BIGGER: {
+            left_type = get_type_from_table(tree->left, table);
+            right_type = get_type_from_table(tree->right, table);
+            if (left_type == INT && right_type == INT) {
+                Info* updatedInfo = tree->info;
+                as_info_base(updatedInfo)->props->type = BOOL;
+                update(table, tree, updatedInfo);
+            } else {
+                printf("Error: Operación inválida para los tipos %s, %s en línea %d.\n", type_to_str(left_type), type_to_str(right_type), as_info_base(tree->info)->props->line);
+                return false;
+            }
+            break;
+        }
+
         case NOT: {
             left_type = get_type_from_table(tree->left, table);
             if (left_type == BOOL) {
@@ -304,6 +334,16 @@ bool check_types(AST* tree, SymbolTable* table) {
             break;
         }
 
+        // case CALL_FN: {
+        //     Info* info = search_global(table, as_info_base(tree->info)->props->name);
+        //     LinkedList* formal = as_info_fn(info)->params;
+        //     if (check_types(formal, tree->right)) {
+        //         Type type_in_table = get_type_from_table(tree, table);
+        //         Info* updatedInfo = tree->info;
+        //         as_info_base(updatedInfo)->props->type = type_in_table;
+        //     }
+        // }
+
         default:
             break;
     }
@@ -313,6 +353,10 @@ bool check_types(AST* tree, SymbolTable* table) {
 
     return left_check && right_check;
 }
+
+// bool check_params(LinkedList* formal, AST* current) {
+
+// }
 
 Type get_type_from_table(AST* node, SymbolTable* table) {
     Info* info = NULL;
