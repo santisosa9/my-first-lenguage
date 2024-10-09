@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "headers/linked_list.h"
+#include "../headers/linked_list.h"
 
 void print_string(void* data)
 {
@@ -17,6 +17,14 @@ int main(int argc, char const *argv[])
     remove_at(list, 1);
     print_list(list, print_string);
     print_string(lookup(list, 1));
+    insert_ll(list, "Hi");
+    print_list(list, print_string);
+    LinkedListIterator* iter = new_linked_list_iterator(list);
+    while (has_next(iter))
+    {
+        printf("%s\n", (char*)next(iter));
+    }
+
     free_list(list);
     return 0;
 }

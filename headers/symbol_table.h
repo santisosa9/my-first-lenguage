@@ -83,6 +83,9 @@ bool fill_table(AST* tree, SymbolTable* table);
 /* Perfrom the type checking */
 bool check_types(AST* tree, SymbolTable* table);
 
+/* Check if the parameters of a function call are correct */
+bool check_params(LinkedList* formal, AST* current);
+
 /* Evaluate an expression */
 int evaluate_expression(AST* expr, SymbolTable* table);
 

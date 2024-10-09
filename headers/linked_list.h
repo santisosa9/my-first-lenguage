@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 #include "utils.h"
 
 typedef struct LinkedListNode
@@ -12,6 +13,11 @@ typedef struct LinkedList
     nat size;
     LinkedListNode* head;
 } LinkedList;
+
+typedef struct LinkedListIterator
+{
+    LinkedListNode* current;
+} LinkedListIterator;
 
 /* Returns a new LinkedListNode initialized with data. */
 LinkedListNode* new_linked_list_node(void* data);
@@ -48,4 +54,14 @@ void print_list(LinkedList* list, void (*print)(void*));
 /* Free the list. */
 void free_list(LinkedList* list);
 
+/* Returns a new LinkedListIterator. */
+LinkedListIterator* new_linked_list_iterator(LinkedList* list);
 
+/* Returns the next data in the list. */
+void* next(LinkedListIterator* iter);
+
+/* Returns true if there is a next element in the list. */
+bool has_next(LinkedListIterator* iter);
+
+/* Free the iterator. */
+void free_linked_list_iter(LinkedListIterator* iter);

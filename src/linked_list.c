@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "../headers/linked_list.h"
 
 LinkedListNode* new_linked_list_node(void* data)
@@ -134,4 +135,25 @@ void free_list(LinkedList* list)
     free(list);
 }
 
+LinkedListIterator* new_linked_list_iterator(LinkedList* list)
+{
+    LinkedListIterator* iter = (LinkedListIterator*)malloc(sizeof(LinkedListIterator));
+    iter->current = list->head;
+    return iter;
+}
 
+void* next(LinkedListIterator* iter)
+{
+    if (iter->current == NULL)
+    {
+        return NULL;
+    }
+    void* data = iter->current->data;
+    iter->current = iter->current->next;
+    return data;
+}
+
+bool has_next(LinkedListIterator* iter)
+{
+    return iter->current != NULL;
+}
