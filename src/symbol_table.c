@@ -242,6 +242,49 @@ bool fill_table(AST* tree, SymbolTable* table) {
     return fill_table(tree->left, table) && fill_table(tree->right, table);
 }
 
+bool check_types_fn(AST* tree, SymbolTable* table, Type fn_return_type) {
+    if (tree == NULL) {
+        return true; // or false depending on your logic
+    }
+
+    Tag tag = tree->tag;
+    Type right_type;
+
+    if (tag == RET) {
+        if (tree->right == NULL) {
+            printf("Error: Return statement has no right child.\n");
+            return false;
+        }
+
+        right_type = get_type_from_table(tree->right, table);
+
+        if (tree->info == NULL) {
+            printf("Error: tree->info is NULL.\n");
+            return false; // Handle the error gracefully
+        }
+
+        if (right_type != fn_return_type) {
+            printf("Error: Return invalido, para la funcion de tipo: %s, se devuelve: %s en línea %d.\n", 
+                   type_to_str(fn_return_type), type_to_str(right_type), 
+                   as_info_base(tree->info)->props->line);
+            return false;
+        }
+    } else {
+        if (tree->right != NULL) {
+            if (!check_types_fn(tree->right, table, fn_return_type)) {
+                return false;
+            }
+        }
+        if (tree->left != NULL) {
+            if (!check_types_fn(tree->left, table, fn_return_type)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 bool check_types(AST* tree, SymbolTable* table) {
     if (tree == NULL) {
         return true;
@@ -343,7 +386,18 @@ bool check_types(AST* tree, SymbolTable* table) {
         //         as_info_base(updatedInfo)->props->type = type_in_table;
         //     }
         // }
-
+        
+        case DEC_FN: {
+            Type fn_type = get_type_from_table(tree, table);
+            if (check_types_fn(tree->right,table,fn_type)){
+                Info* updatedInfo = tree->info;
+                as_info_base(updatedInfo)->props->type = fn_type;
+            }else{
+                return false;
+            }
+            break;
+        }
+        
         default:
             break;
     }
