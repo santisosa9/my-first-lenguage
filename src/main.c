@@ -23,11 +23,8 @@ int main(int argc, char const *argv[])
 
     AST *tree = get_parsed_tree();
     SymbolTable* table = new_symbol_table();
-    print_tree(tree);
-    if (!fill_table(tree, table)) exit(EXIT_FAILURE);
-    if (!check_types(tree, table)) exit(EXIT_FAILURE);
-    // interpret(tree, table);
-    // free_table(table);
-    print_table(table);
     // print_tree(tree);
+    if (!decorate_tree(tree, table)) exit(EXIT_FAILURE);
+    if (!check_types(tree, table)) exit(EXIT_FAILURE);
+    print_tree(tree);
 }

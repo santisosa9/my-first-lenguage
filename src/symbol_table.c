@@ -7,9 +7,9 @@
 #include "../headers/utils.h"
 #include "../headers/ast.h"
 
-Type get_type_from_table(AST* node, SymbolTable* table);
-Type get_type(char* name, SymbolTable* table);
 Info* _search_in_scope(STStackNode* scope, char* name);
+void insert_params(SymbolTable* table, Info* info);
+Type get_type_from_table(AST* node, SymbolTable* table);
 
 SymbolTable* new_symbol_table(){
     SymbolTable* table = (SymbolTable*)malloc(sizeof(SymbolTable));
@@ -42,20 +42,12 @@ void open_scope(SymbolTable* table){
     table->scope_size++;
 }
 
-void close_scope(SymbolTable* table){
-    if(table->scope_size <= 1) return;
+void close_scope(SymbolTable* table) {
+    if (table->scope_size <= 1) return;
 
     STStackNode* prev = table->top->prev;
-    STListNode* current = table->top->head;
-    STListNode* next = NULL;
 
-    while (current != NULL) {
-        next = current->next;
-        free(current);
-        current = next;
-    }
-
-    free_symbol_table_stack_node(table->top);
+    free_symbol_table_stack_node(table->top);  
     table->top = prev;
     table->scope_size--;
 }
@@ -67,6 +59,15 @@ bool insert(SymbolTable* table, Info* info){
     table->top->head = new_node;
     table->total_size++;
     return true;
+}
+
+void insert_params(SymbolTable* table, Info* info) {
+    LinkedList* params = as_info_fn(info)->params;
+    LinkedListIterator* formal_params = new_linked_list_iterator(params);
+    while (has_next(formal_params)) {
+        Info* param = (Info*)next(formal_params);
+        insert(table, param);
+    }
 }
 
 Info* search(SymbolTable* table, char* name){
@@ -85,6 +86,12 @@ Info* search(SymbolTable* table, char* name){
     return NULL;
 }
 
+Info* search_in_current_scope(SymbolTable* table, char* name) {
+    if (table == NULL) return NULL;
+    if (table->top == NULL) return NULL;
+
+    return _search_in_scope(table->top, name);
+}
 
 Info* search_global(SymbolTable* table, char* name) {
     if (table == NULL) return NULL;
@@ -108,7 +115,7 @@ Info* _search_in_scope(STStackNode* scope, char* name) {
 }
 
 bool update(SymbolTable* table, AST* tree, Info* info){
-    if(table == NULL) return false;
+    if (table == NULL) return false;
     if (tree == NULL) return false;
 
     Info* target = NULL;
@@ -206,40 +213,86 @@ void free_symbol_table_list_node(STListNode* node){
     free(node);
 }
 
-bool fill_table(AST* tree, SymbolTable* table) {
-    if (tree == NULL) {
-        return true;
-    }
+bool decorate_tree(AST* tree, SymbolTable* table) {
+    if (tree == NULL) return true;
 
-    Info* existing;
     Tag currentTag = tree->tag;
+    Info* existing;
 
     switch (currentTag) {
-        case DEC:
-            existing = search(table, as_info_base(tree->info)->props->name);
-            if (existing == NULL) {
-                insert(table, tree->info);
-            } else {
-                printf("Error: Redeclaración de la variable '%s' en línea %d.\n", as_info_base(tree->info)->props->name, as_info_base(tree->info)->props->line);
-                return false;
-            }
-            break;
-
-        case DEC_FN:
+        case DEC_FN: {
             existing = search_global(table, as_info_fn(tree->info)->props->name);
             if (existing == NULL) {
                 insert(table, tree->info);
+                open_scope(table);
+                insert_params(table, tree->info);
+                if (!decorate_tree(tree->right, table)) return false;
+                close_scope(table);  
             } else {
-                printf("Error: Redeclaración de la función '%s' en línea %d.\n", as_info_fn(tree->info)->props->name, as_info_fn(tree->info)->props->line);
+                printf("Error: Redeclaración de la función '%s' en línea %d.\n",
+                       as_info_fn(tree->info)->props->name,
+                       as_info_fn(tree->info)->props->line);
                 return false;
             }
             break;
+        }
 
-        default:
+        case BLOCK: {
+            open_scope(table);
+            if (!decorate_tree(tree->right, table)) return false;
+            close_scope(table);  
             break;
+        }
+
+        case DEC: {
+            existing = search_in_current_scope(table, as_info_base(tree->info)->props->name);
+            if (existing == NULL) {
+                insert(table, tree->info);  
+            } else {
+                printf("Error: Redeclaración de la variable '%s' en línea %d.\n",
+                    as_info_base(tree->info)->props->name,
+                    as_info_base(tree->info)->props->line);
+                return false;
+            }
+            if (!decorate_tree(tree->left, table) || !decorate_tree(tree->right, table)) return false;
+            break;
+        }
+
+        case ID: {
+            existing = search(table, as_info_base(tree->info)->props->name);
+            if (existing == NULL) {
+                printf("Error: Variable '%s' no declarada en línea %d.\n",
+                    as_info_base(tree->info)->props->name,
+                    as_info_base(tree->info)->props->line);
+                return false;
+            } else {
+                update(table, tree, existing);
+            }
+            if (!decorate_tree(tree->left, table) || !decorate_tree(tree->right, table)) return false;
+            break;
+        }
+
+        case CALL_FN: {
+            existing = search_global(table, as_info_fn(tree->info)->props->name);
+            if (existing == NULL) {
+                printf("Error: Función '%s' no declarada en línea %d.\n",
+                    as_info_fn(tree->info)->props->name,
+                    as_info_fn(tree->info)->props->line);
+                return false;
+            } else {
+                update(table, tree, existing);
+            }
+            if (!decorate_tree(tree->left, table) || !decorate_tree(tree->right, table)) return false;
+            break;
+        }
+
+        default: {
+            if (!decorate_tree(tree->left, table) || !decorate_tree(tree->right, table)) return false;
+            break;
+        }
     }
 
-    return fill_table(tree->left, table) && fill_table(tree->right, table);
+    return true;
 }
 
 bool check_types_fn(AST* tree, SymbolTable* table, Type fn_return_type) {
@@ -408,10 +461,6 @@ bool check_types(AST* tree, SymbolTable* table) {
     return left_check && right_check;
 }
 
-// bool check_params(LinkedList* formal, AST* current) {
-
-// }
-
 Type get_type_from_table(AST* node, SymbolTable* table) {
     Info* info = NULL;
     Type result;
@@ -437,77 +486,4 @@ Type get_type_from_table(AST* node, SymbolTable* table) {
 
     // Si no lo encuentra en la tabla, usamos el tipo que tiene en el arbol
     return (info != NULL) ? result : as_info_base(node->info)->props->type;
-}
-
-int evaluate_expression(AST* expr, SymbolTable* table) {
-    if (expr == NULL) {
-        return -1;
-    }
-
-    Tag tag = expr->tag;
-
-    switch (tag) {
-        case VALUE:
-            return as_info_base(expr->info)->props->value;
-
-        case ID: {
-            Info* info = search(table, as_info_base(expr->info)->props->name);
-            if (info != NULL) {
-              return as_info_base(info)->props->value;
-            } else {
-              return -1;
-            }
-        }
-
-        case ADD: {
-            return (evaluate_expression(expr->left, table) + evaluate_expression(expr->right, table));
-        }
-
-        case MUL: {
-            return (evaluate_expression(expr->left, table) * evaluate_expression(expr->right, table));
-        }
-
-        case OR: {
-            return (evaluate_expression(expr->left, table) || evaluate_expression(expr->right, table));
-        }
-
-        case AND: {
-            return (evaluate_expression(expr->left, table) && evaluate_expression(expr->right, table));
-        }
-
-        case NOT:
-            return !evaluate_expression(expr->left, table);
-
-        default:
-            return -1;
-    }
-}
-
-void interpret(AST* tree, SymbolTable* table) {
-    if (tree == NULL) {
-        return;
-    }
-
-    if (tree->tag == ASIG) {
-        Info* updatedInfo = search(table, as_info_base(tree->left->info)->props->name);
-        int result = evaluate_expression(tree->right, table);
-        update_value(updatedInfo, result);
-        update(table, tree->left, updatedInfo);
-    }
-
-    if (tree->tag == RET) {
-        int result = evaluate_expression(tree->right, table);
-        Type type = get_type(as_info_base(tree->right->info)->props->name, table);
-        char* to_print = value_to_str(result, type);
-        printf("%s\n", to_print);
-        return;
-    }
-
-    interpret(tree->left, table);
-    interpret(tree->right, table);
-}
-
-Type get_type(char* name, SymbolTable* table) {
-    Info* info = search(table, name);
-    return as_info_base(info)->props->type;
 }

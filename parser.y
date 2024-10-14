@@ -75,7 +75,7 @@
 
 %%
 
-prog: T_PROGRAM block                    { global_tree = build_root(NULL, $1, PROGRAM, $2); }
+prog: T_PROGRAM '{' body '}'             { global_tree = build_root(NULL, $1, PROGRAM, $3); }
     ;
 
 
@@ -101,23 +101,22 @@ statement: ret T_SEMICOLON               { $$ = $1; }
          | call_fn T_SEMICOLON           { $$ = $1; }
          ;
 
-dec_fn: type_var T_ID '(' param ')' block           { Info* i_fn = new_info_fn(as_info_base($2)->props, $4, false);
-                                                      as_info_fn(i_fn)->props->type = $1;
-                                                      $$ = build_root(NULL, i_fn, DEC_FN, $6);
-                                                    }
-
-      | type_var T_ID '(' ')' block                 { Info* i_fn = new_info_fn(as_info_base($2)->props, new_linked_list(), false);
-                                                      as_info_fn(i_fn)->props->type = $1;
-                                                      $$ = build_root(NULL, i_fn, DEC_FN, $5);
-                                                    }
-      | type_var T_ID '(' param ')' T_EXTERN T_SEMICOLON  { Info* i_fn = new_info_fn(as_info_base($2)->props, $4, true);
-                                                      as_info_fn(i_fn)->props->type = $1;
-                                                      $$ = build_root(NULL, i_fn, DEC_FN, NULL);
-                                                    }
-      | type_var T_ID '(' ')' T_EXTERN T_SEMICOLON  { Info* i_fn = new_info_fn(as_info_base($2)->props, new_linked_list(), true);
-                                                      as_info_fn(i_fn)->props->type = $1;
-                                                      $$ = build_root(NULL, i_fn, DEC_FN, NULL);
-                                                    }
+dec_fn: type_var T_ID '(' param ')' '{' body '}'            { Info* i_fn = new_info_fn(as_info_base($2)->props, $4, false);
+                                                              as_info_fn(i_fn)->props->type = $1;
+                                                              $$ = build_root(NULL, i_fn, DEC_FN, $7);
+                                                            }
+      | type_var T_ID '(' ')' '{' body '}'                  { Info* i_fn = new_info_fn(as_info_base($2)->props, new_linked_list(), false);
+                                                              as_info_fn(i_fn)->props->type = $1;
+                                                              $$ = build_root(NULL, i_fn, DEC_FN, $6);
+                                                            }
+      | type_var T_ID '(' param ')' T_EXTERN T_SEMICOLON    { Info* i_fn = new_info_fn(as_info_base($2)->props, $4, true);
+                                                              as_info_fn(i_fn)->props->type = $1;
+                                                              $$ = build_root(NULL, i_fn, DEC_FN, NULL);
+                                                            }
+      | type_var T_ID '(' ')' T_EXTERN T_SEMICOLON          { Info* i_fn = new_info_fn(as_info_base($2)->props, new_linked_list(), true);
+                                                              as_info_fn(i_fn)->props->type = $1;
+                                                              $$ = build_root(NULL, i_fn, DEC_FN, NULL);
+                                                            }
 
 
 param: type_var T_ID                           { InfoBase* i_base = as_info_base($2);

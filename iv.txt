@@ -1,31 +1,15 @@
 Program {
-    int a;
-    a = 5;
-    bool z;
-    z = a > 0;
+    int x;
+    x = 0;
 
-    int i(int i) extern;
-
-    /* int getMinor(int x, int y) {
-      if (x < y) then {
-        return x;
-      } else {
-        return y;
-      }
-    } // Esto no funciona ya que no toma los parametros como valores válidos */
-
-    bool main() {
+    int test(int x) {
+      x = 1;
+      int boca() {
         int x;
-        x = 4;
-        i(x+4);
-        if (true) then {
-            x = 4;
-        } else {
-            x = 8;
-        }
-        while (x > 0) {
-            x = x + 1;
-        }
-        return x;
+        x = 2;
+      }
+      return x;
     }
+
+    return x;
 }

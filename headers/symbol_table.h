@@ -78,16 +78,8 @@ void free_symbol_table_list_node(STListNode* node);
 void free_symbol_table_stack_node(STStackNode* node);
 
 /* Fill the SymbolTable with data in the AST */
-bool fill_table(AST* tree, SymbolTable* table);
+bool decorate_tree(AST* tree, SymbolTable* table);
 
-/* Perfrom the type checking */
+bool check_types_fn(AST* tree, SymbolTable* table, Type fn_return_type);
+
 bool check_types(AST* tree, SymbolTable* table);
-
-/* Check if the parameters of a function call are correct */
-bool check_params(LinkedList* formal, AST* current);
-
-/* Evaluate an expression */
-int evaluate_expression(AST* expr, SymbolTable* table);
-
-/* Interpret the code */
-void interpret(AST* tree, SymbolTable* table);
