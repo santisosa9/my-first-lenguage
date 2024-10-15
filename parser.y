@@ -48,12 +48,16 @@
 %token <INFOP> T_ELSE
 %token <INFOP> T_WHILE
 %token <INFOP> T_EXTERN
+%token <INFOP> T_UNSUB
+%token <INFOP> T_SUB
+%token <INFOP> T_DIV  
+%token <INFOP> T_MOD
 
 
 %left T_AND T_OR
 %nonassoc T_EQUALS T_MINOR T_BIGGER
-%left T_ADD
-%left T_MUL
+%left T_ADD  T_SUB T_UNSUB 
+%left T_MUL T_DIV T_MOD
 %left T_UNMINUS
 
 
@@ -150,6 +154,10 @@ dec: type_var T_ID                      { AST* node = new_node($2, DEC);
 expr: expr T_ADD expr                   { $$ = build_root($1, $2, ADD, $3); }
     | expr T_MUL expr                   { $$ = build_root($1, $2, MUL, $3); }
     | expr T_AND expr                   { $$ = build_root($1, $2, AND, $3); }
+    | expr T_UNSUB expr                 { $$ = build_root($1, $2, UNSUB, $3); }
+    | expr T_DIV expr                   { $$ = build_root($1, $2, DIV, $3); }
+    | expr T_SUB expr                   { $$ = build_root($1, $2, SUB, $3); }
+    | expr T_MOD expr                   { $$ = build_root($1, $2, MOD, $3); }
     | expr T_OR  expr                   { $$ = build_root($1, $2, OR, $3); }
     | expr T_EQUALS expr                { $$ = build_root($1, $2, EQUALS, $3); }
     | expr T_MINOR expr                 { $$ = build_root($1, $2, MINOR, $3); }

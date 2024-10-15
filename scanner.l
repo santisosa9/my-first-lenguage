@@ -56,6 +56,18 @@ NRO         	(-?[1-9][0-9]{0,4})|0
 "+"		  	    { yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
                 return T_ADD; }
 
+"-"		  	    { yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
+                return T_SUB; }
+
+"--"          { yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
+                return T_UNSUB; }
+
+"/"		  	    { yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
+                return T_DIV; }
+
+"%"		  	    { yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
+                return T_MOD; }                
+
 "*"		  	    { yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
                 return T_MUL; }
 
