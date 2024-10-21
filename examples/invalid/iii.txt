@@ -1,0 +1,4 @@
+Program {
+    int x = 3 + 5;
+    3 + 5;    // No debe permitir ningun tipo de expresion en el body de program
+}

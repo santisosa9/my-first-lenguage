@@ -21,7 +21,7 @@
 /* Tokens */
 DIGITO          [0-9]
 LETRA           [a-zA-Z]
-ID              {LETRA}({LETRA}|{DIGITO})*
+ID              {LETRA}({LETRA}|{DIGITO}|_)*
 
 NRO         	(-?[1-9][0-9]{0,4})|0
 
@@ -58,9 +58,6 @@ NRO         	(-?[1-9][0-9]{0,4})|0
 
 "-"		  	    { yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
                 return T_SUB; }
-
-"--"          { yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
-                return T_UNSUB; }
 
 "/"		  	    { yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
                 return T_DIV; }

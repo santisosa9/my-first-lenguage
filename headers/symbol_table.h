@@ -79,7 +79,3 @@ void free_symbol_table_stack_node(STStackNode* node);
 
 /* Fill the SymbolTable with data in the AST */
 bool decorate_tree(AST* tree, SymbolTable* table);
-
-bool check_types_fn(AST* tree, SymbolTable* table, Type fn_return_type);
-
-bool check_types(AST* tree, SymbolTable* table);

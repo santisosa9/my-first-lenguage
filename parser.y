@@ -64,6 +64,7 @@
 %type <ASTP> prog
 %type <TYPE> type_var
 %type <ASTP> body
+%type <ASTP> body_fn
 %type <ASTP> block
 %type <ASTP> statement
 %type <ASTP> dec
@@ -79,37 +80,41 @@
 
 %%
 
-prog: T_PROGRAM '{' body '}'             { global_tree = build_root(NULL, $1, PROGRAM, $3); }
+prog: T_PROGRAM '{' body '}'                                { global_tree = build_root(NULL, NULL, PROGRAM, $3); }
     ;
 
-
-type_var: T_INT                          { $$ = INT; }
-        | T_BOOL                         { $$ = BOOL; }
-        | T_VOID                         { $$ = VOID; }
+type_var: T_INT                                             { $$ = INT; }
+        | T_BOOL                                            { $$ = BOOL; }
+        | T_VOID                                            { $$ = VOID; }
         ;
 
-block: '{' body '}'                      { $$ = build_root(NULL, NULL, BLOCK, $2); }
+body: dec                                                   { $$ = $1; }
+    | dec body                                              { $$ = build_root($1, NULL, SEMICOLON, $2); }
+    | dec_fn                                                { $$ = $1; }
+    | dec_fn body                                           { $$ = build_root($1, NULL, SEMICOLON, $2); }
+
+block: '{' body_fn '}'                                      { $$ = build_root(NULL, NULL, BLOCK, $2); }
      ;
 
-body: statement                          { $$ = $1; }
-    | statement body                     { $$ = build_root($1, NULL, SEMICOLON, $2); }
-    ;
+body_fn: dec                                                { $$ = $1; }
+       | dec body_fn                                        { $$ = build_root($1, NULL, SEMICOLON, $2); }
+       | statement                                          { $$ = $1; }   
+       | statement body_fn                                  { $$ = build_root($1, NULL, SEMICOLON, $2); }
+       ;
 
-statement: ret T_SEMICOLON               { $$ = $1; }
-         | dec T_SEMICOLON               { $$ = $1; }
-         | asig T_SEMICOLON              { $$ = $1; }
-         | if                            { $$ = $1; }
-         | while                         { $$ = $1; }
-         | block                         { $$ = $1; }
-         | dec_fn                        { $$ = $1; }
-         | call_fn T_SEMICOLON           { $$ = $1; }
+statement: asig T_SEMICOLON                                 { $$ = $1; }
+         | call_fn T_SEMICOLON                              { $$ = $1; }
+         | if                                               { $$ = $1; }
+         | while                                            { $$ = $1; }
+         | ret T_SEMICOLON                                  { $$ = $1; }
+         | block                                            { $$ = $1; }
          ;
 
-dec_fn: type_var T_ID '(' param ')' '{' body '}'            { Info* i_fn = new_info_fn(as_info_base($2)->props, $4, false);
+dec_fn: type_var T_ID '(' param ')' '{' body_fn '}'         { Info* i_fn = new_info_fn(as_info_base($2)->props, $4, false);
                                                               as_info_fn(i_fn)->props->type = $1;
                                                               $$ = build_root(NULL, i_fn, DEC_FN, $7);
                                                             }
-      | type_var T_ID '(' ')' '{' body '}'                  { Info* i_fn = new_info_fn(as_info_base($2)->props, new_linked_list(), false);
+      | type_var T_ID '(' ')' '{' body_fn '}'               { Info* i_fn = new_info_fn(as_info_base($2)->props, new_linked_list(), false);
                                                               as_info_fn(i_fn)->props->type = $1;
                                                               $$ = build_root(NULL, i_fn, DEC_FN, $6);
                                                             }
@@ -123,68 +128,70 @@ dec_fn: type_var T_ID '(' param ')' '{' body '}'            { Info* i_fn = new_i
                                                             }
 
 
-param: type_var T_ID                           { InfoBase* i_base = as_info_base($2);
-                                                 i_base->props->type = $1;
-                                                 LinkedList* params = new_linked_list();
-                                                 insert_head(params, i_base);
-                                                 $$ = params;
-                                               }
-     | type_var T_ID ',' param                 { InfoBase* i_base = as_info_base($2);
-                                                 i_base->props->type = $1;
-                                                 LinkedList* params = $4;
-                                                 insert_head(params, i_base);
-                                                 $$ = params;
-                                               }
+param: type_var T_ID                                        { InfoBase* i_base = as_info_base($2);
+                                                              i_base->props->type = $1;
+                                                              LinkedList* params = new_linked_list();
+                                                              insert_head(params, i_base);
+                                                              $$ = params;
+                                                            }
+     | type_var T_ID ',' param                              { InfoBase* i_base = as_info_base($2);
+                                                              i_base->props->type = $1;
+                                                              LinkedList* params = $4;
+                                                              insert_head(params, i_base);
+                                                              $$ = params;
+                                                            }
      ;
 
-call_fn: T_ID '(' param_exprs ')'       { $$ = join_trees(NULL, new_node($1, CALL_FN), $3); }
-       | T_ID '(' ')'                   { $$ = join_trees(NULL, new_node($1, CALL_FN), NULL); }
+call_fn: T_ID '(' param_exprs ')'                           { $$ = join_trees(NULL, new_node($1, CALL_FN), $3); }
+       | T_ID '(' ')'                                       { $$ = join_trees(NULL, new_node($1, CALL_FN), NULL); }
        ;
 
-param_exprs: expr                       { $$ = build_root($1, NULL, PARAM, NULL); }
-           | expr ',' param_exprs       { $$ = build_root($1, NULL, PARAM, $3); }
+param_exprs: expr                                           { $$ = build_root($1, NULL, PARAM, NULL); }
+           | expr ',' param_exprs                           { $$ = build_root($1, NULL, PARAM, $3); }
            ;
 
-dec: type_var T_ID                      { AST* node = new_node($2, DEC);
-                                          as_info_base(node->info)->props->type = $1;
-                                          $$ = node;
-                                        }
+dec: type_var T_ID T_SEMICOLON                              { AST* node = new_node($2, DEC);
+                                                              as_info_base(node->info)->props->type = $1;
+                                                              $$ = node;
+                                                            }
+   | type_var T_ID T_ASIG expr T_SEMICOLON                  { as_info_base($2)->props->type = $1;
+                                                              $$ = join_trees(new_node($2, ID), new_node($2, DEC), $4);
+                                                            }
    ;
 
-expr: expr T_ADD expr                   { $$ = build_root($1, $2, ADD, $3); }
-    | expr T_MUL expr                   { $$ = build_root($1, $2, MUL, $3); }
-    | expr T_AND expr                   { $$ = build_root($1, $2, AND, $3); }
-    | expr T_UNSUB expr                 { $$ = build_root($1, $2, UNSUB, $3); }
-    | expr T_DIV expr                   { $$ = build_root($1, $2, DIV, $3); }
-    | expr T_SUB expr                   { $$ = build_root($1, $2, SUB, $3); }
-    | expr T_MOD expr                   { $$ = build_root($1, $2, MOD, $3); }
-    | expr T_OR  expr                   { $$ = build_root($1, $2, OR, $3); }
-    | expr T_EQUALS expr                { $$ = build_root($1, $2, EQUALS, $3); }
-    | expr T_MINOR expr                 { $$ = build_root($1, $2, MINOR, $3); }
-    | expr T_BIGGER expr                { $$ = build_root($1, $2, BIGGER, $3); }
-    | T_NOT expr %prec T_UNMINUS        { $$ = build_root(NULL, $1, NOT, $2); }
-    | '(' expr ')'                      { $$ = $2; }
-    | T_ID                              { $$ = new_node($1, ID); }
-    | T_NRO                             { $$ = new_node($1, VALUE); }
-    | T_TRUE                            { $$ = new_node($1, VALUE); }
-    | T_FALSE                           { $$ = new_node($1, VALUE); }
-    | call_fn                           { $$ = $1; }
+expr: expr T_ADD expr                                       { $$ = build_root($1, $2, ADD, $3); }
+    | expr T_MUL expr                                       { $$ = build_root($1, $2, MUL, $3); }
+    | expr T_AND expr                                       { $$ = build_root($1, $2, AND, $3); }
+    | expr T_DIV expr                                       { $$ = build_root($1, $2, DIV, $3); }
+    | expr T_SUB expr                                       { $$ = build_root($1, $2, SUB, $3); }
+    | expr T_MOD expr                                       { $$ = build_root($1, $2, MOD, $3); }
+    | expr T_OR expr                                        { $$ = build_root($1, $2, OR, $3); }
+    | expr T_EQUALS expr                                    { $$ = build_root($1, $2, EQUALS, $3); }
+    | expr T_MINOR expr                                     { $$ = build_root($1, $2, MINOR, $3); }
+    | expr T_BIGGER expr                                    { $$ = build_root($1, $2, BIGGER, $3); }
+    | T_NOT expr %prec T_UNMINUS                            { $$ = build_root(NULL, $1, NOT, $2); }
+    | '(' expr ')'                                          { $$ = $2; }
+    | T_ID                                                  { $$ = new_node($1, ID); }
+    | T_NRO                                                 { $$ = new_node($1, VALUE); }
+    | T_TRUE                                                { $$ = new_node($1, VALUE); }
+    | T_FALSE                                               { $$ = new_node($1, VALUE); }
+    | call_fn                                               { $$ = $1; }
     ;
 
-asig: T_ID T_ASIG expr                  { $$ = join_trees(new_node($1, ID), new_node($2, ASIG), $3); }
+asig: T_ID T_ASIG expr                                      { $$ = join_trees(new_node($1, ID), new_node($2, ASIG), $3); }
     ;
 
-ret: T_RET                              { $$ = new_node($1, RET); }
-   | T_RET expr                         { $$ = build_root(NULL, $1, RET, $2); }
+ret: T_RET                                                  { $$ = new_node($1, RET); }
+   | T_RET expr                                             { $$ = build_root(NULL, $1, RET, $2); }
    ;
 
-if: T_IF '(' expr ')' T_THEN block                       { $$ = build_root($3, $1, IF, $6); }
-  | T_IF '(' expr ')' T_THEN block T_ELSE block          { AST* t_e = build_root($6, NULL, T_E, $8);
-                                                           $$ = build_root($3, $1, IF, t_e);
-                                                         }
+if: T_IF '(' expr ')' T_THEN block                          { $$ = build_root($3, $1, IF, $6); }
+  | T_IF '(' expr ')' T_THEN block T_ELSE block             { AST* t_e = build_root($6, NULL, T_E, $8);
+                                                              $$ = build_root($3, $1, IF, t_e);
+                                                            }
   ;
 
-while: T_WHILE '(' expr ')' block       { $$ = build_root($3, $1, WHILE, $5); }
+while: T_WHILE '(' expr ')' block                           { $$ = build_root($3, $1, WHILE, $5); }
   ;
 %%
 

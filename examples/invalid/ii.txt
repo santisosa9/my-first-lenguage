@@ -1,0 +1,4 @@
+Program {
+    int x = -2;
+    return x;   // No debe permitir returns en el body de program
+}

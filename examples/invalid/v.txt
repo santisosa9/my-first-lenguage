@@ -1,0 +1,16 @@
+Program {
+    int x = 0;
+
+    int getMax(int x, int y) {
+        int sumatory(int x) {  // No debe permitir declarar funciones dentro de una función
+            int i = 0;
+            int result = 0;
+            while (i < x || i == x) {
+                result = result + i;
+                i = i + 1;
+            }
+            return result;
+        }
+        int a = sumatory(20);
+    }
+}

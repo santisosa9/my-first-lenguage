@@ -1,0 +1,5 @@
+Program {
+    {   // No debe permitir abrir bloques en el body del program
+        int x = 5;
+    }
+}

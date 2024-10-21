@@ -1,0 +1,19 @@
+Program {
+    int f() {
+        {
+            bool a = f_(); // Falla al buscar f_ dado que aún no está definida. Consultar
+        }
+
+        {
+            bool b = !f_();
+        }
+        return 0;
+    }
+
+    bool f_() {
+        {
+            int x = f();
+        }
+        return false;
+    }
+}

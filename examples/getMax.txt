@@ -1,0 +1,11 @@
+Program {
+    int getMax(int x, int y) {
+        if (x > y) then {
+            return x;
+        } else {
+            return y;
+        }
+    }
+
+    int a = getMax(6, 9);
+}

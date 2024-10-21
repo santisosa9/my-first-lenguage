@@ -23,8 +23,9 @@ int main(int argc, char const *argv[])
 
     AST *tree = get_parsed_tree();
     SymbolTable* table = new_symbol_table();
-    // print_tree(tree);
+    print_tree(tree);
     if (!decorate_tree(tree, table)) exit(EXIT_FAILURE);
-    if (!check_types(tree, table)) exit(EXIT_FAILURE);
+    printf("------------------------------\n");
+    // if (!check_types(tree, table)) exit(EXIT_FAILURE);
     print_tree(tree);
 }

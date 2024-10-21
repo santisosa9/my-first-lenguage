@@ -1,0 +1,21 @@
+Program {
+    int add(int x, int y) {
+        return x + y;
+    }
+
+    int sub(int x, int y) {
+        return x - y;
+    }
+
+    int div(int x, int y) {
+        return x / y;
+    }
+
+    void main() {
+        int x = 5;
+        int y = 10;
+
+        int resultSum = add(x,y);
+        return resultSum;
+    }
+}

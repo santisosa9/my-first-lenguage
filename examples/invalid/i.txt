@@ -1,0 +1,4 @@
+Program {
+    int x;
+    x = 2;    // No debe permitir asignaciones en el body de program
+}
