@@ -52,6 +52,10 @@ void close_scope(SymbolTable* table) {
     table->scope_size--;
 }
 
+bool current_scope_is_global(SymbolTable* table) {
+    return table->top == table->base && table->scope_size == 1;
+}
+
 bool insert(SymbolTable* table, Info* info){
     if(table == NULL) return false;
 

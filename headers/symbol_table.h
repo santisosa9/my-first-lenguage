@@ -55,6 +55,9 @@ void open_scope(SymbolTable* table);
 /* Close the current scope in the table. */
 void close_scope(SymbolTable* table);
 
+/* Returns true if the current scope is the global scope. */
+bool current_scope_is_global(SymbolTable* table);
+
 /* Update the fields of an info inside the table searched by it name. */
 // bool update(SymbolTable* table, Info* info);
 
@@ -80,9 +83,12 @@ void free_symbol_table_stack_node(STStackNode* node);
 /* Fill the SymbolTable with data in the AST */
 bool decorate_tree(AST* tree, SymbolTable* table);
 
+/* Performs type checking */
 bool check_types(AST* tree);
 
+/* Check if a function is well defined */
 bool check_fn(AST* fn);
 
+/* Checks if a function is well invocated */
 bool check_params(LinkedList* formal_params, AST* fn_call);
 
