@@ -15,10 +15,10 @@ typedef enum Tag{
     UNSUB, DIV, MOD,
     IF, T_E,
     WHILE,
-    DEC_FN,
-    CALL_FN,
-    PARAM,
-    MINOR, BIGGER, EQUALS,
+    FN_DEC,
+    FN_CALL,
+    PARAM_SEC,
+    LESS, GREATER, EQUAL,
     FN,
 } Tag;
 

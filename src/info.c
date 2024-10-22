@@ -37,7 +37,7 @@ Info* new_info(Type type, int value, char* name, int line, int col){
 }
 
 
-Info* new_info_fn(Props* props, LinkedList* params, bool is_extern){
+Info* new_info_fn(Props* props, LinkedList*params, bool is_extern){
     Info* info = (Info*)malloc(sizeof(Info));
 
     as_info_fn(info)->props = props;
@@ -54,10 +54,11 @@ Info* copy_info(Tag tag, Info* dest, Info* src){
     if(dest == NULL || src == NULL) return NULL;
 
     switch (tag) {
-        case DEC_FN:
+        case FN_DEC:
             as_info_fn(dest)->props = as_info_fn(src)->props;
             as_info_fn(dest)->cant_params = as_info_fn(src)->cant_params;
             as_info_fn(dest)->params = as_info_fn(src)->params;
+            as_info_fn(dest)->is_extern = as_info_fn(src)->is_extern;
             break;
 
         default:
@@ -77,7 +78,7 @@ void update_value(Info* dest, int value) {
 void print_info(Tag tag, Info* info){
     switch (tag)
     {
-    case DEC_FN:
+    case FN_DEC:
         _print_info_fn(as_info_fn(info));
         break;
 
@@ -110,8 +111,9 @@ void _print_info_fn(InfoFunction* info){
     printf("Value: %s, ", value_to_str(info->props->value, info->props->type));
     printf("Name: %s, ", info->props->name);
     printf("Line: %d, ", info->props->line);
+    printf("is_extern: %s, ", info->is_extern ? "yes" : "no");
     printf("Cant p: %d, ", info->cant_params);
-    printf("Params: [");
+    printf("params: [");
     for (nat i = 0; i < info->cant_params; i++) {
         _print_info_base(lookup(info->params, i));
     }

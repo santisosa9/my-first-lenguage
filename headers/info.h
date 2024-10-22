@@ -25,18 +25,23 @@ typedef struct Props
     bool is_fn;
 } Props;
 
+typedef enum Scope
+{
+    GLOBAL,
+    LOCAL,
+    PARAM,
+} Scope;
 typedef struct InfoBase
 {
     Props* props;
+    Scope scope;
 } InfoBase;
-
-typedef InfoBase Param;
 
 typedef struct InfoFunction
 {
     Props* props;
     nat cant_params;
-    LinkedList* params; // Param[]
+    LinkedList* params; // PARAM[]
     bool is_extern;
 } InfoFunction;
 
@@ -54,7 +59,7 @@ Props* new_props(Type type, int value, char* name, int line, int col);
 
 /* Create a new info. */
 Info* new_info(Type type, int value, char* name, int line, int col);
-Info* new_info_fn(Props* props, LinkedList* params, bool is_extern);
+Info* new_info_fn(Props* props, LinkedList*params, bool is_extern);
 Info* new_info_base(Props* props);
 
 /* Print the info. */

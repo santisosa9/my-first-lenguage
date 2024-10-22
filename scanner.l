@@ -63,19 +63,19 @@ NRO         	(-?[1-9][0-9]{0,4})|0
                 return T_DIV; }
 
 "%"		  	    { yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
-                return T_MOD; }                
+                return T_MOD; }
 
 "*"		  	    { yylval.INFOP = new_info(INT, 0, strdup(yytext), yylineno, 0);
                 return T_MUL; }
 
 ">"           { yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
-                return T_BIGGER; }
+                return T_GREATER; }
 
 "<"           { yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
-                return T_MINOR; }
+                return T_LESS; }
 
 "=="          { yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
-                return T_EQUALS; }
+                return T_EQUAL; }
 
 "!"		  	    { yylval.INFOP = new_info(BOOL, 0, strdup(yytext), yylineno, 0);
                 return T_NOT; }
@@ -122,7 +122,7 @@ NRO         	(-?[1-9][0-9]{0,4})|0
 
 [{}(),]        { return *yytext; }
 
-[ \t\n]       ; 
+[ \t\n]       ;
 
 .			  { printf("ERROR: %s\n",yytext);
                 yyerror(); }
