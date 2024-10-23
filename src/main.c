@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
     }
     else {
         fprintf(stderr, "No input file.\n");
-        exit(EXIT_FAILURE); 
+        exit(EXIT_FAILURE);
     }
 
     yyparse();
@@ -35,10 +35,10 @@ int main(int argc, char const *argv[])
     puts("Decorating tree...");
     if (!decorate_tree(tree, table))
         exit(EXIT_FAILURE);
-    printf("------------------------------\n");
+    puts("Printing tree...");
+    print_tree(tree);
+    puts("------------------------------");
     puts("Checking types...");
     if (!check_types(tree))
         exit(EXIT_FAILURE);
-    puts("Printing tree...");
-    print_tree(tree);
 }

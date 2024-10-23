@@ -7,7 +7,7 @@
 #include "../headers/utils.h"
 
 void _print_tree(AST* tree, int level);
-void _pretty_print_tree(AST* tree, int level, char* prefix, char* connection, bool rigth_was_last);
+void _pretty_print_tree(AST* tree, int level, char* prefix, char* connection, bool father_is_last, bool is_right);
 
 
 AST* build_root(AST* left, Info* root_info, Tag tag, AST* right){
@@ -49,7 +49,7 @@ void print_tree(AST* tree){
     connection[0] = '\0';
 
     // puts("\n_pretty_print_tree");
-    _pretty_print_tree(tree, 0, prefix, connection, true);
+    _pretty_print_tree(tree, 0, prefix, connection, true, false);
 
     free(prefix);
     free(connection);
@@ -64,7 +64,7 @@ void _print_tree(AST* tree, int level){
     _print_tree(tree->right, level+1);
 }
 
-void _pretty_print_tree(AST* tree, int level, char* prefix, char* conection, bool father_is_last){
+void _pretty_print_tree(AST* tree, int level, char* prefix, char* conection, bool father_is_last, bool is_right){
     if (tree == NULL) return;
 
     char* child_prefix = malloc(sizeof(char) * (strlen(prefix) + 12));
@@ -75,7 +75,7 @@ void _pretty_print_tree(AST* tree, int level, char* prefix, char* conection, boo
     right_child_connection[0] = '\0';
 
     /* print info */
-    printf("%s%s%i ",prefix, conection, level);
+    printf("%s%s%i%s ",prefix, conection, level, level == 0 ? "" : is_right ? "r" : "l");
     print_node(tree);
 
     /* set prefix for children */
@@ -104,8 +104,8 @@ void _pretty_print_tree(AST* tree, int level, char* prefix, char* conection, boo
     }
 
     /* print children */
-    _pretty_print_tree(tree->left, level+1, child_prefix, left_child_connection, tree->right == NULL);
-    _pretty_print_tree(tree->right, level+1, child_prefix, right_child_connection, true);
+    _pretty_print_tree(tree->left, level+1, child_prefix, left_child_connection, tree->right == NULL, false);
+    _pretty_print_tree(tree->right, level+1, child_prefix, right_child_connection, true, true);
 
     free(child_prefix);
     free(left_child_connection);

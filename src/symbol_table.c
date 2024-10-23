@@ -390,7 +390,7 @@ bool _check_fn(InfoFunction* info, AST* tree, nat* count_returns) {
         }
 
         case SEMICOLON: {
-            if (tree->left != NULL && tree->left->tag == RET && tree->right == NULL) {
+            if (tree->left != NULL && tree->left->tag == RET && tree->right != NULL) {
                 printf("Warning: unaccecible code after line '%u'.\n",
                     as_info_base(tree->left->info)->props->line
                 );
@@ -491,9 +491,9 @@ bool check_types(AST* tree){
             if (left_type != INT) {
                 fprintf(stderr, "Error: Wrong type for left operand of '%s' at line %u. Expected: '%s', found: '%s'.\n",
                     as_info_base(tree->info)->props->name,
+                    as_info_base(tree->info)->props->line,
                     type_to_str(INT),
-                    type_to_str(left_type),
-                    as_info_base(tree->info)->props->line
+                    type_to_str(left_type)
                 );
                 ok &= false;
                 break;
@@ -502,9 +502,9 @@ bool check_types(AST* tree){
             if (right_type != INT) {
                 fprintf(stderr, "Error: Wrong type for right operand of '%s' at line %u. Expected: '%s', found: '%s'.\n",
                     as_info_base(tree->info)->props->name,
+                    as_info_base(tree->info)->props->line,
                     type_to_str(INT),
-                    type_to_str(right_type),
-                    as_info_base(tree->info)->props->line
+                    type_to_str(right_type)
                 );
                 ok &= false;
                 break;
@@ -546,9 +546,9 @@ bool check_types(AST* tree){
             if (left_type != BOOL) {
                 fprintf(stderr, "Error: Wrong type for left operand of '%s' at line %u. Expected: '%s', found: '%s'.\n",
                     as_info_base(tree->info)->props->name,
+                    as_info_base(tree->info)->props->line,
                     type_to_str(BOOL),
-                    type_to_str(left_type),
-                    as_info_base(tree->info)->props->line
+                    type_to_str(left_type)
                 );
                 ok &= false;
                 break;
@@ -557,9 +557,9 @@ bool check_types(AST* tree){
             if (right_type != BOOL) {
                 fprintf(stderr, "Error: Wrong type for right operand of '%s' at line %u. Expected: '%s', found: '%s'.\n",
                     as_info_base(tree->info)->props->name,
+                    as_info_base(tree->info)->props->line,
                     type_to_str(BOOL),
-                    type_to_str(right_type),
-                    as_info_base(tree->info)->props->line
+                    type_to_str(right_type)
                 );
                 ok &= false;
                 break;
@@ -572,18 +572,18 @@ bool check_types(AST* tree){
         }
 
         case NOT: {
-            left_type = as_info_base(tree->left->info)->props->type;
-            if (left_type != BOOL) {
+            right_type = as_info_base(tree->right->info)->props->type;
+            if (right_type != BOOL) {
                 fprintf(stderr, "Error: Wrong type for the operand of '%s' at line %u. Expected: '%s', found: '%s'.\n",
                     as_info_base(tree->info)->props->name,
+                    as_info_base(tree->info)->props->line,
                     type_to_str(BOOL),
-                    type_to_str(left_type),
-                    as_info_base(tree->info)->props->line
+                    type_to_str(right_type)
                 );
                 ok &= false;
                 break;
             }
-            ok &= check_types(tree->left);
+            ok &= check_types(tree->right);
             break;
         }
 

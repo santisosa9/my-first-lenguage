@@ -1,11 +1,15 @@
 Program {
+    void print_int(int x) extern;
+
     int getMax(int x, int y) {
         if (x > y) then {
             return x;
+            int x = 5;
+            print_int(x);
         } else {
             return y;
         }
-        return 0;
+        return x;
     }
 
     int a = getMax(6, 9);
