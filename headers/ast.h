@@ -32,5 +32,11 @@ void print_tree(AST* tree);
 /* Print a node. */
 void print_node(AST* node);
 
-/* Converts a tag to its corresponding string representation. */
-char* tag_to_str(Tag tag);
+/* Performs type checking */
+bool check_types(AST* tree);
+
+/* Check if a function is well defined */
+bool check_fn(AST* fn);
+
+/* Checks if a function is well invocated */
+bool check_params(LinkedList* formal_params, AST* fn_call);
