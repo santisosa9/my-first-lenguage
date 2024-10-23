@@ -130,12 +130,14 @@ dec_fn: type_var T_ID '(' param ')' '{' body_fn '}'         { Info* i_fn = new_i
 
 param: type_var T_ID                                        { InfoBase* i_base = as_info_base($2);
                                                               i_base->props->type = $1;
+                                                              i_base->scope = PARAM;
                                                               LinkedList* params = new_linked_list();
                                                               insert_head(params, i_base);
                                                               $$ = params;
                                                             }
      | type_var T_ID ',' param                              { InfoBase* i_base = as_info_base($2);
                                                               i_base->props->type = $1;
+                                                              i_base->scope = PARAM;
                                                               LinkedList* params = $4;
                                                               insert_head(params, i_base);
                                                               $$ = params;

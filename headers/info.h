@@ -14,7 +14,6 @@ typedef enum Type
     NO_TYPED,
 } Type;
 
-
 typedef struct Props
 {
     Type type;
@@ -31,6 +30,7 @@ typedef enum Scope
     LOCAL,
     PARAM,
 } Scope;
+
 typedef struct InfoBase
 {
     Props* props;

@@ -16,6 +16,16 @@ InfoFunction* as_info_fn(Info* info){
     return &info->fn;
 }
 
+char* scope_to_str(Scope scope){
+    switch (scope){
+        case GLOBAL:     return strdup("GLOBAL");        break;
+        case LOCAL:      return strdup("LOCAL");         break;
+        case PARAM:     return strdup("PARAMS");        break;
+        default:         return strdup("UNKNOWN_TYPE");  break;
+    }
+}
+
+
 Props* new_prop(Type type, int value, char* name, int line, int col){
     Props* prop = (Props*)malloc(sizeof(Props));
     prop->type = type;
@@ -97,7 +107,8 @@ void _print_info_base(InfoBase* info){
     printf("Type: %s, ", type_to_str(info->props->type));
     printf("Value: %s, ", value_to_str(info->props->value, info->props->type));
     printf("Name: %s, ", info->props->name);
-    printf("Line: %d", info->props->line);
+    printf("Line: %d, ", info->props->line);
+    printf("Scope: %s ", scope_to_str(info->scope));
     printf("}\n");
 }
 
