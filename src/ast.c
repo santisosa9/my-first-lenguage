@@ -114,6 +114,6 @@ void _pretty_print_tree(AST* tree, int level, char* prefix, char* conection, boo
 }
 
 void print_node(AST* node) {
-    printf("Tag: %s, ", tag_to_str(node->tag));
+    printf(YELLOW "%s " RESET, tag_to_str(node->tag));
     print_info(node->tag, node->info);
 }

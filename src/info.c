@@ -106,8 +106,8 @@ void _print_info_base(InfoBase* info){
     printf("{");
     printf("Type: %s, ", type_to_str(info->props->type));
     printf("Value: %s, ", value_to_str(info->props->value, info->props->type));
-    printf("Name: %s, ", info->props->name);
-    printf("Line: %d, ", info->props->line);
+    printf("Name: ‘%s’, ", info->props->name);
+    printf("Line: %u, ", info->props->line);
     printf("Scope: %s ", scope_to_str(info->scope));
     printf("}\n");
 }
@@ -120,11 +120,10 @@ void _print_info_fn(InfoFunction* info){
     printf("{");
     printf("Ret type: %s, ", type_to_str(info->props->type));
     printf("Value: %s, ", value_to_str(info->props->value, info->props->type));
-    printf("Name: %s, ", info->props->name);
-    printf("Line: %d, ", info->props->line);
+    printf("Name: ‘%s’, ", info->props->name);
+    printf("Line: %u, ", info->props->line);
     printf("is_extern: %s, ", info->is_extern ? "yes" : "no");
-    printf("Cant p: %d, ", info->cant_params);
-    printf("params: [");
+    printf("params: %u [", info->cant_params);
     for (nat i = 0; i < info->cant_params; i++) {
         _print_info_base(lookup(info->params, i));
     }
