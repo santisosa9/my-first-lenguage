@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include "info.h"
 #include "ast.h"
 
 typedef struct STListNode
@@ -82,3 +83,4 @@ void free_symbol_table_stack_node(STStackNode* node);
 
 /* Fill the SymbolTable with data in the AST */
 bool decorate_tree(AST* tree, SymbolTable* table);
+

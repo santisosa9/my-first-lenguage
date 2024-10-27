@@ -300,3 +300,4 @@ bool decorate_tree(AST* tree, SymbolTable* table) {
 
     return true;
 }
+
