@@ -2,7 +2,7 @@ Program {
     int sumatory(int x) {
         int i = 0;
         int result = 0;
-        while (i < x || i == x && !2) {
+        while (i < x || i == x && !2) { // Fails: invalid expression '!2'
             result = result + i;
             i = i + 1;
         }
