@@ -40,5 +40,3 @@ bool check_fn(AST* fn);
 
 /* Checks if a function is well invocated */
 bool check_params(LinkedList* formal_params, AST* fn_call);
-
-void generate_intermediate_code(AST* tree);

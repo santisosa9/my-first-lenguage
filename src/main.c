@@ -8,6 +8,7 @@
 #include "../headers/utils.h"
 #include "../headers/parser.h"
 #include "../headers/type_checking.h"
+#include "../headers/intermediate_code.h"
 
 extern AST *get_parsed_tree();
 extern int yyparse();
@@ -50,7 +51,8 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
     puts("Generating intermediate code...");
-    generate_intermediate_code(tree);    
-    // puts("Printing tree...");
-    // print_tree(tree);
+    LinkedList* l = new_linked_list();
+    generate_intermediate_code(tree, l);    
+    puts("Printing tree...");
+    print_tree(tree);
 }
