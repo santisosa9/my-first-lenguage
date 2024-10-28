@@ -93,7 +93,9 @@ body: dec                                                   { $$ = $1; }
     | dec_fn                                                { $$ = $1; }
     | dec_fn body                                           { $$ = build_root($1, NULL, SEMICOLON, $2); }
 
-block: '{' body_fn '}'                                      { $$ = build_root(NULL, NULL, BLOCK, $2); }
+block: '{' body_fn '}'                                      { Info* info = new_info(NO_TYPED, 0, "block", 0, 0);
+                                                              $$ = build_root(NULL, info, BLOCK, $2); 
+                                                            }
      ;
 
 body_fn: dec                                                { $$ = $1; }

@@ -19,7 +19,8 @@ typedef enum Tag{
     FN_CALL,
     PARAM_SEC,
     LESS, GREATER, EQUAL,
-    FN,
+    FN, 
+    JUMP, LABEL, IFF,
 } Tag;
 
 char* tag_to_str(Tag tag);

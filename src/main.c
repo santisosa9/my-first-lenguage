@@ -30,15 +30,19 @@ int main(int argc, char const *argv[])
     AST *tree = get_parsed_tree();
     SymbolTable *table = new_symbol_table();
 
-    puts("Printing tree...");
-    print_tree(tree);
+    // puts("Printing tree...");
+    // print_tree(tree);
     puts("Decorating tree...");
     if (!decorate_tree(tree, table))
         exit(EXIT_FAILURE);
     puts("Printing tree...");
     print_tree(tree);
-    puts("------------------------------");
+    // puts("------------------------------");
     puts("Checking types...");
     if (!check_types(tree))
         exit(EXIT_FAILURE);
+    puts("Generating intermediate code...");
+    generate_intermediate_code(tree);    
+    // puts("Printing tree...");
+    // print_tree(tree);
 }

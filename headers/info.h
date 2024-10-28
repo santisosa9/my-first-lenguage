@@ -55,12 +55,11 @@ InfoBase* as_info_base(Info* info);
 InfoFunction* as_info_fn(Info* info);
 
 /* Create a new prop. */
-Props* new_props(Type type, int value, char* name, int line, int col);
+Props* new_prop(Type type, int value, char* name, int line, int col);
 
 /* Create a new info. */
 Info* new_info(Type type, int value, char* name, int line, int col);
 Info* new_info_fn(Props* props, LinkedList*params, bool is_extern);
-Info* new_info_base(Props* props);
 
 /* Print the info. */
 void print_info(Tag tag, Info* info);

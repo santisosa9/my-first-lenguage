@@ -30,6 +30,9 @@ char* tag_to_str(Tag tag){
         case FN_DEC:        return strdup("FN_DEC");        break;
         case FN_CALL:       return strdup("FN_CALL");       break;
         case PARAM_SEC:     return strdup("PARAM_SEC");     break;
+        case JUMP:          return strdup("JUMP");          break;
+        case LABEL:         return strdup("LABEL");         break;
+        case IFF:           return strdup("IFF");           break;
         default:            return strdup("UNKNOWN_TAG");   break;
     }
 }
