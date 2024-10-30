@@ -19,9 +19,6 @@ typedef struct LinkedListIterator
     LinkedListNode* current;
 } LinkedListIterator;
 
-/* Returns a new LinkedListNode initialized with data. */
-LinkedListNode* new_linked_list_node(void* data);
-
 /* Returns a new emprty LinkedList. */
 LinkedList* new_linked_list();
 

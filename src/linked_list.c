@@ -3,7 +3,8 @@
 #include <stdbool.h>
 #include "../headers/linked_list.h"
 
-LinkedListNode* new_linked_list_node(void* data)
+/* Returns a new LinkedListNode initialized with data. */
+LinkedListNode* _new_linked_list_node(void* data)
 {
     LinkedListNode* node = (LinkedListNode*)malloc(sizeof(LinkedListNode));
     node->data = data;
@@ -26,7 +27,7 @@ void insert_at(LinkedList* list, void* data, nat index)
         printf("Index out of bounds\n");
         exit(1);
     }
-    LinkedListNode* node = new_linked_list_node(data);
+    LinkedListNode* node = _new_linked_list_node(data);
     if (index == 0)
     {
         node->next = list->head;
