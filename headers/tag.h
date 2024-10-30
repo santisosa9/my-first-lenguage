@@ -19,7 +19,7 @@ typedef enum Tag{
     FN_CALL,
     PARAM_SEC,
     LESS, GREATER, EQUAL,
-    FN, 
+    PARAMETER,
     JUMP, LABEL, IFN, FN_END,
 } Tag;
 

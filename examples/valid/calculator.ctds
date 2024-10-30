@@ -13,9 +13,9 @@ Program {
 
     void main() {
         int x = 5;
-        int y = 10;
+        int y;
 
-        int resultSum = add(x,y);
+        int resultSum = add(5 + 15, sub(3, 3 * 8 * 9));
         return resultSum;
     }
 }

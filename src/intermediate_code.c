@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../headers/ast.h"
+// #include "../headers/info.h"
 #include "../headers/intermediate_code.h"
 #include "../headers/quadruple.h"
 
-int temp_counter = 0; 
+int temp_counter = 0;
 
 char* getTempName() {
     char* temp_name = (char*)malloc(10 * sizeof(char));
@@ -12,7 +13,7 @@ char* getTempName() {
     return temp_name;
 }
 
-int label_counter = 0; 
+int label_counter = 0;
 
 char* getLabelName() {
     char* label_name = (char*)malloc(10 * sizeof(char));
@@ -26,7 +27,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
         fprintf(stderr, "Precondition fault: 'ic' must not be NULL.\n");
         exit(EXIT_FAILURE);
     }
-    
+
     if (tree == NULL) {
         return;
     }
@@ -58,7 +59,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
                 result = tree->info;
 
                 Quadruple* quad = new_quadruple(tag, arg1, arg2, result);
-                print_quadruple(quad); 
+                print_quadruple(quad);
             }
             break;
         }
@@ -68,24 +69,24 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
 
             if (tree->right != NULL) {
                 arg1 = tree->right->info;
-                
+
                 as_info_base(tree->info)->props->name = getTempName();
                 result = tree->info;
 
                 Quadruple* quad = new_quadruple(tag, arg1, NULL, result);
-                print_quadruple(quad); 
+                print_quadruple(quad);
             }
             break;
         }
 
-        case ASIG: 
+        case ASIG:
         case DEC: {
             generate_intermediate_code(tree->left, ic);
             generate_intermediate_code(tree->right, ic);
 
             if (tree->left != NULL && tree->right != NULL) {
                 arg1 = tree->right->info;
-                result = tree->left->info; 
+                result = tree->left->info;
 
                 Quadruple* quad = new_quadruple(ASIG, arg1, NULL, result);
                 print_quadruple(quad);
@@ -99,7 +100,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
             if (tree->right != NULL) {
                 result = tree->right->info;
                 Quadruple* quad = new_quadruple(tag, NULL, NULL, result);
-                print_quadruple(quad); 
+                print_quadruple(quad);
             }
             break;
         }
@@ -109,7 +110,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
             char* startLabelName = getLabelName();
             char* endLabelName = getLabelName();
 
-            Info* start; 
+            Info* start;
             Info* end;
 
             as_info_base(tree->info)->props->name = startLabelName;
@@ -119,11 +120,11 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
             print_quadruple(startLabel);
 
             generate_intermediate_code(tree->left, ic); // Genero código intermedio para la condición
-            
+
             end = new_info(NO_TYPED, 0, endLabelName, 0, 0);
 
             if (tree->left != NULL) {
-                arg1 = tree->left->info; 
+                arg1 = tree->left->info;
                 Quadruple* condition = new_quadruple(IFN, arg1, NULL, end); // Si la condición evalua falsa saltamos a endLabel
                 print_quadruple(condition);
             }
@@ -142,12 +143,12 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
             generate_intermediate_code(tree->left, ic); // Genero código intermedio para la condición
 
             char* nextLabelName = getLabelName();
-            Info* next; 
+            Info* next;
 
             if (tree->left != NULL) {
                 arg1 = tree->left->info;
                 next = new_info(NO_TYPED, 0, nextLabelName, 0, 0);
-                Quadruple* condition = new_quadruple(IFN, arg1, NULL, next); 
+                Quadruple* condition = new_quadruple(IFN, arg1, NULL, next);
                 print_quadruple(condition);
             }
 
@@ -180,6 +181,29 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
 
           break;
         }
+
+        case FN_CALL: {
+            generate_intermediate_code(tree->right, ic); // Parametros
+            arg1 = new_info(NO_TYPED, 0, as_info_base(tree->info)->props->name, 0, 0);
+            // copy_info(tree->tag, arg1, tree->info);
+            as_info_base(tree->info)->props->name = getTempName();
+            result = tree->info;
+            Quadruple* call = new_quadruple(FN_CALL, arg1, NULL, result);
+            print_quadruple(call);
+            break;
+        }
+
+        case PARAM_SEC: {
+            generate_intermediate_code(tree->left, ic);
+            if (tree->left != NULL) {
+                Quadruple* param = new_quadruple(PARAMETER, NULL, NULL, tree->left->info);
+                print_quadruple(param);
+            }
+            generate_intermediate_code(tree->right, ic);
+            break;
+        }
+
+
 
         default:
             generate_intermediate_code(tree->left, ic);
