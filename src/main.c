@@ -9,6 +9,7 @@
 #include "../headers/parser.h"
 #include "../headers/type_checking.h"
 #include "../headers/intermediate_code.h"
+#include "../headers/quadruple.h"
 
 extern AST *get_parsed_tree();
 extern int yyparse();
@@ -55,4 +56,6 @@ int main(int argc, char const *argv[])
     generate_intermediate_code(tree, l);    
     puts("Printing tree...");
     print_tree(tree);
+    puts("Printing quadruple list...");
+    print_list(l, (void (*)(void*)) print_quadruple);
 }
