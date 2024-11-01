@@ -56,6 +56,7 @@ InfoFunction* as_info_fn(Info* info);
 
 /* Create a new prop. */
 Props* new_prop(Type type, int value, char* name, int line, int col);
+void copy_prop(Props* dest, Props* src);
 
 /* Create a new info. */
 Info* new_info(Type type, int value, char* name, int line, int col);

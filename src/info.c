@@ -37,6 +37,17 @@ Props* new_prop(Type type, int value, char* name, int line, int col){
     return prop;
 }
 
+void copy_prop(Props* dest, Props* src) {
+    if (src == NULL || dest == NULL) return;
+
+    dest->type = src->type;
+    dest->value = src->value;
+    dest->line = src->line;
+    dest->col = src->col;
+    dest->is_fn = src->is_fn;
+    dest->name = strdup(src->name);
+}
+
 Info* new_info(Type type, int value, char* name, int line, int col){
     Props* props = new_prop(type, value, name, line, col);
     Info* info = (Info*)malloc(sizeof(Info));
@@ -64,6 +75,7 @@ Info* copy_info(Tag tag, Info* dest, Info* src){
     if(dest == NULL || src == NULL) return NULL;
 
     switch (tag) {
+        case FN_CALL: 
         case FN_DEC:
             as_info_fn(dest)->props = as_info_fn(src)->props;
             as_info_fn(dest)->cant_params = as_info_fn(src)->cant_params;
@@ -88,6 +100,7 @@ void update_value(Info* dest, int value) {
 void print_info(Tag tag, Info* info){
     switch (tag)
     {
+    case FN_CALL:
     case FN_DEC:
         _print_info_fn(as_info_fn(info));
         break;

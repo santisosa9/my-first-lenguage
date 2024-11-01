@@ -180,10 +180,16 @@ param: type_var T_ID {
     };
 
 call_fn: T_ID '(' param_exprs ')' {
-        $$ = join_trees(NULL, new_node($1, FN_CALL), $3);
+        LinkedList* params = new_linked_list();
+        Info* i_fn = new_info_fn(as_info_base($1)->props, params, false);
+        as_info_fn(i_fn)->props->type = NO_TYPED;
+        $$ = join_trees(NULL, new_node(i_fn, FN_CALL), $3);
     }
     | T_ID '(' ')' {
-        $$ = join_trees(NULL, new_node($1, FN_CALL), NULL);
+        LinkedList* params = new_linked_list();
+        Info* i_fn = new_info_fn(as_info_base($1)->props, params, false);
+        as_info_fn(i_fn)->props->type = NO_TYPED;
+        $$ = join_trees(NULL, new_node(i_fn, FN_CALL), NULL);
     };
 
 param_exprs: expr {
