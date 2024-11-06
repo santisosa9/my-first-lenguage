@@ -22,6 +22,7 @@ typedef struct Props
     nat line;
     nat col;
     bool is_fn;
+    char* file_path;
 } Props;
 
 typedef enum Scope
@@ -35,6 +36,7 @@ typedef struct InfoBase
 {
     Props* props;
     Scope scope;
+    int offset;
 } InfoBase;
 
 typedef struct InfoFunction
@@ -43,6 +45,7 @@ typedef struct InfoFunction
     nat cant_params;
     LinkedList* params; // PARAM[]
     bool is_extern;
+    nat locals;
 } InfoFunction;
 
 typedef union Info {
@@ -55,12 +58,12 @@ InfoBase* as_info_base(Info* info);
 InfoFunction* as_info_fn(Info* info);
 
 /* Create a new prop. */
-Props* new_prop(Type type, int value, char* name, int line, int col);
+Props* new_prop(Type type, int value, char* name, int line, int col, char* file_path);
 void copy_prop(Props* dest, Props* src);
 
 /* Create a new info. */
-Info* new_info(Type type, int value, char* name, int line, int col);
-Info* new_info_fn(Props* props, LinkedList*params, bool is_extern);
+Info* new_info(Type type, int value, char* name, int line, int col, int offset, char* file_path);
+Info* new_info_fn(Props* props, LinkedList*params, bool is_extern, nat locals);
 
 /* Print the info. */
 void print_info(Tag tag, Info* info);

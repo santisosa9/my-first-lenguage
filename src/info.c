@@ -26,7 +26,7 @@ char* scope_to_str(Scope scope){
 }
 
 
-Props* new_prop(Type type, int value, char* name, int line, int col){
+Props* new_prop(Type type, int value, char* name, int line, int col, char* file_path){
     Props* prop = (Props*)malloc(sizeof(Props));
     prop->type = type;
     prop->value = value;
@@ -34,6 +34,7 @@ Props* new_prop(Type type, int value, char* name, int line, int col){
     prop->line = line;
     prop->col = col;
     prop->is_fn = false;
+    prop->file_path = file_path;
     return prop;
 }
 
@@ -48,8 +49,8 @@ void copy_prop(Props* dest, Props* src) {
     dest->name = strdup(src->name);
 }
 
-Info* new_info(Type type, int value, char* name, int line, int col){
-    Props* props = new_prop(type, value, name, line, col);
+Info* new_info(Type type, int value, char* name, int line, int col, int offset, char* file_path){
+    Props* props = new_prop(type, value, name, line, col, file_path);
     Info* info = (Info*)malloc(sizeof(Info));
 
     as_info_base(info)->props = props;
@@ -58,7 +59,7 @@ Info* new_info(Type type, int value, char* name, int line, int col){
 }
 
 
-Info* new_info_fn(Props* props, LinkedList* params, bool is_extern){
+Info* new_info_fn(Props* props, LinkedList* params, bool is_extern, nat locals){
     Info* info = (Info*)malloc(sizeof(Info));
 
     as_info_fn(info)->props = props;
@@ -75,7 +76,7 @@ Info* copy_info(Tag tag, Info* dest, Info* src){
     if(dest == NULL || src == NULL) return NULL;
 
     switch (tag) {
-        case FN_CALL: 
+        case FN_CALL:
         case FN_DEC:
             memcpy(as_info_fn(dest), as_info_fn(src), sizeof(InfoFunction));
             as_info_fn(dest)->cant_params = as_info_fn(src)->cant_params;
