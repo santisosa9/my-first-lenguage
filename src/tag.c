@@ -32,7 +32,7 @@ char* tag_to_str(Tag tag){
         case PARAM_SEC:     return strdup("PARAM_SEC");     break;
         case JUMP:          return strdup("JUMP");          break;
         case LABEL:         return strdup("LABEL");         break;
-        case IFN:           return strdup("IFN");           break;
+        case IFNOT:         return strdup("IFNOT");         break;
         case FN_END:        return strdup("FN_END");        break;
         case PARAMETER:     return strdup("PARAMETER");     break;
         default:            return strdup("UNKNOWN_TAG");   break;

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../headers/ast.h"
-// #include "../headers/info.h"
+#include "../headers/info.h"
 #include "../headers/intermediate_code.h"
 #include "../headers/quadruple.h"
 
@@ -59,7 +59,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
                 result = tree->info;
 
                 Quadruple* quad = new_quadruple(tag, arg1, arg2, result);
-                insert_ll(ic,quad);
+                insert_ll(ic, quad);
             }
             break;
         }
@@ -74,7 +74,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
                 result = tree->info;
 
                 Quadruple* quad = new_quadruple(tag, arg1, NULL, result);
-                insert_ll(ic,quad);
+                insert_ll(ic, quad);
             }
             break;
         }
@@ -89,7 +89,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
                 result = tree->left->info;
 
                 Quadruple* quad = new_quadruple(ASIG, arg1, NULL, result);
-                insert_ll(ic,quad);
+                insert_ll(ic, quad);
             }
             break;
         }
@@ -100,7 +100,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
             if (tree->right != NULL) {
                 result = tree->right->info;
                 Quadruple* quad = new_quadruple(tag, NULL, NULL, result);
-                insert_ll(ic,quad);
+                insert_ll(ic, quad);
             }
             break;
         }
@@ -117,7 +117,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
             start = tree->info;
 
             Quadruple* startLabel = new_quadruple(LABEL, NULL, NULL, start); // Etiqueta de inicio del while
-            insert_ll(ic, startLabel);
+            insert_ll(ic,  startLabel);
 
             generate_intermediate_code(tree->left, ic); // Genero código intermedio para la condición
 
@@ -125,16 +125,16 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
 
             if (tree->left != NULL) {
                 arg1 = tree->left->info;
-                Quadruple* condition = new_quadruple(IFN, arg1, NULL, end); // Si la condición evalua falsa saltamos a endLabel
-                insert_ll(ic,condition);
+                Quadruple* condition = new_quadruple(IFNOT, arg1, NULL, end); // Si la condición evalua falsa saltamos a endLabel
+                insert_ll(ic, condition);
             }
 
             generate_intermediate_code(tree->right, ic); // Genero código intermedio para el cuerpo del while
 
             Quadruple* jumpToStart = new_quadruple(JUMP, NULL, NULL, start); // Salto al inicio del while
-            insert_ll(ic,jumpToStart);
+            insert_ll(ic, jumpToStart);
             Quadruple* endLabel = new_quadruple(LABEL, NULL, NULL, end); // Etiqueta de fin del while
-            insert_ll(ic,endLabel);
+            insert_ll(ic, endLabel);
             break;
         }
 
@@ -147,25 +147,25 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
             if (tree->left != NULL) {
                 arg1 = tree->left->info;
                 next = new_info(NO_TYPED, 0, nextLabelName, 0, 0);
-                Quadruple* condition = new_quadruple(IFN, arg1, NULL, next);
-                insert_ll(ic,condition);
+                Quadruple* condition = new_quadruple(IFNOT, arg1, NULL, next);
+                insert_ll(ic, condition);
             }
 
             if (tree->right->tag != T_E) {
                 generate_intermediate_code(tree->right, ic);
                 Quadruple* endLabel = new_quadruple(LABEL, NULL, NULL, next); // Etiqueta de fin del if
-                insert_ll(ic,endLabel);
+                insert_ll(ic, endLabel);
             } else {
                 char* endLabelName = getLabelName();
                 Info* end = new_info(NO_TYPED, 0, endLabelName, 0, 0);
                 generate_intermediate_code(tree->right->left, ic); // Bloque del then
                 Quadruple* jumpToEnd = new_quadruple(JUMP, NULL, NULL, end); // Una vez terminado el then salto al fin del if
-                insert_ll(ic,jumpToEnd);
+                insert_ll(ic, jumpToEnd);
                 Quadruple* elseLabel = new_quadruple(LABEL, NULL, NULL, next); // Etiqueta del else
-                insert_ll(ic,elseLabel);
+                insert_ll(ic, elseLabel);
                 generate_intermediate_code(tree->right->right, ic); // Bloque del else
                 Quadruple* endLabel = new_quadruple(LABEL, NULL, NULL, end); // Etiqueta de fin del if
-                insert_ll(ic,endLabel);
+                insert_ll(ic, endLabel);
             }
 
             break;
@@ -173,16 +173,34 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
 
         case FN_DEC: {
           Quadruple* dec = new_quadruple(tree->tag, NULL, NULL, tree->info);
-          insert_ll(ic,dec);
+          insert_ll(ic, dec);
           generate_intermediate_code(tree->right, ic);
           Quadruple* end = new_quadruple(FN_END, NULL, NULL, tree->info);
-          insert_ll(ic,end);
+          insert_ll(ic, end);
 
           break;
         }
 
         case FN_CALL: {
-            generate_intermediate_code(tree->right, ic); // Parametros
+            // Generate intermediate code for the parameters
+            generate_intermediate_code(tree->right, ic);
+
+            // Append the generated parameters to the function call
+            AST* current = tree->right;
+            nat i = 1;
+            while (current != NULL)
+            {
+                AST* expr = current->left;
+                if (expr != NULL) {
+                    Info* num_param = new_info(NO_TYPED, i, itos(i), 0, 0);
+                    Quadruple* param = new_quadruple(PARAMETER, num_param, NULL, expr->info);
+                    insert_ll(ic, param);
+                }
+                current = current->right;
+                i++;
+            }
+
+            // Generate intermediate code for the function call
             arg1 = new_info(NO_TYPED, 0, as_info_fn(tree->info)->props->name, 0, 0);
             char* name = (char*)malloc(10 * sizeof(char));
             if (name != NULL) {
@@ -192,21 +210,9 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
             as_info_fn(tree->info)->props->name = getTempName();
             result = tree->info;
             Quadruple* call = new_quadruple(FN_CALL, arg1, arg2, result);
-            insert_ll(ic,call);
+            insert_ll(ic, call);
             break;
         }
-
-        case PARAM_SEC: {
-            generate_intermediate_code(tree->left, ic);
-            if (tree->left != NULL) {
-                Quadruple* param = new_quadruple(PARAMETER, NULL, NULL, tree->left->info);
-                insert_ll(ic,param); 
-            }
-            generate_intermediate_code(tree->right, ic);
-            break;
-        }
-
-
 
         default:
             generate_intermediate_code(tree->left, ic);

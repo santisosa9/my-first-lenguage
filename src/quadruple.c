@@ -20,9 +20,14 @@ void print_quadruple(Quadruple* quad) {
         return;
     }
 
-    printf("{%s", tag_to_str(quad->op));
-    printf(", %s", (quad->arg1 && as_info_base(quad->arg1)->props) ? as_info_base(quad->arg1)->props->name : " ");
-    printf(", %s", (quad->arg2 && as_info_base(quad->arg2)->props) ? as_info_base(quad->arg2)->props->name : " ");
-    printf(", %s", (quad->result && as_info_base(quad->result)->props) ? as_info_base(quad->result)->props->name : " ");
+    char* op = tag_to_str(quad->op);
+    // char* padded_op = (char*)malloc(11 * sizeof(char));
+    // snprintf(padded_op, 11, "%-10s", op);
+
+    printf("{%-10s" , op);
+    printf(", %-10s", (quad->arg1 && as_info_base(quad->arg1)->props) ? as_info_base(quad->arg1)->props->name : " ");
+    printf(", %-10s", (quad->arg2 && as_info_base(quad->arg2)->props) ? as_info_base(quad->arg2)->props->name : " ");
+    printf(", %-10s", (quad->result && as_info_base(quad->result)->props) ? as_info_base(quad->result)->props->name : " ");
     printf("}\n");
+    free(op);
 }

@@ -1,5 +1,5 @@
 Program {
-    int add(int x, int y) {
+    int add(int x, int y, int z) {
         return x + y;
     }
 
@@ -15,7 +15,7 @@ Program {
         int x = 5;
         int y;
 
-        int resultSum = add(5 + 15, sub(3, 3 * 8 * 9));
+        int resultSum = add(5 + 15, sub(3, 3 * 8 * 9), div(10, 2));
         return resultSum;
     }
 }

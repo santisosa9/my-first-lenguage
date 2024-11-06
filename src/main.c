@@ -38,8 +38,8 @@ int main(int argc, char const *argv[])
     AST *tree = get_parsed_tree();
     SymbolTable *table = new_symbol_table();
 
-    // puts("Printing tree...");
-    // print_tree(tree);
+    puts("Printing tree...");
+    print_tree(tree);
     puts("Decorating tree...");
     if (!decorate_tree(tree, table))
         exit(EXIT_FAILURE);
@@ -53,7 +53,7 @@ int main(int argc, char const *argv[])
     }
     puts("Generating intermediate code...");
     LinkedList* l = new_linked_list();
-    generate_intermediate_code(tree, l);    
+    generate_intermediate_code(tree, l);
     puts("Printing tree...");
     print_tree(tree);
     puts("Printing quadruple list...");

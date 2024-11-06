@@ -20,7 +20,7 @@ char* scope_to_str(Scope scope){
     switch (scope){
         case GLOBAL:     return strdup("GLOBAL");        break;
         case LOCAL:      return strdup("LOCAL");         break;
-        case PARAM:     return strdup("PARAMS");        break;
+        case PARAM:      return strdup("PARAM");         break;
         default:         return strdup("UNKNOWN_TYPE");  break;
     }
 }
@@ -58,7 +58,7 @@ Info* new_info(Type type, int value, char* name, int line, int col){
 }
 
 
-Info* new_info_fn(Props* props, LinkedList*params, bool is_extern){
+Info* new_info_fn(Props* props, LinkedList* params, bool is_extern){
     Info* info = (Info*)malloc(sizeof(Info));
 
     as_info_fn(info)->props = props;
@@ -77,14 +77,14 @@ Info* copy_info(Tag tag, Info* dest, Info* src){
     switch (tag) {
         case FN_CALL: 
         case FN_DEC:
-            as_info_fn(dest)->props = as_info_fn(src)->props;
+            memcpy(as_info_fn(dest), as_info_fn(src), sizeof(InfoFunction));
             as_info_fn(dest)->cant_params = as_info_fn(src)->cant_params;
             as_info_fn(dest)->params = as_info_fn(src)->params;
             as_info_fn(dest)->is_extern = as_info_fn(src)->is_extern;
             break;
 
         default:
-            as_info_base(dest)->props = as_info_base(src)->props;
+            memcpy(as_info_base(dest), as_info_base(src), sizeof(InfoBase));
             break;
     }
 
