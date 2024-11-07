@@ -9,6 +9,7 @@
 
 Info* _search_in_scope(STStackNode* scope, char* name);
 void insert_params(SymbolTable* table, Info* info);
+void _set_offset_params(LinkedList* params);
 
 SymbolTable* new_symbol_table(){
     SymbolTable* table = (SymbolTable*)malloc(sizeof(SymbolTable));
@@ -229,7 +230,11 @@ bool decorate_tree(AST* tree, SymbolTable* table) {
                 insert(table, tree->info);
                 open_scope(table);
                 insert_params(table, tree->info);
-                if (!decorate_tree(tree->right, table)) return false;
+                int locals = 0;
+                if (!decorate_tree_fn(tree->right, table, &locals)) return false;
+                InfoFunction* i_fn = as_info_fn(tree->info);
+                i_fn->locals = (locals);
+                _set_offset_params(i_fn->params);
                 close_scope(table);
             } else {
                 printf("Error: Redeclaración de la función '%s' en línea %d.\n",
@@ -237,13 +242,6 @@ bool decorate_tree(AST* tree, SymbolTable* table) {
                        as_info_fn(tree->info)->props->line);
                 return false;
             }
-            break;
-        }
-
-        case BLOCK: {
-            open_scope(table);
-            if (!decorate_tree(tree->right, table)) return false;
-            close_scope(table);
             break;
         }
 
@@ -274,7 +272,6 @@ bool decorate_tree(AST* tree, SymbolTable* table) {
             } else {
                 update(table, tree, existing);
             }
-            if (!decorate_tree(tree->left, table) || !decorate_tree(tree->right, table)) return false;
             break;
         }
 
@@ -293,7 +290,7 @@ bool decorate_tree(AST* tree, SymbolTable* table) {
                 as_info_fn(i_fn)->cant_params = as_info_fn(existing)->cant_params;  
                 tree->info = i_fn;
             }
-            if (!decorate_tree(tree->left, table) || !decorate_tree(tree->right, table)) return false;
+            if (!decorate_tree(tree->right, table)) return false;
             break;
         }
 
@@ -306,3 +303,105 @@ bool decorate_tree(AST* tree, SymbolTable* table) {
     return true;
 }
 
+bool decorate_tree_fn(AST* tree, SymbolTable* table, int* locals) {
+    if (tree == NULL) return true;
+
+    Tag currentTag = tree->tag;
+    Info* existing;
+
+    switch (currentTag) {
+        case BLOCK: {
+            open_scope(table);
+            if (!decorate_tree_fn(tree->right, table, locals)) return false;
+            close_scope(table);
+            break;
+        }
+
+        case DEC: {
+            existing = search_in_current_scope(table, as_info_base(tree->info)->props->name);
+            if (existing == NULL) {
+                // actualizo el scope y el offset
+                as_info_base(tree->info)->scope = LOCAL;
+                (*locals)++;
+                as_info_base(tree->info)->props->offset = (-4 * (*locals)) -4;
+                insert(table, tree->info);
+            } else {
+                printf("Error: Redeclaración de la variable '%s' en línea %d.\n",
+                    as_info_base(tree->info)->props->name,
+                    as_info_base(tree->info)->props->line);
+                return false;
+            }
+            if (!decorate_tree_fn(tree->left, table, locals) || !decorate_tree_fn(tree->right, table, locals)) return false;
+            break;
+        }
+
+        case ID: {
+            existing = search(table, as_info_base(tree->info)->props->name);
+            if (existing == NULL) {
+                printf("Error: Variable '%s' no declarada en línea %d.\n",
+                    as_info_base(tree->info)->props->name,
+                    as_info_base(tree->info)->props->line);
+                return false;
+            } else {
+                update(table, tree, existing);
+            }
+            break;
+        }
+
+        case FN_CALL: {
+            existing = search_global(table, as_info_fn(tree->info)->props->name);
+            if (existing == NULL) {
+                printf("Error: Función '%s' no declarada en línea %d.\n",
+                    as_info_fn(tree->info)->props->name,
+                    as_info_fn(tree->info)->props->line);
+                return false;
+            } else {
+                Props* prop = new_prop(NO_TYPED, 0, "", 0, 0);
+                copy_prop(prop, as_info_fn(existing)->props);
+                prop->line = as_info_fn(tree->info)->props->line;
+                Info* i_fn = new_info_fn(prop, as_info_fn(existing)->params, as_info_fn(existing)->is_extern);
+                as_info_fn(i_fn)->cant_params = as_info_fn(existing)->cant_params;  
+                tree->info = i_fn;
+            }
+            (*locals)++;
+            as_info_base(tree->info)->props->offset = (-4 * (*locals)) -4;
+            if (!decorate_tree_fn(tree->right, table, locals)) return false;
+            break;
+        }
+
+        case ADD: 
+        case SUB: 
+        case MUL: 
+        case DIV: 
+        case LESS:
+        case GREATER:
+        case EQUAL:
+        case AND:
+        case OR: {
+            (*locals)++;
+            as_info_base(tree->info)->props->offset = (-4 * (*locals)) -4;
+
+            if (!decorate_tree_fn(tree->left, table, locals)) return false;
+            if (!decorate_tree_fn(tree->right, table, locals)) return false;
+            break;
+        }
+
+        default: {
+            if (!decorate_tree_fn(tree->left, table, locals) || !decorate_tree_fn(tree->right, table, locals)) return false;
+            break;
+        }
+    }
+
+    return true;
+}
+
+void _set_offset_params(LinkedList* params) {
+    LinkedListIterator* iterator = new_linked_list_iterator(params);
+    int offset = 4;
+    while (has_next(iterator)) {
+        Info* data = (Info*)next(iterator);
+        as_info_base(data)->props->offset = offset;
+        offset += 4;
+    }
+    free(iterator);
+}

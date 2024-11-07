@@ -25,9 +25,18 @@ void print_quadruple(Quadruple* quad) {
     // snprintf(padded_op, 11, "%-10s", op);
 
     printf("{%-10s" , op);
-    printf(", %-10s", (quad->arg1 && as_info_base(quad->arg1)->props) ? as_info_base(quad->arg1)->props->name : " ");
-    printf(", %-10s", (quad->arg2 && as_info_base(quad->arg2)->props) ? as_info_base(quad->arg2)->props->name : " ");
-    printf(", %-10s", (quad->result && as_info_base(quad->result)->props) ? as_info_base(quad->result)->props->name : " ");
+    printf(", %s", (quad->arg1 && as_info_base(quad->arg1)->props) ? as_info_base(quad->arg1)->props->name : " ");
+    if (quad->arg1 && as_info_base(quad->arg1)->props->offset != 0) {
+        printf(" (%d)", as_info_base(quad->arg1)->props->offset);
+    }
+    printf(", %s", (quad->arg2 && as_info_base(quad->arg2)->props) ? as_info_base(quad->arg2)->props->name : " ");
+    if (quad->arg2 && as_info_base(quad->arg2)->props->offset != 0) {
+        printf(" (%d)", as_info_base(quad->arg2)->props->offset);
+    }
+    printf(", %s", (quad->result && as_info_base(quad->result)->props) ? as_info_base(quad->result)->props->name : " ");
+    if (quad->result && as_info_base(quad->result)->props->offset != 0) {
+        printf(" (%d)", as_info_base(quad->result)->props->offset);
+    }
     printf("}\n");
     free(op);
 }

@@ -26,7 +26,7 @@ char* scope_to_str(Scope scope){
 }
 
 
-Props* new_prop(Type type, int value, char* name, int line, int col, char* file_path){
+Props* new_prop(Type type, int value, char* name, int line, int col){
     Props* prop = (Props*)malloc(sizeof(Props));
     prop->type = type;
     prop->value = value;
@@ -34,7 +34,8 @@ Props* new_prop(Type type, int value, char* name, int line, int col, char* file_
     prop->line = line;
     prop->col = col;
     prop->is_fn = false;
-    prop->file_path = file_path;
+    prop->offset = 0;
+    prop->file_path = get_file_path();
     return prop;
 }
 
@@ -49,8 +50,8 @@ void copy_prop(Props* dest, Props* src) {
     dest->name = strdup(src->name);
 }
 
-Info* new_info(Type type, int value, char* name, int line, int col, int offset, char* file_path){
-    Props* props = new_prop(type, value, name, line, col, file_path);
+Info* new_info(Type type, int value, char* name, int line, int col){
+    Props* props = new_prop(type, value, name, line, col);
     Info* info = (Info*)malloc(sizeof(Info));
 
     as_info_base(info)->props = props;
@@ -59,7 +60,7 @@ Info* new_info(Type type, int value, char* name, int line, int col, int offset, 
 }
 
 
-Info* new_info_fn(Props* props, LinkedList* params, bool is_extern, nat locals){
+Info* new_info_fn(Props* props, LinkedList* params, bool is_extern){
     Info* info = (Info*)malloc(sizeof(Info));
 
     as_info_fn(info)->props = props;
@@ -67,7 +68,7 @@ Info* new_info_fn(Props* props, LinkedList* params, bool is_extern, nat locals){
     as_info_fn(info)->cant_params = params->size;
     as_info_fn(info)->params = params;
     as_info_fn(info)->is_extern = is_extern;
-
+    as_info_fn(info)->locals = 0;
 
     return info;
 }
@@ -123,6 +124,7 @@ void _print_info_base(InfoBase* info){
     printf("Name: ‘%s’, ", info->props->name);
     printf("Line: %u, ", info->props->line);
     printf("Scope: %s ", scope_to_str(info->scope));
+    printf("Offset: %d ", info->props->offset);
     printf("}\n");
 }
 
@@ -137,6 +139,8 @@ void _print_info_fn(InfoFunction* info){
     printf("Name: ‘%s’, ", info->props->name);
     printf("Line: %u, ", info->props->line);
     printf("is_extern: %s, ", info->is_extern ? "yes" : "no");
+    printf("Locals: %u, ", info->locals);
+    printf("Offset: %d, ", info->props->offset);
     printf("params: %u [", info->cant_params);
     for (nat i = 0; i < info->cant_params; i++) {
         _print_info_base(lookup(info->params, i));
