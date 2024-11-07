@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+char* current_file_path = NULL;
+
 char* repeat_char(char chr, int times){
     char* result = (char*)malloc(sizeof(char) * times + 1);
     for(int i = 0; i < times; i++){
@@ -26,9 +28,16 @@ char* itos(int n){
     return result;
 }
 
-char *strdup(const char *src) {
-    char *dst = malloc(strlen (src) + 1);  // Space for length plus null
-    if (dst == NULL) return NULL;          // No memory
-    strcpy(dst, src);                      // Copy the characters
-    return dst;                            // Return the new string
+
+// Returns a heap allocated string that is a duplicate of the string src.
+char* strdup(const char *src) {
+    size_t len = strlen(src) + 1;       // Space for length plus null
+    char *dst = (char*)malloc(len);     // Space for length plus null
+    if (dst == NULL) return NULL;       // No memory
+    strncpy(dst, src, len);             // Copy the characters
+    return dst;                         // Return the new string
+}
+
+char* get_file_path(){
+    return current_file_path == NULL ? strdup("") : current_file_path;
 }

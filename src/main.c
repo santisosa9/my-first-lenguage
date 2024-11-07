@@ -14,12 +14,14 @@
 extern AST *get_parsed_tree();
 extern int yyparse();
 extern FILE *yyin;
+extern char *current_file_path;
 
 int main(int argc, char const *argv[])
 {
     ++argv, --argc;
     if (argc > 0) {
-        yyin = fopen(argv[0], "r");
+        current_file_path = strdup(argv[0]);
+        yyin = fopen(current_file_path, "r");
         if (yyin == NULL) {
             fprintf(stderr, "Cannot open file '%s'.\n", argv[0]);
             exit(EXIT_FAILURE);
