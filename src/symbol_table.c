@@ -283,7 +283,7 @@ bool decorate_tree(AST* tree, SymbolTable* table) {
                     as_info_fn(tree->info)->props->line);
                 return false;
             } else {
-                Props* prop = new_prop(NO_TYPED, 0, "", 0, 0);
+                Props* prop = new_prop(NO_TYPED, 0, "", 0, 0,get_file_path());
                 copy_prop(prop, as_info_fn(existing)->props);
                 prop->line = as_info_fn(tree->info)->props->line;
                 Info* i_fn = new_info_fn(prop, as_info_fn(existing)->params, as_info_fn(existing)->is_extern);
@@ -356,7 +356,7 @@ bool decorate_tree_fn(AST* tree, SymbolTable* table, int* locals) {
                     as_info_fn(tree->info)->props->line);
                 return false;
             } else {
-                Props* prop = new_prop(NO_TYPED, 0, "", 0, 0);
+                Props* prop = new_prop(NO_TYPED, 0, "", 0, 0,get_file_path());
                 copy_prop(prop, as_info_fn(existing)->props);
                 prop->line = as_info_fn(tree->info)->props->line;
                 Info* i_fn = new_info_fn(prop, as_info_fn(existing)->params, as_info_fn(existing)->is_extern);

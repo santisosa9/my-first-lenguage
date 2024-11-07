@@ -26,7 +26,7 @@ char* scope_to_str(Scope scope){
 }
 
 
-Props* new_prop(Type type, int value, char* name, int line, int col){
+Props* new_prop(Type type, int value, char* name, int line, int col,char* file_path){
     Props* prop = (Props*)malloc(sizeof(Props));
     prop->type = type;
     prop->value = value;
@@ -35,7 +35,7 @@ Props* new_prop(Type type, int value, char* name, int line, int col){
     prop->col = col;
     prop->is_fn = false;
     prop->offset = 0;
-    prop->file_path = get_file_path();
+    prop->file_path = file_path;
     return prop;
 }
 
@@ -50,8 +50,8 @@ void copy_prop(Props* dest, Props* src) {
     dest->name = strdup(src->name);
 }
 
-Info* new_info(Type type, int value, char* name, int line, int col){
-    Props* props = new_prop(type, value, name, line, col);
+Info* new_info(Type type, int value, char* name, int line, int col,char* file_path){
+    Props* props = new_prop(type, value, name, line, col,file_path);
     Info* info = (Info*)malloc(sizeof(Info));
 
     as_info_base(info)->props = props;

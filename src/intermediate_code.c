@@ -121,7 +121,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
 
             generate_intermediate_code(tree->left, ic); // Genero código intermedio para la condición
 
-            end = new_info(NO_TYPED, 0, endLabelName, 0, 0);
+            end = new_info(NO_TYPED, 0, endLabelName, 0, 0,get_file_path());
 
             if (tree->left != NULL) {
                 arg1 = tree->left->info;
@@ -146,7 +146,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
 
             if (tree->left != NULL) {
                 arg1 = tree->left->info;
-                next = new_info(NO_TYPED, 0, nextLabelName, 0, 0);
+                next = new_info(NO_TYPED, 0, nextLabelName, 0, 0,get_file_path());
                 Quadruple* condition = new_quadruple(IFNOT, arg1, NULL, next);
                 insert_ll(ic, condition);
             }
@@ -157,7 +157,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
                 insert_ll(ic, endLabel);
             } else {
                 char* endLabelName = getLabelName();
-                Info* end = new_info(NO_TYPED, 0, endLabelName, 0, 0);
+                Info* end = new_info(NO_TYPED, 0, endLabelName, 0, 0,get_file_path());
                 generate_intermediate_code(tree->right->left, ic); // Bloque del then
                 Quadruple* jumpToEnd = new_quadruple(JUMP, NULL, NULL, end); // Una vez terminado el then salto al fin del if
                 insert_ll(ic, jumpToEnd);
@@ -192,7 +192,7 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
             {
                 AST* expr = current->left;
                 if (expr != NULL) {
-                    Info* num_param = new_info(NO_TYPED, i, itos(i), 0, 0);
+                    Info* num_param = new_info(NO_TYPED, i, itos(i), 0, 0,get_file_path());
                     Quadruple* param = new_quadruple(PARAMETER, num_param, NULL, expr->info);
                     insert_ll(ic, param);
                 }
@@ -201,12 +201,12 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
             }
 
             // Generate intermediate code for the function call
-            arg1 = new_info(NO_TYPED, 0, as_info_fn(tree->info)->props->name, 0, 0);
+            arg1 = new_info(NO_TYPED, 0, as_info_fn(tree->info)->props->name, 0, 0,get_file_path());
             char* name = (char*)malloc(10 * sizeof(char));
             if (name != NULL) {
                 sprintf(name, "%d", as_info_fn(tree->info)->cant_params);
             }
-            arg2 = new_info(NO_TYPED, 0, name, 0, 0);
+            arg2 = new_info(NO_TYPED, 0, name, 0, 0,get_file_path());
             as_info_fn(tree->info)->props->name = getTempName();
             result = tree->info;
             Quadruple* call = new_quadruple(FN_CALL, arg1, arg2, result);
