@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../headers/asm_x86_64_gnu_templates.h"
+#include "../headers/asm_x86_64_templates.h"
 
 /*
     Template #1

@@ -4,7 +4,8 @@
 #include <stdbool.h>
 
 #include "../headers/asm.h"
-#include "../headers/asm_x86_64_gnu_templates.h"
+#include "../headers/asm_x86_64_gnu.h"
+#include "../headers/asm_x86_64_templates.h"
 #include "../headers/intermediate_code.h"
 #include "../headers/quadruple.h"
 #include "../headers/utils.h"
