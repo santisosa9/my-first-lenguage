@@ -323,7 +323,7 @@ bool decorate_tree_fn(AST* tree, SymbolTable* table, int* locals) {
                 // actualizo el scope y el offset
                 as_info_base(tree->info)->scope = LOCAL;
                 (*locals)++;
-                as_info_base(tree->info)->props->offset = (-4 * (*locals)) -4;
+                as_info_base(tree->info)->props->offset = (-8 * (*locals)) -8;
                 insert(table, tree->info);
             } else {
                 printf("Error: Redeclaración de la variable '%s' en línea %d.\n",
@@ -364,7 +364,7 @@ bool decorate_tree_fn(AST* tree, SymbolTable* table, int* locals) {
                 tree->info = i_fn;
             }
             (*locals)++;
-            as_info_base(tree->info)->props->offset = (-4 * (*locals)) -4;
+            as_info_base(tree->info)->props->offset = (-8 * (*locals)) -8;
             if (!decorate_tree_fn(tree->right, table, locals)) return false;
             break;
         }
@@ -379,7 +379,7 @@ bool decorate_tree_fn(AST* tree, SymbolTable* table, int* locals) {
         case AND:
         case OR: {
             (*locals)++;
-            as_info_base(tree->info)->props->offset = (-4 * (*locals)) -4;
+            as_info_base(tree->info)->props->offset = (-8 * (*locals)) -8;
 
             if (!decorate_tree_fn(tree->left, table, locals)) return false;
             if (!decorate_tree_fn(tree->right, table, locals)) return false;
@@ -397,11 +397,11 @@ bool decorate_tree_fn(AST* tree, SymbolTable* table, int* locals) {
 
 void _set_offset_params(LinkedList* params) {
     LinkedListIterator* iterator = new_linked_list_iterator(params);
-    int offset = 4;
+    int offset = 8;
     while (has_next(iterator)) {
         Info* data = (Info*)next(iterator);
         as_info_base(data)->props->offset = offset;
-        offset += 4;
+        offset += 8;
     }
     free(iterator);
 }
