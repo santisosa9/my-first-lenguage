@@ -24,6 +24,14 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
                 gen_x86_64_bin_arith(quad, output);
                 break;
             }
+
+            case LESS:
+            case EQUAL:
+            case GREATER: {
+                gen_x86_64_comparison(quad, output);
+                break;
+            }
+
             case LABEL: {
                 gen_x86_64_label(quad, output);
                 break;
@@ -85,6 +93,36 @@ void gen_x86_64_bin_arith(Quadruple* quad, FILE* output) {
 
 }
 
+void gen_x86_64_comparison(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_comparison: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_comparison: Invalid call error.", "'output' must not be NULL.");
+
+    char* op1 = NULL;
+    char* op2 = NULL;
+    switch (quad->op) {
+        case LESS: op1 = "cmovl"; op2 = "comvge"; break;
+        case EQUAL: op1 = "cmove"; op2 = "cmovne";  break;
+        case GREATER: op1 = "cmovg"; op2 = "cmovle";  break;
+
+        default: {
+            fprintf(stderr, "Error: gen_x86_64_comparison: Invalid quadruple error.\n");
+            fprintf(stderr, "Precondition fault: 'quad' must be a valid Quadruple.\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    char* generated_asm = template_comparison_x86_64(
+                            op1, op2,
+                            as_info_base(quad->arg1)->props->name,
+                            as_info_base(quad->arg2)->props->name,
+                            as_info_base(quad->result)->props->name
+                        );
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
+
+}
 
 void gen_x86_64_label(Quadruple* quad, FILE* output) {
     assert_pre(quad != NULL, "gen_x86_64_label: Invalid call error.", "'quad' must not be NULL.");
