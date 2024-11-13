@@ -63,3 +63,29 @@ char* template_comparison_x86_64(const char* op1, const char* op2, const char* a
 
     return buffer;
 }
+
+/*
+    Template #3
+
+    Assign a value to a variable.
+
+    label:
+    
+    - Uses 'movq' to move data.
+    - Uses '%r10' as a temporary register to hold the value to be assigned.
+
+    Important: Need to free the returned string.
+ */
+char* template_3_x86_64(const char* arg1, const char* result) {
+    const char* template =
+        IDENT "movl" IDENT  "%s, %%r10\n"      //Move the immediate value `arg1` to %r10
+        IDENT "movl" IDENT  "%%r10, %s\n";     //Move the value in %r10 to `result`
+
+        char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(result) +1);
+
+    sprintf(buffer, template, arg1, result);
+
+    return buffer;
+}
+
+

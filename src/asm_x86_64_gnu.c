@@ -36,6 +36,13 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
                 gen_x86_64_label(quad, output);
                 break;
             }
+            
+            case ASIG: {
+                char* generated_asm=  template_3_x86_64(as_info_base(quad->arg1)->props->name,as_info_base(quad->result)->props->name);
+                fprintf(output,generated_asm);
+                free(generated_asm);
+                break;
+            }
 
             case PARAMETER: {
                 fprintf(output, "push %s\n", as_info_base(quad->result)->props->name);
