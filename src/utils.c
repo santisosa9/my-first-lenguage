@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 char* current_file_path = NULL;
 
@@ -40,4 +41,13 @@ char* strdup(const char *src) {
 
 char* get_file_path(){
     return current_file_path == NULL ? strdup("") : current_file_path;
+}
+
+
+void assert_pre(bool condition, const char* error_msg, const char* precondition_fault_msg){
+    if(!condition){
+        fprintf(stderr, "Error: %s\n", error_msg);
+        fprintf(stderr, "Precondition fault: %s\n", precondition_fault_msg);
+        exit(EXIT_FAILURE);
+    }
 }

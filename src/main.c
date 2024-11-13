@@ -10,6 +10,7 @@
 #include "../headers/type_checking.h"
 #include "../headers/intermediate_code.h"
 #include "../headers/quadruple.h"
+#include "../headers/asm.h"
 
 extern AST *get_parsed_tree();
 extern int yyparse();
@@ -60,4 +61,9 @@ int main(int argc, char const *argv[])
     print_tree(tree);
     puts("Printing quadruple list...");
     print_list(l, (void (*)(void*)) print_quadruple);
+    puts("------------------------------");
+    puts("Generating ASM...");
+    LinkedListIterator* it = new_linked_list_iterator(l);
+    generate_asm(X86_64_LINUX_GNU, it, stdout);
+
 }

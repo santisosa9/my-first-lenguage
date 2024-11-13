@@ -11,3 +11,5 @@ char* repeat_char(char chr, int times);
 char* itos(int n);
 char* strdup(const char* s);
 char* get_file_path();
+
+void assert_pre(bool condition, const char* error_msg, const char* precondition_fault_msg);
