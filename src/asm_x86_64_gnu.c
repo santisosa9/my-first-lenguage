@@ -30,7 +30,7 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
             }
 
             case PARAMETER: {
-                fprintf(output, "push %s\n", as_info_base(quad->arg2)->props->name);
+                fprintf(output, "push %s\n", as_info_base(quad->result)->props->name);
                 break;
             }
 
@@ -90,7 +90,7 @@ void gen_x86_64_label(Quadruple* quad, FILE* output) {
     assert_pre(quad != NULL, "gen_x86_64_label: Invalid call error.", "'quad' must not be NULL.");
     assert_pre(output != NULL, "gen_x86_64_label: Invalid call error.", "'output' must not be NULL.");
 
-    char* generated_asm = template_2_x86_64(as_info_base(quad->arg1)->props->name);
+    char* generated_asm = template_2_x86_64(as_info_base(quad->result)->props->name);
 
     fprintf(output, "%s", generated_asm);
 

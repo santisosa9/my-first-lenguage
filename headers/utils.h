@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdio.h>
+#include <stdbool.h>
 
 #define RED     "\033[0;31m"
 #define YELLOW  "\033[0;33m"
