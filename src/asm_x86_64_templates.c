@@ -51,15 +51,19 @@ char* template_2_x86_64(const char* label) {
     return buffer;
 }
 
-char* template_comparison_x86_64(const char* op1, const char* op2, const char* arg1, const char* arg2, const char* result) {
+char* template_comparison_x86_64(const char* op, const char* arg1, const char* arg2, const char* result) {
     const char* template =
-        IDENT "cmp"  IDENT "%s, %s\n"   // cmp arg1, arg2
-        IDENT "%s"   IDENT "1, %s\n"    // op1 1, result
-        IDENT "%s"   IDENT "0, %s\n";   // op2 0, result
+        IDENT "movq"  IDENT "%s, %%r10\n"
+        IDENT "movq"  IDENT "%s, %%r11\n"
+        IDENT "cmp"   IDENT "%%r10, %%r11\n"   
+        IDENT "movq"  IDENT "$0, %%r11\n"
+        IDENT "movq"  IDENT "$1, %%r10\n"
+        IDENT "%s"    IDENT "%%r10, %%r11\n"    
+        IDENT "movq"  IDENT "%%r11, %s\n\n";
 
-    char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(arg2) + strlen(op1) + strlen(op2) + (strlen(result) * 2) + 1);
+    char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(arg2) + strlen(op) + strlen(result) + 1);
 
-    sprintf(buffer, template, arg1, arg2, op1, result, op2, result);
+    sprintf(buffer, template, arg1, arg2, op, result);
 
     return buffer;
 }

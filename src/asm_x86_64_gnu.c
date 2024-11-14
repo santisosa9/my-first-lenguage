@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../headers/asm_x86_64_gnu.h"
 #include "../headers/asm_x86_64_templates.h"
 #include "../headers/quadruple.h"
 #include "../headers/utils.h"
 
-
+char* _get_offset(Info* info);
 
 void gen_x86_64(LinkedListIterator* it, FILE* output) {
     assert_pre(it != NULL, "generate_x86_64: Invalid call error.", "'it' must not be NULL.");
@@ -104,12 +105,11 @@ void gen_x86_64_comparison(Quadruple* quad, FILE* output) {
     assert_pre(quad != NULL, "gen_x86_64_comparison: Invalid call error.", "'quad' must not be NULL.");
     assert_pre(output != NULL, "gen_x86_64_comparison: Invalid call error.", "'output' must not be NULL.");
 
-    char* op1 = NULL;
-    char* op2 = NULL;
+    char* op = NULL;
     switch (quad->op) {
-        case LESS: op1 = "cmovl"; op2 = "comvge"; break;
-        case EQUAL: op1 = "cmove"; op2 = "cmovne";  break;
-        case GREATER: op1 = "cmovg"; op2 = "cmovle";  break;
+        case LESS: op = "cmovl"; break;
+        case EQUAL: op = "cmove"; break;
+        case GREATER: op = "cmovg"; break;
 
         default: {
             fprintf(stderr, "Error: gen_x86_64_comparison: Invalid quadruple error.\n");
@@ -119,10 +119,10 @@ void gen_x86_64_comparison(Quadruple* quad, FILE* output) {
     }
 
     char* generated_asm = template_comparison_x86_64(
-                            op1, op2,
-                            as_info_base(quad->arg1)->props->name,
-                            as_info_base(quad->arg2)->props->name,
-                            as_info_base(quad->result)->props->name
+                            op,
+                            _get_offset(quad->arg1),
+                            _get_offset(quad->arg2),
+                            _get_offset(quad->result)
                         );
 
     fprintf(output, "%s", generated_asm);
@@ -140,4 +140,11 @@ void gen_x86_64_label(Quadruple* quad, FILE* output) {
     fprintf(output, "%s", generated_asm);
 
     free(generated_asm);
+}
+
+char* _get_offset(Info* info) {
+    char* offset = itos(as_info_base(info)->props->offset);
+    char* result = (char*) malloc(strlen(offset) + 5);
+    sprintf(result, "%s(%s)", offset, "%rbp");
+    return result;
 }
