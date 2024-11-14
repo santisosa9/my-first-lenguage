@@ -45,6 +45,25 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
                 break;
             }
 
+            case JUMP: {
+                const char* template = IDENT "jmp" IDENT "%s\n";
+                char* label = as_info_base(quad->result)->props->name;
+                fprintf(stdout, template, label);
+                break;
+            }
+
+            case IFNOT: {
+                char* arg1 = as_info_base(quad->arg1)->props->name;
+                char* result = as_info_base(quad->result)->props->name;
+                const char* op = "jne";  // This will be changed, i need to get the operation
+                const char* label= as_info_base(quad->result)->props->name;
+                fprintf(output, "\tcmp \t%s, %s\n", arg1, result);   // Comparison line
+                fprintf(output, "\t%s \t%s\n", op, label);           // Conditional jump line
+
+                break;
+            }
+
+
             case AND:
             case OR: {
                 gen_x86_64_bin_boolean(quad, output);
