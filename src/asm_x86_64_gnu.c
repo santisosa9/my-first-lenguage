@@ -37,11 +37,17 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
                 gen_x86_64_label(quad, output);
                 break;
             }
-            
+
             case ASIG: {
                 char* generated_asm=  template_3_x86_64(as_info_base(quad->arg1)->props->name,as_info_base(quad->result)->props->name);
                 fprintf(output,generated_asm);
                 free(generated_asm);
+                break;
+            }
+
+            case AND:
+            case OR: {
+                gen_x86_64_bin_boolean(quad, output);
                 break;
             }
 
@@ -147,4 +153,42 @@ char* _get_offset(Info* info) {
     char* result = (char*) malloc(strlen(offset) + 5);
     sprintf(result, "%s(%s)", offset, "%rbp");
     return result;
+}
+
+void gen_x86_64_bin_boolean(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_bin_boolean: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_bin_boolean: Invalid call error.", "'output' must not be NULL.");
+
+    char* absorbent = NULL;
+    switch (quad->op) {
+        case AND:{
+            absorbent = "$0";
+            break;
+        }
+        case OR: {
+            absorbent = "$1";
+            break;
+        }
+
+        default: {
+            fprintf(stderr, "Error: gen_x86_64_bin_logic: Invalid quadruple error.\n");
+            fprintf(stderr, "Precondition fault: 'quad' must be a valid Quadruple.\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    char* comment = template_dbg_comment_x86_64("%s %s %s", as_info_base(quad->arg1)->props->name, quad->op == AND ? "&&" : "||", as_info_base(quad->arg2)->props->name);
+    fprintf(output, "%s", comment);
+
+    char* generated_asm = template_bin_boolean_x86_64(
+                            absorbent,
+                            as_info_base(quad->arg1)->props->name,
+                            as_info_base(quad->arg2)->props->name,
+                            as_info_base(quad->result)->props->name
+                        );
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
+    free(comment);
 }
