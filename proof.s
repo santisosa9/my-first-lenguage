@@ -13,12 +13,11 @@
 x:
 	.long	15674
 	.globl	y
-	.bss
 	.align 4
 	.type	y, @object
 	.size	y, 4
 y:
-	.zero	4
+	.long	6
 	.text
 	.globl	main
 	.type	main, @function
@@ -35,10 +34,11 @@ main:
 # proof.c:8:     y = z;
 	movl	-4(%rbp), %eax	# z, tmp86
 	movl	%eax, y(%rip)	# tmp86, y
-# proof.c:10:     return x + y;
-	movl	x(%rip), %edx	# x, x.0_1
-	movl	y(%rip), %eax	# y, y.1_2
-	addl	%edx, %eax	# x.0_1, _6
+# proof.c:10:     return x / y;
+	movl	x(%rip), %eax	# x, x.0_1
+	movl	y(%rip), %ecx	# y, y.1_2
+	cltd
+	idivl	%ecx	# y.1_2
 # proof.c:11: }
 	popq	%rbp	#
 	.cfi_def_cfa 7, 8
