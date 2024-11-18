@@ -248,8 +248,8 @@ bool decorate_tree(AST* tree, SymbolTable* table) {
         case DEC: {
             existing = search_in_current_scope(table, as_info_base(tree->info)->props->name);
             if (existing == NULL) {
-                if(!current_scope_is_global(table)){
-                    as_info_base(tree->info)->scope = LOCAL;
+                if(current_scope_is_global(table)){
+                    as_info_base(tree->info)->scope = GLOBAL;
                 }
                 insert(table, tree->info);
             } else {

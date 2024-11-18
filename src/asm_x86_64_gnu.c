@@ -14,9 +14,10 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
     assert_pre(it != NULL, "generate_x86_64: Invalid call error.", "'it' must not be NULL.");
     assert_pre(output != NULL, "generate_x86_64: Invalid call error.", "'output' must not be NULL.");
 
-
-
     Quadruple* quad = NULL;
+    bool data_section_emitted = false;  
+    bool text_section_emitted = false;
+
     while (has_next(it)) {
         quad = next(it);
         switch (quad->op) {
@@ -37,6 +38,10 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
             }
 
             case FN_DEC: {
+                if (!text_section_emitted) {
+                    fprintf(output, IDENT ".text\n");
+                    text_section_emitted = true;
+                }
                 gen_x86_64_fn_dec(quad, output);
                 break;
             }
@@ -58,16 +63,8 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
 
             case IFNOT: {
                 gen_x86_64_ifnot(quad, output);
-                // char* arg1 = as_info_base(quad->arg1)->props->name;
-                // char* result = as_info_base(quad->result)->props->name;
-                // const char* op = "jne";  // This will be changed, i need to get the operation
-                // const char* label= as_info_base(quad->result)->props->name;
-                // fprintf(output, "\tcmp \t%s, %s\n", arg1, result);   // Comparison line
-                // fprintf(output, "\t%s \t%s\n", op, label);           // Conditional jump line
-
                 break;
             }
-
 
             case AND:
             case OR: {
@@ -77,7 +74,6 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
 
             case PARAMETER: {
                 gen_x86_64_parameter(quad, output);
-                // fprintf(output, "push %s\n", as_info_base(quad->result)->props->name);
                 break;
             }
 
@@ -91,10 +87,16 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
                 break;
             }
 
+            case GLOBAL_DEC: {
+                if (!data_section_emitted) {
+                    fprintf(output, IDENT ".data\n");
+                    data_section_emitted = true;
+                }
+                gen_x86_64_global_dec(quad, output);
+            }
+
             default: {
-                // fprintf(stderr, "Error: generate_x86_64: Invalid quadruple error.\n");
-                // fprintf(stderr, "Precondition fault: 'quad' must be a valid Quadruple.\n");
-                // exit(EXIT_FAILURE);
+
             }
         }
     }
@@ -199,6 +201,9 @@ char* _to_asm(Info* info) {
     if (as_info_base(info)->scope == LOCAL || as_info_base(info)->scope == PARAM) {
         char* result = _get_offset(info, "rbp");
         return result;
+    }
+    if (as_info_base(info)->scope == NO_SCOPE) {
+        return "";
     }
     assert_pre(false, "_to_asm: Invalid call error.", "Invalid scope.");
     return NULL;
@@ -323,6 +328,36 @@ void gen_x86_64_fn_call(Quadruple* quad, FILE* output) {
     char* name = as_info_fn(quad->arg1)->props->name;
     int cant_params = atoi(as_info_base(quad->arg2)->props->name);
     char* generated_asm = template_fn_call_x86_64(name, cant_params);
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
+}
+
+void gen_x86_64_global_dec(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_global_dec: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_global_dec: Invalid call error.", "'output' must not be NULL.");
+
+    InfoBase* result_info = as_info_base(quad->result);
+    Props* props = result_info->props;
+
+    const char* type_str = NULL;
+    switch (props->type) {
+        case INT:
+            type_str = ".long";  // Enteros de 4 bytes
+            break;
+        case BOOL:
+            type_str = ".byte";  // Booleanos de 1 byte
+            break;
+        default:
+            type_str = ".zero";  // Sin tipo: reservar espacio sin inicializar
+            break;
+    }
+
+    char* name = props->name;
+    int align = (props->type == BOOL) ? 1 : 4;
+    char* value = itos(props->value);
+    char* generated_asm = template_global_dec_x86_64(name, itos(align), type_str, value);
 
     fprintf(output, "%s", generated_asm);
 

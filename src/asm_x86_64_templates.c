@@ -208,12 +208,14 @@ char* template_dbg_comment_x86_64(const char* fmt, ...) {
 
 char* template_fn_dec_x86_64(const char* name, const char* locals) {
     const char* template =
+        IDENT ".globl %s\n"  
+        IDENT ".type %s, @function\n"
         "%s:\n"
         IDENT "enter"  IDENT "$(8*%s), $0\n\n";
 
-    char* buffer = (char*) malloc(strlen(template) + strlen(name) + strlen(locals) + 1);
+    char* buffer = (char*) malloc(strlen(template) + (strlen(name) * 3) + strlen(locals) + 1);
 
-    sprintf(buffer, template, name, locals);
+    sprintf(buffer, template, name, name, name, locals);
 
     return buffer;
 }
@@ -256,6 +258,20 @@ char* template_fn_call_x86_64(const char* name, int cant_params) {
 
         sprintf(buffer, template, name);
     }
+
+    return buffer;
+}
+
+char* template_global_dec_x86_64(const char* name, const char* align, const char* type, const char* value) {
+    const char* template =
+        IDENT ".globl %s\n"
+        IDENT ".align %s\n"
+        "%s:\n"
+        IDENT "%s %s\n";
+
+    char* buffer = (char*) malloc(strlen(template) + (strlen(name) * 2) + strlen(align) + strlen(type) + strlen(value) + 1);
+
+    sprintf(buffer, template, name, align, name, type, value);
 
     return buffer;
 }

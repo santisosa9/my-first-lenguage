@@ -18,6 +18,7 @@ InfoFunction* as_info_fn(Info* info){
 
 char* scope_to_str(Scope scope){
     switch (scope){
+        case NO_SCOPE:   return strdup("NO_SCOPE");      break;
         case GLOBAL:     return strdup("GLOBAL");        break;
         case LOCAL:      return strdup("LOCAL");         break;
         case PARAM:      return strdup("PARAM");         break;
@@ -55,6 +56,7 @@ Info* new_info(Type type, int value, char* name, int line, int col,char* file_pa
     Props* props = new_prop(type, value, name, line, col,file_path);
     Info* info = (Info*)malloc(sizeof(Info));
 
+    as_info_base(info)->scope = NO_SCOPE;
     as_info_base(info)->props = props;
 
     return info;

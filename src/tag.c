@@ -35,6 +35,7 @@ char* tag_to_str(Tag tag){
         case IFNOT:         return strdup("IFNOT");         break;
         case FN_END:        return strdup("FN_END");        break;
         case PARAMETER:     return strdup("PARAMETER");     break;
+        case GLOBAL_DEC:    return strdup("GLOBAL");        break;
         default:            return strdup("UNKNOWN_TAG");   break;
     }
 }

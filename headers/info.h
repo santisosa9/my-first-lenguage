@@ -28,6 +28,7 @@ typedef struct Props
 
 typedef enum Scope
 {
+    NO_SCOPE,
     GLOBAL,
     LOCAL,
     PARAM,

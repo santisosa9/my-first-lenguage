@@ -21,6 +21,7 @@ typedef enum Tag{
     LESS, GREATER, EQUAL,
     PARAMETER,
     JUMP, LABEL, IFNOT, FN_END,
+    GLOBAL_DEC
 } Tag;
 
 char* tag_to_str(Tag tag);

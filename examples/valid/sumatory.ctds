@@ -1,4 +1,8 @@
 Program {
+    int z;
+    bool q;
+    int b = 1234;
+    bool r = false;
     int sumatory(int x) {
         int i = 0;
         int result = 0;

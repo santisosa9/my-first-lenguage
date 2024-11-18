@@ -16,3 +16,4 @@ void gen_x86_64_fn_end(Quadruple* quad, FILE* output);
 void gen_x86_64_jump(Quadruple* quad, FILE* output);
 void gen_x86_64_assign(Quadruple* quad, FILE* output);
 void gen_x86_64_fn_call(Quadruple* quad, FILE* output);
+void gen_x86_64_global_dec(Quadruple* quad, FILE* output);
