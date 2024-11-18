@@ -62,12 +62,12 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
 
             case IFNOT: {
                 gen_x86_64_ifnot(quad, output);
-                char* arg1 = as_info_base(quad->arg1)->props->name;
-                char* result = as_info_base(quad->result)->props->name;
-                const char* op = "jne";  // This will be changed, i need to get the operation
-                const char* label= as_info_base(quad->result)->props->name;
-                fprintf(output, "\tcmp \t%s, %s\n", arg1, result);   // Comparison line
-                fprintf(output, "\t%s \t%s\n", op, label);           // Conditional jump line
+                // char* arg1 = as_info_base(quad->arg1)->props->name;
+                // char* result = as_info_base(quad->result)->props->name;
+                // const char* op = "jne";  // This will be changed, i need to get the operation
+                // const char* label= as_info_base(quad->result)->props->name;
+                // fprintf(output, "\tcmp \t%s, %s\n", arg1, result);   // Comparison line
+                // fprintf(output, "\t%s \t%s\n", op, label);           // Conditional jump line
 
                 break;
             }
@@ -204,8 +204,8 @@ char* _to_asm(Info* info) {
         char* result = _get_offset(info, "rbp");
         return result;
     }
-
     assert_pre(false, "_to_asm: Invalid call error.", "Invalid scope.");
+    return NULL;
 }
 
 void gen_x86_64_bin_boolean(Quadruple* quad, FILE* output) {
@@ -248,8 +248,8 @@ void gen_x86_64_parameter(Quadruple* quad, FILE* output) {
     assert_pre(output != NULL, "gen_x86_64_parameter: Invalid call error.", "'output' must not be NULL.");
 
     char* generated_asm = template_parameter_x86_64(
-                            as_info_base(quad->result)->props->name,
-                            as_info_base(quad->arg1)->props->name
+                            _to_asm(quad->result),
+                            as_info_base(quad->arg1)->props->value
                         );
 
     fprintf(output, "%s", generated_asm);
@@ -263,7 +263,8 @@ void gen_x86_64_ifnot(Quadruple* quad, FILE* output) {
 
     char* generated_asm = template_ifnot_x86_64(
                             _to_asm(quad->arg1),
-                            as_info_base(quad->result)->props->name);
+                            as_info_base(quad->result)->props->name
+                        );
 
     fprintf(output, "%s", generated_asm);
 
