@@ -287,10 +287,16 @@ bool decorate_tree(AST* tree, SymbolTable* table) {
                 copy_prop(prop, as_info_fn(existing)->props);
                 prop->line = as_info_fn(tree->info)->props->line;
                 Info* i_fn = new_info_fn(prop, as_info_fn(existing)->params, as_info_fn(existing)->is_extern);
-                as_info_fn(i_fn)->cant_params = as_info_fn(existing)->cant_params;  
+                as_info_fn(i_fn)->cant_params = as_info_fn(existing)->cant_params;
                 tree->info = i_fn;
             }
             if (!decorate_tree(tree->right, table)) return false;
+            break;
+        }
+
+        case VALUE: {
+            as_info_base(tree->info)->scope = LITERAL;
+            if (!decorate_tree(tree->left, table) || !decorate_tree(tree->right, table)) return false;
             break;
         }
 
@@ -360,7 +366,7 @@ bool decorate_tree_fn(AST* tree, SymbolTable* table, int* locals) {
                 copy_prop(prop, as_info_fn(existing)->props);
                 prop->line = as_info_fn(tree->info)->props->line;
                 Info* i_fn = new_info_fn(prop, as_info_fn(existing)->params, as_info_fn(existing)->is_extern);
-                as_info_fn(i_fn)->cant_params = as_info_fn(existing)->cant_params;  
+                as_info_fn(i_fn)->cant_params = as_info_fn(existing)->cant_params;
                 tree->info = i_fn;
             }
             (*locals)++;
@@ -369,10 +375,10 @@ bool decorate_tree_fn(AST* tree, SymbolTable* table, int* locals) {
             break;
         }
 
-        case ADD: 
-        case SUB: 
-        case MUL: 
-        case DIV: 
+        case ADD:
+        case SUB:
+        case MUL:
+        case DIV:
         case LESS:
         case GREATER:
         case EQUAL:
@@ -386,6 +392,12 @@ bool decorate_tree_fn(AST* tree, SymbolTable* table, int* locals) {
             break;
         }
 
+        case VALUE: {
+            as_info_base(tree->info)->scope = LITERAL;
+            if (!decorate_tree_fn(tree->left, table, locals) || !decorate_tree_fn(tree->right, table, locals)) return false;
+            break;
+        }
+        
         default: {
             if (!decorate_tree_fn(tree->left, table, locals) || !decorate_tree_fn(tree->right, table, locals)) return false;
             break;

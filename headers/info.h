@@ -31,6 +31,7 @@ typedef enum Scope
     GLOBAL,
     LOCAL,
     PARAM,
+    LITERAL
 } Scope;
 
 typedef struct InfoBase

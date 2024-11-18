@@ -7,7 +7,8 @@
 #include "../headers/quadruple.h"
 #include "../headers/utils.h"
 
-char* _get_offset(Info* info);
+char* _get_offset(Info* info, const char* reg);
+char* _to_asm(Info* info);
 
 void gen_x86_64(LinkedListIterator* it, FILE* output) {
     assert_pre(it != NULL, "generate_x86_64: Invalid call error.", "'it' must not be NULL.");
@@ -39,7 +40,7 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
             }
 
             case ASIG: {
-                char* generated_asm=  template_3_x86_64(as_info_base(quad->arg1)->props->name,as_info_base(quad->result)->props->name);
+                char* generated_asm=  template_assign_x86_64(as_info_base(quad->arg1)->props->name,as_info_base(quad->result)->props->name);
                 fprintf(output,generated_asm);
                 free(generated_asm);
                 break;
@@ -71,7 +72,8 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
             }
 
             case PARAMETER: {
-                fprintf(output, "push %s\n", as_info_base(quad->result)->props->name);
+                gen_x86_64_parameter(quad, output);
+                // fprintf(output, "push %s\n", as_info_base(quad->result)->props->name);
                 break;
             }
 
@@ -115,9 +117,9 @@ void gen_x86_64_bin_arith(Quadruple* quad, FILE* output) {
 
     char* generated_asm = template_1_x86_64(
                             op,
-                            as_info_base(quad->arg1)->props->name,
-                            as_info_base(quad->arg2)->props->name,
-                            as_info_base(quad->result)->props->name
+                            _to_asm(quad->arg1),
+                            _to_asm(quad->arg2),
+                            _to_asm(quad->result)
                         );
 
     fprintf(output, "%s", generated_asm);
@@ -145,9 +147,9 @@ void gen_x86_64_comparison(Quadruple* quad, FILE* output) {
 
     char* generated_asm = template_comparison_x86_64(
                             op,
-                            _get_offset(quad->arg1),
-                            _get_offset(quad->arg2),
-                            _get_offset(quad->result)
+                            _to_asm(quad->arg1),
+                            _to_asm(quad->arg2),
+                            _to_asm(quad->result)
                         );
 
     fprintf(output, "%s", generated_asm);
@@ -167,11 +169,36 @@ void gen_x86_64_label(Quadruple* quad, FILE* output) {
     free(generated_asm);
 }
 
-char* _get_offset(Info* info) {
+char* _get_offset(Info* info, const char* reg) {
     char* offset = itos(as_info_base(info)->props->offset);
     char* result = (char*) malloc(strlen(offset) + 5);
-    sprintf(result, "%s(%s)", offset, "%rbp");
+    sprintf(result, "%s(%s)", offset, reg);
+
+    free(offset);
     return result;
+}
+
+char* _to_asm(Info* info) {
+    if (as_info_base(info)->scope == LITERAL) {
+        char* value = itos(as_info_base(info)->props->value);
+        char* tmp = (char*) malloc(strlen("$") + strlen(value) + 1);
+        char* result = sprintf(tmp, "$%s", value);
+
+        free(value);
+        free(tmp);
+
+        return result;
+    }
+    if (as_info_base(info)->scope == GLOBAL) {
+        char* result = _get_offset(info, "rip");
+        return result;
+    }
+    if (as_info_base(info)->scope == LOCAL || as_info_base(info)->scope == PARAM) {
+        char* result = _get_offset(info, "rbp");
+        return result;
+    }
+
+    assert_pre(false, "_to_asm: Invalid call error.", "Invalid scope.");
 }
 
 void gen_x86_64_bin_boolean(Quadruple* quad, FILE* output) {
@@ -180,14 +207,8 @@ void gen_x86_64_bin_boolean(Quadruple* quad, FILE* output) {
 
     char* absorbent = NULL;
     switch (quad->op) {
-        case AND:{
-            absorbent = "$0";
-            break;
-        }
-        case OR: {
-            absorbent = "$1";
-            break;
-        }
+        case AND: absorbent = "$0"; break;
+        case OR:  absorbent = "$1"; break;
 
         default: {
             fprintf(stderr, "Error: gen_x86_64_bin_logic: Invalid quadruple error.\n");
@@ -198,16 +219,33 @@ void gen_x86_64_bin_boolean(Quadruple* quad, FILE* output) {
 
     char* comment = template_dbg_comment_x86_64("%s %s %s", as_info_base(quad->arg1)->props->name, quad->op == AND ? "&&" : "||", as_info_base(quad->arg2)->props->name);
     fprintf(output, "%s", comment);
+    free(comment);
+    comment = template_dbg_comment_x86_64("%s %s %s", _to_asm(quad->arg1), quad->op == AND ? "&&" : "||", _to_asm(quad->arg2));
+    fprintf(output, "%s", comment);
 
     char* generated_asm = template_bin_boolean_x86_64(
                             absorbent,
-                            as_info_base(quad->arg1)->props->name,
-                            as_info_base(quad->arg2)->props->name,
-                            as_info_base(quad->result)->props->name
+                            _to_asm(quad->arg1),
+                            _to_asm(quad->arg2),
+                            _to_asm(quad->result)
                         );
 
     fprintf(output, "%s", generated_asm);
 
     free(generated_asm);
     free(comment);
+}
+
+void gen_x86_64_parameter(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_parameter: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_parameter: Invalid call error.", "'output' must not be NULL.");
+
+    char* generated_asm = template_parameter_x86_64(
+                            as_info_base(quad->result)->props->name,
+                            as_info_base(quad->arg1)->props->name
+                        );
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
 }

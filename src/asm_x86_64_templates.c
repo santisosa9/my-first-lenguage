@@ -71,17 +71,17 @@ char* template_comparison_x86_64(const char* op, const char* arg1, const char* a
 
     Assign a value to a variable.
 
-    label:
+    result = arg1
 
     - Uses 'movq' to move data.
     - Uses '%r10' as a temporary register to hold the value to be assigned.
 
     Important: Need to free the returned string.
  */
-char* template_3_x86_64(const char* arg1, const char* result) {
+char* template_assign_x86_64(const char* arg1, const char* result) {
     const char* template =
-        IDENT "movl" IDENT  "%s, %%r10\n"      //Move the immediate value `arg1` to %r10
-        IDENT "movl" IDENT  "%%r10, %s\n";     //Move the value in %r10 to `result`
+        IDENT "movq" IDENT  "%s, %%r10\n"      //Move the immediate value `arg1` to %r10
+        IDENT "movq" IDENT  "%%r10, %s\n";     //Move the value in %r10 to `result`
 
         char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(result) +1);
 
@@ -91,6 +91,20 @@ char* template_3_x86_64(const char* arg1, const char* result) {
 }
 
 
+/*
+    Template for binary boolean operations.
+    This binary boolean operations are implemented using short-circuit evaluation.
+
+    Assign the result of a binary boolean operation to a variable.
+
+    if arg1 == absorbent then result = absorbent
+    else  result = arg2
+
+    It uses 'movq' to move data.
+    It uses '%r10' and '%r11' as temporary registers.
+
+    Important: Need to free the returned string.
+ */
 char* template_bin_boolean_x86_64(const char* absorbent, const char* arg1, const char* arg2, const char* result) {
     const char* template =
         IDENT "movq"    IDENT "%s, %%r10\n"     // movq     arg1, %r10
@@ -142,3 +156,40 @@ char* template_dbg_comment_x86_64(const char* fmt, ...) {
     return buffer;
 }
 
+char* template_parameter_x86_64(const char* param, int index) {
+    char* buffer = NULL;
+    
+    if (index >= 1 && index <= 6) {
+        const char* template =
+            IDENT "movq" IDENT "%s, %s\n"
+            IDENT "pushq" IDENT "%s\n\n";
+
+        char* param_register[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+
+        char* buffer = (char*) malloc(strlen(template) + strlen(param) + 5 * 2 + 1);
+
+        sprintf(buffer, template, param, param_register[index - 1], param_register[index - 1]);
+    }
+    else {
+        const char* template =
+            IDENT "pushq" IDENT "%s\n\n";
+
+        char* buffer = (char*) malloc(strlen(template) + strlen(param) + 1);
+
+        sprintf(buffer, template, param);
+    }
+
+    return buffer;
+}
+
+
+char* template_constant_x86_64(const char* constant, const char* result) {
+    const char* template =
+        IDENT "movq" IDENT "$%s";
+
+    char* buffer = (char*) malloc(strlen(template) + strlen(constant) + strlen(result) + 1);
+
+    sprintf(buffer, template, constant, result);
+
+    return buffer;
+}

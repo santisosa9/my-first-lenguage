@@ -21,6 +21,7 @@ char* scope_to_str(Scope scope){
         case GLOBAL:     return strdup("GLOBAL");        break;
         case LOCAL:      return strdup("LOCAL");         break;
         case PARAM:      return strdup("PARAM");         break;
+        case LITERAL:    return strdup("LITERAL");       break;
         default:         return strdup("UNKNOWN_TYPE");  break;
     }
 }
