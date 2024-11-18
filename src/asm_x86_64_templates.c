@@ -16,11 +16,11 @@
 
     Important: Need to free the returned string.
  */
-char* template_1_x86_64(const char* op, const char* arg1, const char* arg2, const char* result) {
+char* template_bin_op_result_x86_64(const char* op, const char* arg1, const char* arg2, const char* result) {
     const char* template =
-        IDENT "movq" IDENT "%s, %%r10\n"    // movl arg1, %r10
+        IDENT "movq" IDENT "%s, %%r10\n"    // movq arg1, %r10
         IDENT "%s"   IDENT "%s, %%r10\n"    // op   arg2, %r10
-        IDENT "movq" IDENT "%%r10, %s\n";   // movl %r10, result
+        IDENT "movq" IDENT "%%r10, %s\n";   // movq %r10, result
 
     char* buffer = (char*) malloc(strlen(template) + strlen(op) + strlen(arg1) + strlen(arg2) + strlen(result) + 1);
 
@@ -38,7 +38,7 @@ char* template_1_x86_64(const char* op, const char* arg1, const char* arg2, cons
 
     Important: Need to free the returned string.
  */
-char* template_2_x86_64(const char* label) {
+char* template_label_x86_64(const char* label) {
     const char* template =
         "%s:\n";
 
@@ -53,7 +53,7 @@ char* template_comparison_x86_64(const char* op, const char* arg1, const char* a
     const char* template =
         IDENT "movq"  IDENT "%s, %%r10\n"
         IDENT "movq"  IDENT "%s, %%r11\n"
-        IDENT "cmp"   IDENT "%%r10, %%r11\n"
+        IDENT "cmpq"   IDENT "%%r10, %%r11\n"
         IDENT "movq"  IDENT "$0, %%r11\n"
         IDENT "movq"  IDENT "$1, %%r10\n"
         IDENT "%s"    IDENT "%%r10, %%r11\n"
@@ -158,7 +158,7 @@ char* template_dbg_comment_x86_64(const char* fmt, ...) {
 
 char* template_parameter_x86_64(const char* param, int index) {
     char* buffer = NULL;
-    
+
     if (index >= 1 && index <= 6) {
         const char* template =
             IDENT "movq" IDENT "%s, %s\n"

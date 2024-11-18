@@ -14,6 +14,8 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
     assert_pre(it != NULL, "generate_x86_64: Invalid call error.", "'it' must not be NULL.");
     assert_pre(output != NULL, "generate_x86_64: Invalid call error.", "'output' must not be NULL.");
 
+
+
     Quadruple* quad = NULL;
     while (has_next(it)) {
         quad = next(it);
@@ -115,7 +117,7 @@ void gen_x86_64_bin_arith(Quadruple* quad, FILE* output) {
         }
     }
 
-    char* generated_asm = template_1_x86_64(
+    char* generated_asm = template_bin_op_result_x86_64(
                             op,
                             _to_asm(quad->arg1),
                             _to_asm(quad->arg2),
@@ -162,7 +164,7 @@ void gen_x86_64_label(Quadruple* quad, FILE* output) {
     assert_pre(quad != NULL, "gen_x86_64_label: Invalid call error.", "'quad' must not be NULL.");
     assert_pre(output != NULL, "gen_x86_64_label: Invalid call error.", "'output' must not be NULL.");
 
-    char* generated_asm = template_2_x86_64(as_info_base(quad->result)->props->name);
+    char* generated_asm = template_label_x86_64(as_info_base(quad->result)->props->name);
 
     fprintf(output, "%s", generated_asm);
 

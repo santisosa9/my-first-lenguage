@@ -42,7 +42,7 @@ int main(int argc, char const *argv[])
     SymbolTable *table = new_symbol_table();
 
     puts("Printing tree...");
-    print_tree(tree);
+    // print_tree(tree);
     puts("Decorating tree...");
     if (!decorate_tree(tree, table))
         exit(EXIT_FAILURE);
@@ -58,7 +58,7 @@ int main(int argc, char const *argv[])
     LinkedList* l = new_linked_list();
     generate_intermediate_code(tree, l);
     puts("Printing tree...");
-    print_tree(tree);
+    // print_tree(tree);
     puts("Printing quadruple list...");
     print_list(l, (void (*)(void*)) print_quadruple);
     puts("------------------------------");
