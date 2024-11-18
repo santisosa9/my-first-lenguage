@@ -5,7 +5,7 @@
 #include "../headers/asm_x86_64_templates.h"
 
 /*
-    Template #1
+    Template for save binary operation result.
 
     Assign the result of a binary operation to a variable.
 
@@ -30,9 +30,9 @@ char* template_bin_op_result_x86_64(const char* op, const char* arg1, const char
 }
 
 /*
-    Template #2
+    Template for labels.
 
-    Assign the result of a binary operation to a variable.
+    Create a label.
 
     label:
 
@@ -51,13 +51,13 @@ char* template_label_x86_64(const char* label) {
 
 char* template_comparison_x86_64(const char* op, const char* arg1, const char* arg2, const char* result) {
     const char* template =
-        IDENT "movq"  IDENT "%s, %%r10\n"
-        IDENT "movq"  IDENT "%s, %%r11\n"
-        IDENT "cmpq"   IDENT "%%r10, %%r11\n"
-        IDENT "movq"  IDENT "$0, %%r11\n"
-        IDENT "movq"  IDENT "$1, %%r10\n"
-        IDENT "%s"    IDENT "%%r10, %%r11\n"
-        IDENT "movq"  IDENT "%%r11, %s\n\n";
+        IDENT "movq" IDENT "%s, %%r10\n"
+        IDENT "movq" IDENT "%s, %%r11\n"
+        IDENT "cmpq" IDENT "%%r10, %%r11\n"
+        IDENT "movq" IDENT "$0, %%r11\n"
+        IDENT "movq" IDENT "$1, %%r10\n"
+        IDENT "%s"   IDENT "%%r10, %%r11\n"
+        IDENT "movq" IDENT "%%r11, %s\n\n";
 
     char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(arg2) + strlen(op) + strlen(result) + 1);
 
@@ -67,7 +67,7 @@ char* template_comparison_x86_64(const char* op, const char* arg1, const char* a
 }
 
 /*
-    Template #3
+    Template for assign a value to a variable.
 
     Assign a value to a variable.
 
@@ -80,10 +80,10 @@ char* template_comparison_x86_64(const char* op, const char* arg1, const char* a
  */
 char* template_assign_x86_64(const char* arg1, const char* result) {
     const char* template =
-        IDENT "movq" IDENT  "%s, %%r10\n"      //Move the immediate value `arg1` to %r10
-        IDENT "movq" IDENT  "%%r10, %s\n";     //Move the value in %r10 to `result`
+        IDENT "movq" IDENT "%s, %%r10\n"      // Move the immediate value `arg1` to %r10
+        IDENT "movq" IDENT "%%r10, %s\n";     // Move the value in %r10 to `result`
 
-        char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(result) +1);
+    char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(result) +1);
 
     sprintf(buffer, template, arg1, result);
 
@@ -107,12 +107,12 @@ char* template_assign_x86_64(const char* arg1, const char* result) {
  */
 char* template_bin_boolean_x86_64(const char* absorbent, const char* arg1, const char* arg2, const char* result) {
     const char* template =
-        IDENT "movq"    IDENT "%s, %%r10\n"     // movq     arg1, %r10
-        IDENT "cmpq"    IDENT "%%r10, %s\n"     // cmpq     %r10, absorbent
-        IDENT "cmove"   IDENT "%s, %%r11\n"     // move     absorbent, %r11
-        IDENT "movq"    IDENT "%s, %%r10\n"     // movq     arg2, %r10
-        IDENT "cmovne"  IDENT "%%r10, %%r11\n"  // cmovne   %r10, %r11
-        IDENT "movq"    IDENT "%%r11, %s\n\n";  // movq     %r11, result
+        IDENT "movq"   IDENT "%s, %%r10\n"     // movq     arg1, %r10
+        IDENT "cmpq"   IDENT "%%r10, %s\n"     // cmpq     %r10, absorbent
+        IDENT "cmove"  IDENT "%s, %%r11\n"     // move     absorbent, %r11
+        IDENT "movq"   IDENT "%s, %%r10\n"     // movq     arg2, %r10
+        IDENT "cmovne" IDENT "%%r10, %%r11\n"  // cmovne   %r10, %r11
+        IDENT "movq"   IDENT "%%r11, %s\n\n";  // movq     %r11, result
 
     char* buffer = (char*) malloc(strlen(template) + strlen(absorbent) + strlen(arg1) + strlen(arg2) + strlen(result) + 1);
 
@@ -122,6 +122,44 @@ char* template_bin_boolean_x86_64(const char* absorbent, const char* arg1, const
 }
 
 
+char* template_parameter_x86_64(const char* param, int index) {
+    char* buffer = NULL;
+
+    if (index >= 1 && index <= 6) {
+        const char* template =
+            IDENT "movq"  IDENT "%s, %s\n"
+            IDENT "pushq" IDENT "%s\n\n";
+
+        char* param_register[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+
+        char* buffer = (char*) malloc(strlen(template) + strlen(param) + 5 * 2 + 1);
+
+        sprintf(buffer, template, param, param_register[index - 1], param_register[index - 1]);
+    }
+    else {
+        const char* template =
+            IDENT "pushq" IDENT "%s\n\n";
+
+        char* buffer = (char*) malloc(strlen(template) + strlen(param) + 1);
+
+        sprintf(buffer, template, param);
+    }
+
+    return buffer;
+}
+
+
+/*
+    Template for debug comments.
+
+    Add a comment to the assembly code.
+
+    # comment
+
+    It uses fmt to format the comment and the variable arguments.
+
+    Important: Need to free the returned string.
+ */
 char* template_dbg_comment_x86_64(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
@@ -152,44 +190,6 @@ char* template_dbg_comment_x86_64(const char* fmt, ...) {
 
     sprintf(buffer, template, comment);
     free(comment);
-
-    return buffer;
-}
-
-char* template_parameter_x86_64(const char* param, int index) {
-    char* buffer = NULL;
-
-    if (index >= 1 && index <= 6) {
-        const char* template =
-            IDENT "movq" IDENT "%s, %s\n"
-            IDENT "pushq" IDENT "%s\n\n";
-
-        char* param_register[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
-
-        char* buffer = (char*) malloc(strlen(template) + strlen(param) + 5 * 2 + 1);
-
-        sprintf(buffer, template, param, param_register[index - 1], param_register[index - 1]);
-    }
-    else {
-        const char* template =
-            IDENT "pushq" IDENT "%s\n\n";
-
-        char* buffer = (char*) malloc(strlen(template) + strlen(param) + 1);
-
-        sprintf(buffer, template, param);
-    }
-
-    return buffer;
-}
-
-
-char* template_constant_x86_64(const char* constant, const char* result) {
-    const char* template =
-        IDENT "movq" IDENT "$%s";
-
-    char* buffer = (char*) malloc(strlen(template) + strlen(constant) + strlen(result) + 1);
-
-    sprintf(buffer, template, constant, result);
 
     return buffer;
 }
