@@ -148,6 +148,18 @@ char* template_parameter_x86_64(const char* param, int index) {
     return buffer;
 }
 
+char* template_ifnot_x86_64(const char* arg1, const char* label) {
+    const char* template =
+        IDENT "cmpq" IDENT "%s, $0\n"
+        IDENT "je"  IDENT "%s\n\n";
+
+    char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(label) + 1);
+
+    sprintf(buffer, template, arg1, label);
+
+    return buffer;
+}
+
 
 /*
     Template for debug comments.
