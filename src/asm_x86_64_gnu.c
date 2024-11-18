@@ -182,12 +182,11 @@ char* _to_asm(Info* info) {
     if (as_info_base(info)->scope == LITERAL) {
         char* value = itos(as_info_base(info)->props->value);
         char* tmp = (char*) malloc(strlen("$") + strlen(value) + 1);
-        char* result = sprintf(tmp, "$%s", value);
+        sprintf(tmp, "$%s", value);
 
         free(value);
-        free(tmp);
 
-        return result;
+        return tmp;
     }
     if (as_info_base(info)->scope == GLOBAL) {
         char* result = _get_offset(info, "rip");
