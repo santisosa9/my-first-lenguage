@@ -205,3 +205,27 @@ char* template_dbg_comment_x86_64(const char* fmt, ...) {
 
     return buffer;
 }
+
+char* template_fn_dec_x86_64(const char* name, const char* locals) {
+    const char* template =
+        "%s:\n"
+        IDENT "enter"  IDENT "$(8*%s), $0\n\n";
+
+    char* buffer = (char*) malloc(strlen(template) + strlen(name) + strlen(locals) + 1);
+
+    sprintf(buffer, template, name, locals);
+
+    return buffer;
+}
+
+char* template_fn_end_x86_64() {
+    const char* template =
+        IDENT "leave\n"
+        IDENT "ret\n\n";
+
+    char* buffer = (char*) malloc(strlen(template) + 1);
+
+    sprintf(buffer, template);
+
+    return buffer;
+}

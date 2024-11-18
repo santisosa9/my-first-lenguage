@@ -36,6 +36,11 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
                 break;
             }
 
+            case FN_DEC: {
+                gen_x86_64_fn_dec(quad, output);
+                break;
+            }
+
             case LABEL: {
                 gen_x86_64_label(quad, output);
                 break;
@@ -86,7 +91,7 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
             }
 
             case FN_END: {
-                fprintf(output, "ret\n");
+                gen_x86_64_fn_end(quad, output);
                 break;
             }
 
@@ -258,8 +263,32 @@ void gen_x86_64_ifnot(Quadruple* quad, FILE* output) {
 
     char* generated_asm = template_ifnot_x86_64(
                             _to_asm(quad->arg1),
-                            template_label_x86_64(as_info_base(quad->result)->props->name)
-                        );
+                            as_info_base(quad->result)->props->name);
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
+}
+
+void gen_x86_64_fn_dec(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_fn_dec: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_fn_dec: Invalid call error.", "'output' must not be NULL.");
+
+    char* name = as_info_fn(quad->result)->props->name;
+    int locals = as_info_fn(quad->result)->locals;
+
+    char* generated_asm = template_fn_dec_x86_64(name, itos(locals));
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
+}
+
+void gen_x86_64_fn_end(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_fn_end: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_fn_end: Invalid call error.", "'output' must not be NULL.");
+
+    char* generated_asm = template_fn_end_x86_64();
 
     fprintf(output, "%s", generated_asm);
 

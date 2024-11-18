@@ -15,3 +15,6 @@ char* template_bin_boolean_x86_64(const char* absorbent, const char* arg1, const
 char* template_dbg_comment_x86_64(const char* fmt, ...);
 char* template_parameter_x86_64(const char* param, int index);
 char* template_ifnot_x86_64(const char* arg1, const char* label);
+char* template_fn_dec_x86_64(const char* name, const char* locals);
+char* template_fn_end_x86_64();
+
