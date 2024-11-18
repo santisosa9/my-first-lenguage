@@ -20,7 +20,7 @@ char* template_bin_op_result_x86_64(const char* op, const char* arg1, const char
     const char* template =
         IDENT "movq" IDENT "%s, %%r10\n"    // movq arg1, %r10
         IDENT "%s"   IDENT "%s, %%r10\n"    // op   arg2, %r10
-        IDENT "movq" IDENT "%%r10, %s\n";   // movq %r10, result
+        IDENT "movq" IDENT "%%r10, %s\n\n";   // movq %r10, result
 
     char* buffer = (char*) malloc(strlen(template) + strlen(op) + strlen(arg1) + strlen(arg2) + strlen(result) + 1);
 
@@ -81,7 +81,7 @@ char* template_comparison_x86_64(const char* op, const char* arg1, const char* a
 char* template_assign_x86_64(const char* arg1, const char* result) {
     const char* template =
         IDENT "movq" IDENT "%s, %%r10\n"      // Move the immediate value `arg1` to %r10
-        IDENT "movq" IDENT "%%r10, %s\n";     // Move the value in %r10 to `result`
+        IDENT "movq" IDENT "%%r10, %s\n\n";     // Move the value in %r10 to `result`
 
     char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(result) +1);
 
