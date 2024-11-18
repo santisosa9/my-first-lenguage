@@ -229,3 +229,33 @@ char* template_fn_end_x86_64() {
 
     return buffer;
 }
+
+char* template_jump_x86_64(const char* label) {
+    const char* template = IDENT "jmp" IDENT "%s\n\n";
+
+    char* buffer = (char*) malloc(strlen(template) + strlen(label) + 1);
+
+    sprintf(buffer, template, label);
+
+    return buffer;
+}
+
+char* template_fn_call_x86_64(const char* name, int cant_params) {
+    char* buffer;
+    if (cant_params > 0) {
+        const char* template =
+            IDENT "call"  IDENT "%s\n"
+            IDENT "addq" IDENT "$(8*%d), %%rsp\n\n";
+
+        buffer = (char*) malloc(strlen(template) + strlen(name) + 11);
+        sprintf(buffer, template, name, cant_params);
+    } else {
+        const char* template = IDENT "call" IDENT "%s\n\n";
+
+        buffer = (char*) malloc(strlen(template) + strlen(name) + 1);
+
+        sprintf(buffer, template, name);
+    }
+
+    return buffer;
+}
