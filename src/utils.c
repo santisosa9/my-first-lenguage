@@ -51,3 +51,24 @@ void assert_pre(bool condition, const char* error_msg, const char* precondition_
         exit(EXIT_FAILURE);
     }
 }
+
+
+void parse_args(int argc, char const *argv[]){
+    ++argv, --argc;
+    if (argc > 0) {
+        current_file_path = strdup(argv[0]);
+        FILE* file = fopen(current_file_path, "r");
+        if (file == NULL) {
+            fprintf(stderr, "Cannot open file '%s'.\n", argv[0]);
+            exit(EXIT_FAILURE);
+        }
+        fclose(file);
+    }
+    else if (!feof(stdin)) {
+        current_file_path = strdup("stdin");
+    }
+    else {
+        fprintf(stderr, "No input file.\n");
+        exit(EXIT_FAILURE);
+    }
+}
