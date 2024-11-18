@@ -132,7 +132,7 @@ char* template_parameter_x86_64(const char* param, int index) {
 
         char* param_register[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
 
-        char* buffer = (char*) malloc(strlen(template) + strlen(param) + 5 * 2 + 1);
+        buffer = (char*) malloc(strlen(template) + strlen(param) + 5 * 2 + 1);
 
         sprintf(buffer, template, param, param_register[index - 1], param_register[index - 1]);
     }
@@ -140,7 +140,7 @@ char* template_parameter_x86_64(const char* param, int index) {
         const char* template =
             IDENT "pushq" IDENT "%s\n\n";
 
-        char* buffer = (char*) malloc(strlen(template) + strlen(param) + 1);
+        buffer = (char*) malloc(strlen(template) + strlen(param) + 1);
 
         sprintf(buffer, template, param);
     }
