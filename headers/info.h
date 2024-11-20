@@ -64,7 +64,7 @@ Props* new_prop(Type type, int value, char* name, int line, int col,char* file_p
 void copy_prop(Props* dest, Props* src);
 
 /* Create a new info. */
-Info* new_info(Type type, int value, char* name, int line, int col,char* file_path);
+Info* new_info(Type type, int value, char* name, int line, int col);
 Info* new_info_fn(Props* props, LinkedList*params, bool is_extern);
 
 /* Print the info. */

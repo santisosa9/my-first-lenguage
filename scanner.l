@@ -32,88 +32,88 @@ NRO         	(-?[1-9][0-9]{0,4})|0
 
   /* Info* new_info(Tag tag, Type type, int value, char* name, int line, int col); */
 
-";" 		      { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+";" 		      { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_SEMICOLON; }
 
-"extern"      { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"extern"      { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_EXTERN; }
 
-"if"          { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"if"          { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_IF; }
 
-"then"        { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"then"        { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_THEN; }
 
-"else"        { yylval.INFOP =new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"else"        { yylval.INFOP =new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_ELSE; }
 
-"while"       { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"while"       { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_WHILE; }
 
-"="			      { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"="			      { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_ASIG; }
 
-"+"		  	    { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"+"		  	    { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_ADD; }
 
-"-"		  	    { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"-"		  	    { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_SUB; }
 
-"/"		  	    { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"/"		  	    { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_DIV; }
 
-"%"		  	    { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"%"		  	    { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_MOD; }
 
-"*"		  	    { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"*"		  	    { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_MUL; }
 
-">"           { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+">"           { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_GREATER; }
 
-"<"           { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"<"           { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_LESS; }
 
-"=="          { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"=="          { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_EQUAL; }
 
-"!"		  	    { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"!"		  	    { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_NOT; }
 
-"||"		      { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"||"		      { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_OR; }
 
-"&&"		      { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"&&"		      { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_AND; }
 
-"true"		    { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"true"		    { yylval.INFOP = new_info(BOOL, 1, strdup(yytext), yylineno, 0);
                 return T_TRUE; }
 
-"false"		    { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"false"		    { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_FALSE; }
 
-"int"		      { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"int"		      { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_INT; }
 
-"integer"	    { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"integer"	    { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_INT; }
 
-"bool"		    { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"bool"		    { yylval.INFOP = new_info(BOOL, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_BOOL; }
 
-"void"		    { yylval.INFOP = new_info(VOID, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"void"		    { yylval.INFOP = new_info(VOID, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_VOID; }
 
-"return"	    { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"return"	    { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_RET; }
 
-"Program"	    { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+"Program"	    { yylval.INFOP = new_info(NO_TYPED, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_PROGRAM; }
 
-{ID}		      { yylval.INFOP = new_info(ANY, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+{ID}		      { yylval.INFOP = new_info(ANY, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_ID; }
 
-{NRO}		      { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0, get_file_path());
+{NRO}		      { yylval.INFOP = new_info(INT, atoi(yytext), strdup(yytext), yylineno, 0);
                 return T_NRO; }
 
 "//".*        { /* DO NOTHING */ }

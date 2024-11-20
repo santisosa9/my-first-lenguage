@@ -195,11 +195,14 @@ char* _to_asm(Info* info) {
         return tmp;
     }
     if (as_info_base(info)->scope == GLOBAL) {
-        char* result = _get_offset(info, "rip");
+        char* name = as_info_base(info)->props->name;
+        char* result = (char*) malloc(strlen(name) + strlen("%rip") + 1);
+        sprintf(result, "%s(%%rip)", name);
+
         return result;
     }
     if (as_info_base(info)->scope == LOCAL || as_info_base(info)->scope == PARAM || as_info_base(info)->scope == NO_SCOPE) {
-        char* result = _get_offset(info, "rbp");
+        char* result = _get_offset(info, "%rbp");
         return result;
     }
     assert_pre(false, "_to_asm: Invalid call error.", "Invalid scope.");
@@ -347,7 +350,7 @@ void gen_x86_64_global_dec(Quadruple* quad, FILE* output) {
     }
 
     char* name = props->name;
-    int align = (props->type == BOOL) ? 1 : 4;
+    int align = (props->type == BOOL) ? 1 : 8;
     char* value = itos(props->value);
     char* generated_asm = template_global_dec_x86_64(name, itos(align), type_str, value);
 

@@ -52,8 +52,8 @@ void copy_prop(Props* dest, Props* src) {
     dest->name = strdup(src->name);
 }
 
-Info* new_info(Type type, int value, char* name, int line, int col,char* file_path){
-    Props* props = new_prop(type, value, name, line, col,file_path);
+Info* new_info(Type type, int value, char* name, int line, int col){
+    Props* props = new_prop(type, value, name, line, col,get_file_path());
     Info* info = (Info*)malloc(sizeof(Info));
 
     as_info_base(info)->scope = NO_SCOPE;

@@ -1,9 +1,10 @@
 Program {
+    bool r = true;
     int i = 17;
     int x = 2 * 7;
     int z;
     int sumatory(int x) {
-        int i = 0;
+        bool k = true;
         int result = 0;
         while (i < x || i == x) {
             result = result + i;

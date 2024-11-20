@@ -105,7 +105,7 @@ body: dec {
     };
 
 block: '{' body_fn '}' {
-        Info* info = new_info(NO_TYPED, 0, "block", 0, 0,get_file_path());
+        Info* info = new_info(NO_TYPED, 0, "block", 0, 0);
         $$ = build_root(NULL, info, BLOCK, $2);
     };
 
