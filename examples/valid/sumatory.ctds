@@ -1,8 +1,7 @@
 Program {
+    int i = 17;
+    int x = 2 * 7;
     int z;
-    bool q;
-    int b = 1234;
-    bool r = false;
     int sumatory(int x) {
         int i = 0;
         int result = 0;
@@ -12,6 +11,4 @@ Program {
         }
         return result;
     }
-
-    int a = sumatory(20*3);
 }

@@ -98,25 +98,18 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
             generate_intermediate_code(tree->left, ic);
             generate_intermediate_code(tree->right, ic);
 
-            if (tree->left != NULL && tree->right != NULL) {
-                arg1 = tree->right->info;
-                result = tree->left->info;
-
-                Quadruple* quad = new_quadruple(ASIG, arg1, NULL, result);
-                insert_ll(ic, quad);
-            }
-
             if (as_info_base(tree->info)->scope == GLOBAL) {
-                if (tree->right != NULL) {
-                    Info* info = new_info(NO_TYPED, 0, "", 0, 0, get_file_path());
-                    copy_info(DEC, info, tree->info);
-                    as_info_base(info)->props->value = as_info_base(tree->right->info)->props->value;
-                    result = info;
-                } else {
-                    result = tree->info;
-                }
+                result = tree->info;
                 Quadruple* global_quad = new_quadruple(GLOBAL_DEC, NULL, NULL, result); 
                 insert_head(ic, global_quad);
+            } else {
+                if (tree->left != NULL && tree->right != NULL) {
+                  arg1 = tree->right->info;
+                  result = tree->left->info;
+
+                  Quadruple* quad = new_quadruple(ASIG, arg1, NULL, result);
+                  insert_ll(ic, quad);
+                }
             }
 
             break;

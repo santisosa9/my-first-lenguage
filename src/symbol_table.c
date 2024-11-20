@@ -10,6 +10,7 @@
 Info* _search_in_scope(STStackNode* scope, char* name);
 void insert_params(SymbolTable* table, Info* info);
 void _set_offset_params(LinkedList* params);
+int _evaluate_expression(AST* expr);
 
 SymbolTable* new_symbol_table(){
     SymbolTable* table = (SymbolTable*)malloc(sizeof(SymbolTable));
@@ -248,8 +249,11 @@ bool decorate_tree(AST* tree, SymbolTable* table) {
         case DEC: {
             existing = search_in_current_scope(table, as_info_base(tree->info)->props->name);
             if (existing == NULL) {
-                if(current_scope_is_global(table)){
+                if (current_scope_is_global(table)) {
                     as_info_base(tree->info)->scope = GLOBAL;
+                }
+                if (tree->right != NULL) {
+                    as_info_base(tree->info)->props->value = _evaluate_expression(tree->right);
                 }
                 insert(table, tree->info);
             } else {
@@ -416,4 +420,42 @@ void _set_offset_params(LinkedList* params) {
         offset += 8;
     }
     free(iterator);
+}
+
+int _evaluate_expression(AST* expr) {
+    if (expr == NULL) {
+        return -1;
+    }
+
+    Tag tag = expr->tag;
+
+    switch (tag) {
+        case VALUE:
+            return as_info_base(expr->info)->props->value;
+
+        case ADD: {
+            return (_evaluate_expression(expr->left) + _evaluate_expression(expr->right));
+        }
+
+        case MUL: {
+            return (_evaluate_expression(expr->left) * _evaluate_expression(expr->right));
+        }
+
+        case OR: {
+            return (_evaluate_expression(expr->left) || _evaluate_expression(expr->right));
+        }
+        
+        case AND: {
+            return (_evaluate_expression(expr->left) && _evaluate_expression(expr->right));
+        }
+
+        case NOT:
+            return !_evaluate_expression(expr->left);
+
+        default:
+            printf("Error: Declaracion global no válida.\n");
+            exit(EXIT_FAILURE);
+            
+
+    }
 }
