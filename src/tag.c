@@ -36,6 +36,8 @@ char* tag_to_str(Tag tag){
         case FN_END:        return strdup("FN_END");        break;
         case PARAMETER:     return strdup("PARAMETER");     break;
         case GLOBAL_DEC:    return strdup("GLOBAL");        break;
+        case TYPED_FC:      return strdup("TYPED_FC");      break;
+        case VOID_FC:       return strdup("VOID_FC");       break;
         default:            return strdup("UNKNOWN_TAG");   break;
     }
 }

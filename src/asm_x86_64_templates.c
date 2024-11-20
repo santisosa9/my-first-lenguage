@@ -53,7 +53,7 @@ char* template_comparison_x86_64(const char* op, const char* arg1, const char* a
     const char* template =
         IDENT "movq" IDENT "%s, %%r10\n"
         IDENT "movq" IDENT "%s, %%r11\n"
-        IDENT "cmpq" IDENT "%%r10, %%r11\n"
+        IDENT "cmpq" IDENT "%%r11, %%r10\n"
         IDENT "movq" IDENT "$0, %%r11\n"
         IDENT "movq" IDENT "$1, %%r10\n"
         IDENT "%s"   IDENT "%%r10, %%r11\n"
@@ -109,7 +109,8 @@ char* template_bin_boolean_x86_64(const char* absorbent, const char* arg1, const
     const char* template =
         IDENT "movq"   IDENT "%s, %%r10\n"     // movq     arg1, %r10
         IDENT "cmpq"   IDENT "%s, %%r10\n"     // cmpq     absorbent, %r10
-        IDENT "cmove"  IDENT "%s, %%r11\n"     // move     absorbent, %r11
+        IDENT "movq"   IDENT "%s, %%r10\n"     // movq     absorbent, %r10
+        IDENT "cmove"  IDENT "%%r10, %%r11\n"  // move     %r10, %r11
         IDENT "movq"   IDENT "%s, %%r10\n"     // movq     arg2, %r10
         IDENT "cmovne" IDENT "%%r10, %%r11\n"  // cmovne   %r10, %r11
         IDENT "movq"   IDENT "%%r11, %s\n\n";  // movq     %r11, result
@@ -242,7 +243,7 @@ char* template_jump_x86_64(const char* label) {
     return buffer;
 }
 
-char* template_fn_call_x86_64(const char* name, int cant_params) {
+char* template_void_fn_call_x86_64(const char* name, int cant_params) {
     char* buffer;
     if (cant_params > 0) {
         const char* template =
@@ -257,6 +258,28 @@ char* template_fn_call_x86_64(const char* name, int cant_params) {
         buffer = (char*) malloc(strlen(template) + strlen(name) + 1);
 
         sprintf(buffer, template, name);
+    }
+
+    return buffer;
+}
+
+char* template_typed_fn_call_x86_64(const char* name, int cant_params, const char* result) {
+    char* buffer;
+    if (cant_params > 0) {
+        const char* template =
+            IDENT "call"  IDENT "%s\n"
+            IDENT "addq"  IDENT "$(8*%d), %%rsp\n"
+            IDENT "movq"  IDENT "%%rax, %s\n\n";
+
+        buffer = (char*) malloc(strlen(template) + strlen(name) + strlen(result) + 11);
+        sprintf(buffer, template, name, cant_params, result);
+    } else {
+        const char* template = 
+            IDENT "call" IDENT "%s\n"
+            IDENT "movq"  IDENT "%%rax, %s\n\n";
+
+        buffer = (char*) malloc(strlen(template) + strlen(name) + strlen(result) + 1);
+        sprintf(buffer, template, name, result);
     }
 
     return buffer;

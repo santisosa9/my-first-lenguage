@@ -77,8 +77,13 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
                 break;
             }
 
-            case FN_CALL: {
-                gen_x86_64_fn_call(quad, output);
+            case VOID_FC: {
+                gen_x86_64_void_fn_call(quad, output);
+                break;
+            }
+
+            case TYPED_FC: {
+                gen_x86_64_typed_fn_call(quad, output);
                 break;
             }
 
@@ -322,13 +327,26 @@ void gen_x86_64_assign(Quadruple* quad, FILE* output) {
     free(generated_asm);
 }
 
-void gen_x86_64_fn_call(Quadruple* quad, FILE* output) {
-    assert_pre(quad != NULL, "gen_x86_64_fn_call: Invalid call error.", "'quad' must not be NULL.");
-    assert_pre(output != NULL, "gen_x86_64_fn_call: Invalid call error.", "'output' must not be NULL.");
+void gen_x86_64_void_fn_call(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_void_fn_call: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_void_fn_call: Invalid call error.", "'output' must not be NULL.");
 
     char* name = as_info_fn(quad->arg1)->props->name;
     int cant_params = atoi(as_info_base(quad->arg2)->props->name);
-    char* generated_asm = template_fn_call_x86_64(name, cant_params);
+    char* generated_asm = template_void_fn_call_x86_64(name, cant_params);
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
+}
+
+void gen_x86_64_typed_fn_call(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_typed_fn_call: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_typed_fn_call: Invalid call error.", "'output' must not be NULL.");
+
+    char* name = as_info_fn(quad->arg1)->props->name;
+    int cant_params = atoi(as_info_base(quad->arg2)->props->name);
+    char* generated_asm = template_typed_fn_call_x86_64(name, cant_params, _to_asm(quad->result));
 
     fprintf(output, "%s", generated_asm);
 

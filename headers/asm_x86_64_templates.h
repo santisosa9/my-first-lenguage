@@ -19,6 +19,7 @@ char* template_fn_dec_x86_64(const char* name, const char* locals);
 char* template_fn_end_x86_64();
 char* template_jump_x86_64(const char* label);
 char* template_assign_x86_64(const char* arg1, const char* result);
-char* template_fn_call_x86_64(const char* name, int cant_params);
+char* template_void_fn_call_x86_64(const char* name, int cant_params);
+char* template_typed_fn_call_x86_64(const char* name, int cant_params, const char* result);
 char* template_global_dec_x86_64(const char* name, const char* align, const char* type, const char* value);
 char* template_ret_x86_64(const char* offset);

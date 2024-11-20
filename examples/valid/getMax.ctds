@@ -1,4 +1,5 @@
 Program {
+
     int getMax(int x, int y) {
         if (x > y) then {
             return x;
@@ -7,5 +8,11 @@ Program {
         }
     }
 
-    int a = getMax(6, 9);
+    void print_int(int x) extern;
+
+    void main() {
+        int max = getMax(6,9);
+        print_int(max);
+    }
+
 }

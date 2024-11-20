@@ -1,61 +1,28 @@
 	.text
-	.globl sumatory
-	.type sumatory, @function
-sumatory:
-	enter	$(8*7), $0
+	.globl getMax
+	.type getMax, @function
+getMax:
+	enter	$(8*1), $0
 
-	movq	$0, %r10
-	movq	%r10, -16(%rbp)
+	movq	8(%rbp), %r10
+	movq	16(%rbp), %r11
+	cmpq	%r11, %r10
+	movq	$0, %r11
+	movq	$1, %r10
+	cmovg	%r10, %r11
+	movq	%r11, -16(%rbp)
 
-	movq	$0, %r10
-	movq	%r10, -24(%rbp)
+	cmpq	$0, -16(%rbp)
+	je	l0
+
+	movq	8(%rbp), %rax
+
+	jmp	l1
 
 l0:
-	movq	-16(%rbp), %r10
-	movq	8(%rbp), %r11
-	cmpq	%r10, %r11
-	movq	$0, %r11
-	movq	$1, %r10
-	cmovl	%r10, %r11
-	movq	%r11, -40(%rbp)
-
-	movq	-16(%rbp), %r10
-	movq	8(%rbp), %r11
-	cmpq	%r10, %r11
-	movq	$0, %r11
-	movq	$1, %r10
-	cmove	%r10, %r11
-	movq	%r11, -48(%rbp)
-
-	movq	-40(%rbp), %r10
-	cmpq	$1, %r10
-	cmove	$1, %r11
-	movq	-48(%rbp), %r10
-	cmovne	%r10, %r11
-	movq	%r11, -32(%rbp)
-
-	cmpq	$0, -32(%rbp)
-	je	l1
-
-	movq	-24(%rbp), %r10
-	addq	-16(%rbp), %r10
-	movq	%r10, -56(%rbp)
-
-	movq	-56(%rbp), %r10
-	movq	%r10, -24(%rbp)
-
-	movq	-16(%rbp), %r10
-	addq	$1, %r10
-	movq	%r10, -64(%rbp)
-
-	movq	-64(%rbp), %r10
-	movq	%r10, -16(%rbp)
-
-	jmp	l0
+	movq	16(%rbp), %rax
 
 l1:
-	movq	-24(%rbp), %rax
-
 	leave
 	ret
 
@@ -64,11 +31,15 @@ l1:
 main:
 	enter	$(8*3), $0
 
-	movq	$2, %rdi
+	movq	$6, %rdi
 	pushq	%rdi
 
-	call	sumatory
-	addq	$(8*1), %rsp
+	movq	$9, %rsi
+	pushq	%rsi
+
+	call	getMax
+	addq	$(8*2), %rsp
+	movq	%rax, -24(%rbp)
 
 	movq	-24(%rbp), %r10
 	movq	%r10, -16(%rbp)

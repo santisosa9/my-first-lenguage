@@ -225,8 +225,13 @@ void generate_intermediate_code_fn(AST* tree, LinkedList* ic) {
             }
             arg2 = new_info(NO_TYPED, 0, name, 0, 0);
             as_info_fn(tree->info)->props->name = getTempName();
-            result = tree->info;
-            Quadruple* call = new_quadruple(FN_CALL, arg1, arg2, result);
+            Quadruple* call;
+            if (as_info_fn(tree->info)->props->type != VOID) {
+              result = tree->info;
+              call = new_quadruple(TYPED_FC, arg1, arg2, result);
+            } else {
+              call = new_quadruple(VOID_FC, arg1, arg2, NULL);
+            }
             insert_ll(ic, call);
             break;
         }
