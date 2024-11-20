@@ -48,6 +48,7 @@ typedef struct InfoFunction
     LinkedList* params; // PARAM[]
     bool is_extern;
     nat locals;
+    Scope scope;
 } InfoFunction;
 
 typedef union Info {

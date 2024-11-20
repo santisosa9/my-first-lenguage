@@ -108,7 +108,7 @@ char* template_assign_x86_64(const char* arg1, const char* result) {
 char* template_bin_boolean_x86_64(const char* absorbent, const char* arg1, const char* arg2, const char* result) {
     const char* template =
         IDENT "movq"   IDENT "%s, %%r10\n"     // movq     arg1, %r10
-        IDENT "cmpq"   IDENT "%%r10, %s\n"     // cmpq     %r10, absorbent
+        IDENT "cmpq"   IDENT "%s, %%r10\n"     // cmpq     absorbent, %r10
         IDENT "cmove"  IDENT "%s, %%r11\n"     // move     absorbent, %r11
         IDENT "movq"   IDENT "%s, %%r10\n"     // movq     arg2, %r10
         IDENT "cmovne" IDENT "%%r10, %%r11\n"  // cmovne   %r10, %r11
@@ -150,7 +150,7 @@ char* template_parameter_x86_64(const char* param, int index) {
 
 char* template_ifnot_x86_64(const char* arg1, const char* label) {
     const char* template =
-        IDENT "cmpq" IDENT "%s, $0\n"
+        IDENT "cmpq" IDENT "$0, %s\n"
         IDENT "je"  IDENT "%s\n\n";
 
     char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(label) + 1);
@@ -272,6 +272,17 @@ char* template_global_dec_x86_64(const char* name, const char* align, const char
     char* buffer = (char*) malloc(strlen(template) + (strlen(name) * 2) + strlen(align) + strlen(type) + strlen(value) + 1);
 
     sprintf(buffer, template, name, align, name, type, value);
+
+    return buffer;
+}
+
+char* template_ret_x86_64(const char* offset) {
+    const char* template =
+        IDENT "movq" IDENT "%s, %%rax\n\n";
+
+    char* buffer = (char*) malloc(strlen(template) + strlen(offset) + 1);
+
+    sprintf(buffer, template, offset);
 
     return buffer;
 }

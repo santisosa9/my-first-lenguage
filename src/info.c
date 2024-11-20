@@ -72,6 +72,7 @@ Info* new_info_fn(Props* props, LinkedList* params, bool is_extern){
     as_info_fn(info)->params = params;
     as_info_fn(info)->is_extern = is_extern;
     as_info_fn(info)->locals = 0;
+    as_info_fn(info)->scope = NO_SCOPE;
 
     return info;
 }
@@ -144,6 +145,7 @@ void _print_info_fn(InfoFunction* info){
     printf("is_extern: %s, ", info->is_extern ? "yes" : "no");
     printf("Locals: %u, ", info->locals);
     printf("Offset: %d, ", info->props->offset);
+    printf("Scope: %s ", scope_to_str(info->scope));
     printf("params: %u [", info->cant_params);
     for (nat i = 0; i < info->cant_params; i++) {
         _print_info_base(lookup(info->params, i));

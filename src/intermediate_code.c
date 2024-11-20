@@ -265,11 +265,13 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
         }
 
         case FN_DEC: {
-            Quadruple* dec = new_quadruple(tree->tag, NULL, NULL, tree->info);
-            insert_ll(ic, dec);
-            generate_intermediate_code_fn(tree->right, ic);
-            Quadruple* end = new_quadruple(FN_END, NULL, NULL, tree->info);
-            insert_ll(ic, end);
+            if (!as_info_fn(tree->info)->is_extern) {
+                Quadruple* dec = new_quadruple(tree->tag, NULL, NULL, tree->info);
+                insert_ll(ic, dec);
+                generate_intermediate_code_fn(tree->right, ic);
+                Quadruple* end = new_quadruple(FN_END, NULL, NULL, tree->info);
+                insert_ll(ic, end);
+            }
 
             break;
         }

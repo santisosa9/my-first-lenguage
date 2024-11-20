@@ -93,6 +93,12 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
                     data_section_emitted = true;
                 }
                 gen_x86_64_global_dec(quad, output);
+                break;
+            }
+
+            case RET: {
+                gen_x86_64_ret(quad, output);
+                break;
             }
 
             default: {
@@ -108,8 +114,8 @@ void gen_x86_64_bin_arith(Quadruple* quad, FILE* output) {
 
     char* op = NULL;
     switch (quad->op) {
-        case ADD: op = "addl";   break;
-        case SUB: op = "subl";   break;
+        case ADD: op = "addq";   break;
+        case SUB: op = "subq";   break;
         case MUL: op = "imul";  break;
         case DIV: op = "idiv";  break;
         case MOD: op = "idiv";  break;
@@ -194,15 +200,15 @@ char* _to_asm(Info* info) {
 
         return tmp;
     }
+    if (as_info_fn(info)->scope == NO_SCOPE || as_info_base(info)->scope == LOCAL || as_info_base(info)->scope == PARAM || as_info_base(info)->scope == NO_SCOPE) {
+        char* result = _get_offset(info, "%rbp");
+        return result;
+    }
     if (as_info_base(info)->scope == GLOBAL) {
         char* name = as_info_base(info)->props->name;
         char* result = (char*) malloc(strlen(name) + strlen("%rip") + 1);
         sprintf(result, "%s(%%rip)", name);
 
-        return result;
-    }
-    if (as_info_base(info)->scope == LOCAL || as_info_base(info)->scope == PARAM || as_info_base(info)->scope == NO_SCOPE) {
-        char* result = _get_offset(info, "%rbp");
         return result;
     }
     assert_pre(false, "_to_asm: Invalid call error.", "Invalid scope.");
@@ -353,6 +359,17 @@ void gen_x86_64_global_dec(Quadruple* quad, FILE* output) {
     int align = (props->type == BOOL) ? 1 : 8;
     char* value = itos(props->value);
     char* generated_asm = template_global_dec_x86_64(name, itos(align), type_str, value);
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
+}
+
+void gen_x86_64_ret(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_ret: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_ret: Invalid call error.", "'output' must not be NULL.");
+
+    char* generated_asm = template_ret_x86_64(_to_asm(quad->result));
 
     fprintf(output, "%s", generated_asm);
 
