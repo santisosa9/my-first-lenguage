@@ -29,6 +29,75 @@ char* template_bin_op_result_x86_64(const char* op, const char* arg1, const char
     return buffer;
 }
 
+char* template_mul_x86_64(const char* arg1, const char* arg2, const char* result) {
+    const char* template =
+        IDENT "xorq"  IDENT "%%rdx, %%rdx\n"    // Clear %rdx
+        IDENT "movq"  IDENT "%s, %%rax\n"       // mov arg1, %rax
+        IDENT "movq"  IDENT "%s, %%rcx\n"       // mov arg2, %rcx
+        IDENT "imulq" IDENT "%%rcx, %%rax\n"    // imul %rcx, %rax
+        IDENT "movq"  IDENT "%%rax, %s\n\n";    // mov %rax, result
+
+    char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(arg2) + strlen(result) + 1);
+
+    sprintf(buffer, template, arg1, arg2, result);
+
+    return buffer;
+}
+
+/*
+    Template for save division operation result.
+
+    Assign the result of a division operation to a variable.
+
+    result = arg1 / arg2
+
+
+ */
+char* template_div_x86_64(const char* arg1, const char* arg2, const char* result) {
+    const char* template =
+        IDENT "xorq"  IDENT "%%rdx, %%rdx\n"    // Clear %rdx
+        IDENT "movq"  IDENT "%s, %%rax\n"       // mov arg1, %rax
+        IDENT "movq"  IDENT "%s, %%rcx\n"       // mov arg2, %rcx
+        IDENT "cqto\n"                           // Sign extend %rax to %rdx:%rax
+        IDENT "idivq" IDENT "%%rcx\n"              // idiv arg2
+        IDENT "movq"  IDENT "%%rax, %s\n\n";    // mov %rax, result
+
+    char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(arg2) + strlen(result) + 1);
+
+    sprintf(buffer, template, arg1, arg2, result);
+
+    return buffer;
+}
+
+char* template_mod_x86_64(const char* arg1, const char* arg2, const char* result) {
+    const char* template =
+        IDENT "xorq"  IDENT "%%rdx, %%rdx\n"    // Clear %rdx
+        IDENT "movq"  IDENT "%s, %%rax\n"       // mov arg1, %rax
+        IDENT "movq"  IDENT "%s, %%rcx\n"       // mov arg2, %rcx
+        IDENT "cqto\n"                           // Sign extend %rax to %rdx:%rax
+        IDENT "idivq" IDENT "%%rcx\n"              // idiv arg2
+        IDENT "movq"  IDENT "%%rdx, %s\n\n";    // mov %rax, result
+
+    char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(arg2) + strlen(result) + 1);
+
+    sprintf(buffer, template, arg1, arg2, result);
+
+    return buffer;
+}
+
+char* template_unminus_x86_64(const char* arg1, const char* result) {
+    const char* template =
+        IDENT "movq" IDENT "%s, %%r10\n"    // mov arg1, %r10
+        IDENT "negq" IDENT "%%r10\n"        // neg %r10
+        IDENT "movq" IDENT "%%r10, %s\n\n"; // mov %r10, result
+
+    char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(result) + 1);
+
+    sprintf(buffer, template, arg1, result);
+
+    return buffer;
+}
+
 /*
     Template for labels.
 
@@ -122,6 +191,24 @@ char* template_bin_boolean_x86_64(const char* absorbent, const char* arg1, const
     return buffer;
 }
 
+char* template_not_x86_64(const char* arg1, const char* result) {
+    const char* template =
+        IDENT "xorq"   IDENT "%%r10, %%r10\n" // Clear %r10
+        IDENT "movq"   IDENT "%s, %%r10\n"    // movq arg1, %r10
+        IDENT "cmpq"   IDENT "$0, %%r10\n"    // cmpq $0, %r10
+        IDENT "movq"   IDENT "$1, %%r11\n"    // move $1, %r10
+        IDENT "cmove"  IDENT "%%r11, %%r10\n" // move $1, %r10
+        IDENT "movq"   IDENT "$0, %%r11\n"    // movq %r10, result
+        IDENT "cmovne" IDENT "%%r11, %%r10\n"    // move $0, %r10
+        IDENT "movq"   IDENT "%%r10, %s\n\n"; // movq %r10, result
+
+    char* buffer = (char*) malloc(strlen(template) + strlen(arg1) + strlen(result) + 1);
+
+    sprintf(buffer, template, arg1, result);
+
+    return buffer;
+}
+
 
 char* template_parameter_x86_64(const char* param, int index) {
     char* buffer = NULL;
@@ -209,7 +296,7 @@ char* template_dbg_comment_x86_64(const char* fmt, ...) {
 
 char* template_fn_dec_x86_64(const char* name, const char* locals) {
     const char* template =
-        IDENT ".globl %s\n"  
+        IDENT ".globl %s\n"
         IDENT ".type %s, @function\n"
         "%s:\n"
         IDENT "enter"  IDENT "$(8*%s), $0\n\n";
@@ -274,7 +361,7 @@ char* template_typed_fn_call_x86_64(const char* name, int cant_params, const cha
         buffer = (char*) malloc(strlen(template) + strlen(name) + strlen(result) + 11);
         sprintf(buffer, template, name, cant_params, result);
     } else {
-        const char* template = 
+        const char* template =
             IDENT "call" IDENT "%s\n"
             IDENT "movq"  IDENT "%%rax, %s\n\n";
 

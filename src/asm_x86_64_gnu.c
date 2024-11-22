@@ -15,18 +15,30 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
     assert_pre(output != NULL, "generate_x86_64: Invalid call error.", "'output' must not be NULL.");
 
     Quadruple* quad = NULL;
-    bool data_section_emitted = false;  
+    bool data_section_emitted = false;
     bool text_section_emitted = false;
 
     while (has_next(it)) {
         quad = next(it);
         switch (quad->op) {
             case ADD:
-            case SUB:
-            case MUL:
-            case DIV:
-            case MOD: {
+            case SUB: {
                 gen_x86_64_bin_arith(quad, output);
+                break;
+            }
+
+            case MUL: {
+                gen_x86_64_mul(quad, output);
+                break;
+            }
+
+            case DIV: {
+                gen_x86_64_div(quad, output);
+                break;
+            }
+
+            case MOD: {
+                gen_x86_64_mod(quad, output);
                 break;
             }
 
@@ -53,7 +65,7 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
 
             case ASIG: {
                 gen_x86_64_assign(quad, output);
-                break; 
+                break;
             }
 
             case JUMP: {
@@ -69,6 +81,16 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
             case AND:
             case OR: {
                 gen_x86_64_bin_boolean(quad, output);
+                break;
+            }
+
+            case NOT: {
+                gen_x86_64_not(quad, output);
+                break;
+            }
+
+            case UNMINUS: {
+                gen_x86_64_unminus(quad, output);
                 break;
             }
 
@@ -111,6 +133,47 @@ void gen_x86_64(LinkedListIterator* it, FILE* output) {
             }
         }
     }
+}
+
+void gen_x86_64_mul(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_fn_dec: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_fn_dec: Invalid call error.", "'output' must not be NULL.");
+
+    char* comment = template_dbg_comment_x86_64("%s %s %s", _to_asm(quad->arg1), _to_asm(quad->arg2), _to_asm(quad->result));
+    fprintf(output, "%s", comment);
+    free(comment);
+
+    char* generated_asm = template_mul_x86_64(_to_asm(quad->arg1), _to_asm(quad->arg2), _to_asm(quad->result));
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
+}
+
+void gen_x86_64_div(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_div: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_div: Invalid call error.", "'output' must not be NULL.");
+
+    char* comment = template_dbg_comment_x86_64("%s %s %s", _to_asm(quad->arg1), _to_asm(quad->arg2), _to_asm(quad->result));
+    fprintf(output, "%s", comment);
+    free(comment);
+
+    char* generated_asm = template_div_x86_64(_to_asm(quad->arg1), _to_asm(quad->arg2), _to_asm(quad->result));
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
+}
+
+void gen_x86_64_mod(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_mod: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_mod: Invalid call error.", "'output' must not be NULL.");
+
+    char* generated_asm = template_mod_x86_64(_to_asm(quad->arg1), _to_asm(quad->arg2), _to_asm(quad->result));
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
 }
 
 void gen_x86_64_bin_arith(Quadruple* quad, FILE* output) {
@@ -393,3 +456,31 @@ void gen_x86_64_ret(Quadruple* quad, FILE* output) {
 
     free(generated_asm);
 }
+
+
+void gen_x86_64_not(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_not: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_not: Invalid call error.", "'output' must not be NULL.");
+
+    char* comment = template_dbg_comment_x86_64("%s %s", _to_asm(quad->arg1), _to_asm(quad->result));
+    fprintf(output, "%s", comment);
+    free(comment);
+
+    char* generated_asm = template_not_x86_64(_to_asm(quad->arg1), _to_asm(quad->result));
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
+}
+
+void gen_x86_64_unminus(Quadruple* quad, FILE* output) {
+    assert_pre(quad != NULL, "gen_x86_64_unsub: Invalid call error.", "'quad' must not be NULL.");
+    assert_pre(output != NULL, "gen_x86_64_unsub: Invalid call error.", "'output' must not be NULL.");
+
+    char* generated_asm = template_unminus_x86_64(_to_asm(quad->arg1), _to_asm(quad->result));
+
+    fprintf(output, "%s", generated_asm);
+
+    free(generated_asm);
+}
+

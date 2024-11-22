@@ -81,6 +81,21 @@ void generate_intermediate_code_fn(AST* tree, LinkedList* ic) {
             break;
         }
 
+        case UNMINUS: {
+            generate_intermediate_code_fn(tree->right, ic);
+
+            if (tree->right != NULL) {
+                arg1 = tree->right->info;
+
+                as_info_base(tree->info)->props->name = getTempName();
+                result = tree->info;
+
+                Quadruple* quad = new_quadruple(tag, arg1, NULL, result);
+                insert_ll(ic, quad);
+            }
+            break;
+        }
+
         case ASIG: {
             generate_intermediate_code_fn(tree->left, ic);
             generate_intermediate_code_fn(tree->right, ic);
@@ -107,7 +122,7 @@ void generate_intermediate_code_fn(AST* tree, LinkedList* ic) {
               Quadruple* quad = new_quadruple(ASIG, arg1, NULL, result);
               insert_ll(ic, quad);
             }
-            
+
             break;
         }
 
@@ -263,9 +278,9 @@ void generate_intermediate_code(AST* tree, LinkedList* ic) {
             generate_intermediate_code(tree->right, ic);
 
             result = tree->info;
-            Quadruple* global_quad = new_quadruple(GLOBAL_DEC, NULL, NULL, result); 
+            Quadruple* global_quad = new_quadruple(GLOBAL_DEC, NULL, NULL, result);
             insert_head(ic, global_quad);
-          
+
             break;
         }
 

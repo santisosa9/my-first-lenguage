@@ -242,6 +242,9 @@ expr: expr T_ADD expr {
     | T_NOT expr %prec T_UNMINUS {
         $$ = build_root(NULL, $1, NOT, $2);
     }
+    | T_SUB expr %prec T_UNMINUS {
+        $$ = build_root(NULL, $1, UNMINUS, $2);
+    }
     | '(' expr ')' {
         $$ = $2;
     }

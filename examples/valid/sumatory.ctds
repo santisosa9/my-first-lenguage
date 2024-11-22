@@ -4,7 +4,8 @@ Program {
     int sumatory(int x) {
         int i = 0;
         int result = 0;
-        int limit = 5;
+        print_int(x);
+        int limit = x;
         while (i < limit || i == limit) {
             result = result + i;
             print_int(i);
@@ -15,7 +16,12 @@ Program {
 
 
     void main () {
-        int sum = sumatory(2);
+        int x = 10;
+        print_int(x);
+        print_int(x * 2);
+        print_int(x / 2);
+        print_int(x % 2);
+        int sum = sumatory(x);
         print_int(sum);
     }
 }

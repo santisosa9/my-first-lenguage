@@ -12,7 +12,7 @@ typedef enum Tag{
     SEMICOLON,
     BLOCK,
     NOT, OR, AND, ADD, MUL, SUB,
-    UNSUB, DIV, MOD,
+    UNMINUS, DIV, MOD,
     IF, T_E,
     WHILE,
     FN_DEC,

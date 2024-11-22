@@ -1,4 +1,5 @@
 #pragma once
+
 #include "info.h"
 #include "tag.h"
 #include "utils.h"
@@ -29,6 +30,9 @@ void free_tree(AST* tree);
 /* Print the tree. */
 void print_tree(AST* tree);
 
+/* Print the tree to a file. */
+void pretty_print_tree(FILE* f, AST* tree, int level, char* prefix, char* conection, bool father_is_last, bool is_right);
+
 /* Print a node. */
 void print_node(AST* node);
 
@@ -40,3 +44,6 @@ bool check_fn(AST* fn);
 
 /* Checks if a function is well invocated */
 bool check_params(LinkedList* formal_params, AST* fn_call);
+
+/* Write the AST into a file */
+void write_tree_to_file(AST* tree, FILE* file);

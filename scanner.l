@@ -23,7 +23,7 @@ DIGITO          [0-9]
 LETRA           [a-zA-Z]
 ID              {LETRA}({LETRA}|{DIGITO}|_)*
 
-NRO         	(-?[1-9][0-9]{0,4})|0
+NRO         	([1-9][0-9]{0,4})|0
 
 
 /* Reglas */
@@ -134,4 +134,5 @@ void yyerror(){
     int line_len = strlen(itos(yylineno));
     printf("  %d  | %s\n", yylineno, yytext);
     printf("%s|\n", repeat_char(' ', line_len + 4));
+    exit(1);
 }

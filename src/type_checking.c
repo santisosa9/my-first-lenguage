@@ -21,7 +21,8 @@ bool check_expr(AST* tree) {
         case ADD:
         case MUL:
         case SUB:
-        case DIV: {
+        case DIV:
+        case MOD: {
             left_type = as_info_base(tree->left->info)->props->type;
             right_type = as_info_base(tree->right->info)->props->type;
             if (left_type != INT) {
@@ -114,6 +115,22 @@ bool check_expr(AST* tree) {
                     as_info_base(tree->info)->props->name,
                     as_info_base(tree->info)->props->line,
                     type_to_str(BOOL),
+                    type_to_str(right_type)
+                );
+                ok &= false;
+                break;
+            }
+            ok &= check_types(tree->right);
+            break;
+        }
+
+        case UNMINUS: {
+            right_type = as_info_base(tree->right->info)->props->type;
+            if (right_type != INT) {
+                fprintf(stderr, "Error: Wrong type for the operand of '%s' at line %u. Expected: '%s', found: '%s'.\n",
+                    as_info_base(tree->info)->props->name,
+                    as_info_base(tree->info)->props->line,
+                    type_to_str(INT),
                     type_to_str(right_type)
                 );
                 ok &= false;
@@ -296,6 +313,7 @@ bool _check_fn(InfoFunction* info, AST* tree, nat* count_returns) {
             bool left_check = _check_fn(info, tree->left, count_returns);
             bool right_check = _check_fn(info, tree->right, count_returns);
             ok &= left_check && right_check;
+            assert(ok, "Type mismatch at line '%s'.", as_info_fn(tree->info)->props->line);
             break;
         }
 
@@ -380,6 +398,7 @@ bool check_types(AST* tree) {
     switch (tag){
         case FN_DEC: {
             ok &= check_fn(tree);
+            assert(ok, "Type mismatch at line '%s'.", as_info_fn(tree->info)->props->line);
             break;
         }
 
@@ -408,6 +427,7 @@ bool check_types(AST* tree) {
         // Expressions:
         default:{
             ok &= check_expr(tree);
+            assert(ok, "Type mismatch at line '%s'.", as_info_fn(tree->info)->props->line);
             break;
         }
     }

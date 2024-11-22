@@ -111,17 +111,17 @@ void* lookup(LinkedList* list, nat index)
     return current->data;
 }
 
-void print_list(LinkedList* list, void (*print)(void*))
+void print_list(LinkedList* list, FILE* f, void (*print)(void*))
 {
     LinkedListNode* current = list->head;
-    printf("[");
+    fprintf(f, "[");
     while (current != NULL)
     {
         print(current->data);
-        if (current->next != NULL) printf(", ");
+        if (current->next != NULL) fprintf(f, ", ");
         current = current->next;
     }
-    printf("]\n");
+    fprintf(f, "]\n");
 }
 
 void free_list(LinkedList* list)

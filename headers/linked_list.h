@@ -46,7 +46,7 @@ void* remove_at(LinkedList* list, nat index);
 void* lookup(LinkedList* list, nat index);
 
 /* Print the list. */
-void print_list(LinkedList* list, void (*print)(void*));
+void print_list(LinkedList* list, FILE* f, void (*print)(void*));
 
 /* Free the list. */
 void free_list(LinkedList* list);

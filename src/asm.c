@@ -10,7 +10,7 @@
 #include "../headers/quadruple.h"
 #include "../headers/utils.h"
 
-void generate_asm(ASM_TARGET target, LinkedListIterator* ic, FILE* output) {
+void generate_asm(AsmTarget target, LinkedListIterator* ic, FILE* output) {
     switch (target) {
         case X86_64_LINUX_GNU: {
             gen_x86_64(ic, output);
@@ -19,7 +19,7 @@ void generate_asm(ASM_TARGET target, LinkedListIterator* ic, FILE* output) {
 
         default: {
             fprintf(stderr, "Error: generate_asm: Invalid target error.\n");
-            fprintf(stderr, "Precondition fault: 'target' must be a valid ASM_TARGET.\n");
+            fprintf(stderr, "Precondition fault: 'target' must be a valid AsmTarget.\n");
             exit(EXIT_FAILURE);
         }
     }

@@ -16,7 +16,7 @@ char* tag_to_str(Tag tag){
         case AND:           return strdup("AND");           break;
         case ADD:           return strdup("ADD");           break;
         case SUB:           return strdup("SUB");           break;
-        case UNSUB:         return strdup("UNSUB");         break;
+        case UNMINUS:         return strdup("UNMINUS");         break;
         case DIV:           return strdup("DIV");           break;
         case MOD:           return strdup("MOD");           break;
         case EQUAL:         return strdup("EQUAL");         break;

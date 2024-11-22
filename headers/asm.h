@@ -7,9 +7,9 @@
 
 #include "linked_list.h"
 
-typedef enum ASM_TARGET {
+typedef enum AsmTarget {
     X86_64_LINUX_GNU,
     X86_64_LINUX_NASM
-} ASM_TARGET;
+} AsmTarget;
 
-void generate_asm(ASM_TARGET target, LinkedListIterator *it, FILE *f);
+void generate_asm(AsmTarget target, LinkedListIterator *it, FILE *f);

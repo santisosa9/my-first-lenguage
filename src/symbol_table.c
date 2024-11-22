@@ -401,7 +401,17 @@ bool decorate_tree_fn(AST* tree, SymbolTable* table, int* locals) {
             if (!decorate_tree_fn(tree->left, table, locals) || !decorate_tree_fn(tree->right, table, locals)) return false;
             break;
         }
-        
+
+        case UNMINUS:
+        case NOT: {
+            (*locals)++;
+            as_info_base(tree->info)->props->offset = (-8 * (*locals)) -8;
+            if (!decorate_tree_fn(tree->right, table, locals)) return false;
+            break;
+        }
+
+
+
         default: {
             if (!decorate_tree_fn(tree->left, table, locals) || !decorate_tree_fn(tree->right, table, locals)) return false;
             break;
@@ -413,7 +423,7 @@ bool decorate_tree_fn(AST* tree, SymbolTable* table, int* locals) {
 
 void _set_offset_params(LinkedList* params) {
     LinkedListIterator* iterator = new_linked_list_iterator(params);
-    int offset = 8;
+    int offset = 16;
     while (has_next(iterator)) {
         Info* data = (Info*)next(iterator);
         as_info_base(data)->props->offset = offset;
@@ -444,7 +454,7 @@ int _evaluate_expression(AST* expr) {
         case OR: {
             return (_evaluate_expression(expr->left) || _evaluate_expression(expr->right));
         }
-        
+
         case AND: {
             return (_evaluate_expression(expr->left) && _evaluate_expression(expr->right));
         }
@@ -455,7 +465,7 @@ int _evaluate_expression(AST* expr) {
         default:
             printf("Error: Declaracion global no válida.\n");
             exit(EXIT_FAILURE);
-            
+
 
     }
 }
