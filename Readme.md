@@ -1,5 +1,33 @@
 # TDS24
-TODO: (complete)
+Lenguaje de programación propuesto para el proyecto de la materia Taller de Diseño de Software.
+
+# Build
+Para construir el compilador, puedes usar el Makefile proporcionado. El Makefile incluye varias reglas para ayudarte a compilar y gestionar el proyecto de manera eficiente.
+
+Puedes ejecutar
+```sh
+make
+```
+para construir el compilador, o
+```sh
+make dbg
+```
+para construir el compilador con información de depuración.
+
+Después de construir el compilador, puedes ejecutarlo con
+```sh
+./ctds <input_file>
+```
+
+
+### Makefile Rules
+
+- **executable**: Construye todo el proyecto (es la regla predeterminada).
+- **dbg**: Compila el proyecto con información de depuración.
+- **clean**: Elimina todos los archivos compilados y binarios.
+- **warn**: Compila el proyecto con todas las advertencias habilitadas.
+- **we**: Compila el proyecto con todas las advertencias habilitadas y trata las advertencias como errores.
+
 
 # Decisiones de Implementación
 A continuación de enumeran y describen las consideraciones y deciciones tomadas

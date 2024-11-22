@@ -8,6 +8,7 @@
 
 # Executables
 compiler
+ctds
 main
 
 # Flex and Bison generated files

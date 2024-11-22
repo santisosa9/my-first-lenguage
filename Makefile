@@ -19,7 +19,7 @@ OBJS = $(patsubst $(SRC_F)/%.c, $(BUILD_F)/%.o, $(wildcard $(SRC_F)/*.c))
 BISON_FLAGS = -d
 
 # executable
-EXE = ./compiler
+EXE = ./ctds
 
 # TIP: Take a look to usefull phony rules at the end of this file!
 
